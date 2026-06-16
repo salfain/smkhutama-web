@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, LogIn, ArrowLeft, GraduationCap, HeartHandshake } from "lucide-react";
 import { loginAction } from "./actions";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR";
 type System = "CBT" | "SIBIKONS";
@@ -49,6 +50,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [redirecting, setRedirecting] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const sys = systemConfig[system];
@@ -69,6 +71,7 @@ export default function LoginPage() {
       else {
         // Siswa yang masuk lewat SIBIKONS diarahkan ke portal BK siswa
         const dest = system === "SIBIKONS" && role === "STUDENT" ? "/student/bk" : r.redirectTo;
+        setRedirecting(true);
         window.location.href = dest;
       }
     });
@@ -80,6 +83,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {redirecting && <FullScreenLoader message="Mengarahkan ke dashboard..." accent={system === "SIBIKONS" ? "purple" : "blue"} />}
       {/* Left panel */}
       <div className={`hidden flex-1 flex-col items-center justify-center bg-gradient-to-br ${leftPanelBg} p-12 text-white lg:flex transition-colors duration-500`}>
         <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm overflow-hidden">

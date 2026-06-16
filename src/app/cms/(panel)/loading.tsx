@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "@/components/LoadingSkeleton";
 
-export default function TeacherLoading() {
+export default function CmsLoading() {
   return <LoadingSpinner />;
 }

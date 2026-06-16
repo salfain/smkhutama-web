@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, LayoutTemplate } from "lucide-react";
 import { cmsLogin } from "../actions";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export default function CmsLoginPage() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function CmsLoginPage() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [redirecting, setRedirecting] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
@@ -22,12 +24,13 @@ export default function CmsLoginPage() {
     startTransition(async () => {
       const r = await cmsLogin(username.trim(), password);
       if ("error" in r && r.error) setError(r.error);
-      else window.location.href = "/cms/dashboard";
+      else { setRedirecting(true); window.location.href = "/cms/dashboard"; }
     });
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center mesh-bg px-4">
+      {redirecting && <FullScreenLoader message="Mengarahkan ke dashboard..." />}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="animate-float-slow absolute -left-16 top-10 h-64 w-64 rounded-full bg-blue-400/30 blur-3xl" />
         <div className="animate-float-slower absolute right-0 bottom-10 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
