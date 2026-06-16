@@ -498,6 +498,39 @@ model LandingNews {
   @@map("landing_news")
 }
 
+/// Guru & tenaga pendidik (landing)
+model LandingTeacher {
+  id          String   @id @default(uuid())
+  name        String
+  position    String
+  subject     String?
+  photoUrl    String?  @map("photo_url")
+  orderNumber Int      @default(0) @map("order_number")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_teachers")
+}
+
+/// Ekstrakurikuler (landing)
+model LandingExtracurricular {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  description String
+  schedule    String?
+  icon        String   @default("Sparkles")
+  color       String   @default("from-blue-500 to-indigo-600")
+  imageUrl    String?  @map("image_url")
+  orderNumber Int      @default(0) @map("order_number")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_extracurriculars")
+}
+
 /// Pendaftaran online (PPDB)
 model Registration {
   id            String             @id @default(uuid())

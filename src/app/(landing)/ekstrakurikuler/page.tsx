@@ -1,8 +1,11 @@
 import {
   Sparkles, Tent, Trophy, Volleyball, Flag, Moon, Languages, Music, HeartPulse, type LucideIcon,
 } from "lucide-react";
-import { EXTRACURRICULARS } from "@/lib/landing-static";
+import { prisma } from "@/lib/prisma";
+import { EXTRACURRICULARS, type Extracurricular } from "@/lib/landing-static";
 import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Ekstrakurikuler – SMK Hutama" };
 
@@ -10,7 +13,18 @@ const ICONS: Record<string, LucideIcon> = {
   Tent, Trophy, Volleyball, Flag, Moon, Languages, Music, Sparkles, HeartPulse,
 };
 
-export default function EkstrakurikulerPage() {
+export default async function EkstrakurikulerPage() {
+  const rows = await prisma.landingExtracurricular
+    .findMany({ where: { isActive: true }, orderBy: { orderNumber: "asc" } })
+    .catch(() => []);
+
+  const items: Extracurricular[] = rows.length > 0
+    ? rows.map((e) => ({
+        name: e.name, category: e.category, description: e.description,
+        schedule: e.schedule ?? "", icon: e.icon, color: e.color, image: e.imageUrl,
+      }))
+    : EXTRACURRICULARS;
+
   return (
     <>
       <section className="relative overflow-hidden mesh-bg text-white">
@@ -35,7 +49,7 @@ export default function EkstrakurikulerPage() {
       <section className="bg-slate-50 dark:bg-slate-900">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <RevealContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {EXTRACURRICULARS.map((e, i) => {
+            {items.map((e, i) => {
               const Icon = ICONS[e.icon] ?? Sparkles;
               return (
                 <RevealCard key={i}>

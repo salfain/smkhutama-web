@@ -6,6 +6,7 @@ import { useTransition } from "react";
 import {
   LayoutDashboard, Image, BarChart3, GraduationCap,
   Newspaper, Users, Settings, LogOut, Menu, ChevronRight, ExternalLink,
+  UserCog, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -18,6 +19,8 @@ const nav = [
   { href: "/cms/hero-images", icon: Image, label: "Gambar Hero" },
   { href: "/cms/stats", icon: BarChart3, label: "Statistik" },
   { href: "/cms/majors", icon: GraduationCap, label: "Jurusan" },
+  { href: "/cms/teachers", icon: UserCog, label: "Data Guru" },
+  { href: "/cms/extracurriculars", icon: Sparkles, label: "Ekstrakurikuler" },
   { href: "/cms/news", icon: Newspaper, label: "Berita" },
   { href: "/cms/registrations", icon: Users, label: "Pendaftar PPDB" },
 ];

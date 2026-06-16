@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 function revalidateLanding() {
   revalidatePath("/");
   revalidatePath("/ppdb");
+  revalidatePath("/guru");
+  revalidatePath("/ekstrakurikuler");
 }
 
 // ---------- PROFILE ----------
@@ -141,6 +143,65 @@ export async function deleteNews(id: string) {
   await requireCmsAuth();
   await prisma.landingNews.delete({ where: { id } });
   revalidateLanding(); revalidatePath("/cms/news");
+  return { success: true };
+}
+
+// ---------- TEACHERS ----------
+export async function getTeachers() {
+  return prisma.landingTeacher.findMany({ orderBy: { orderNumber: "asc" } });
+}
+export async function saveTeacher(formData: FormData) {
+  await requireCmsAuth();
+  const id = String(formData.get("id") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
+  const position = String(formData.get("position") ?? "").trim();
+  const subject = String(formData.get("subject") ?? "").trim();
+  const photoUrl = String(formData.get("photoUrl") ?? "").trim();
+  if (!name || !position) return { error: "Nama dan jabatan wajib diisi" };
+  const data = { name, position, subject: subject || null, photoUrl: photoUrl || null };
+  if (id) await prisma.landingTeacher.update({ where: { id }, data });
+  else {
+    const count = await prisma.landingTeacher.count();
+    await prisma.landingTeacher.create({ data: { ...data, orderNumber: count } });
+  }
+  revalidateLanding(); revalidatePath("/cms/teachers");
+  return { success: true };
+}
+export async function deleteTeacher(id: string) {
+  await requireCmsAuth();
+  await prisma.landingTeacher.delete({ where: { id } });
+  revalidateLanding(); revalidatePath("/cms/teachers");
+  return { success: true };
+}
+
+// ---------- EXTRACURRICULARS ----------
+export async function getExtracurriculars() {
+  return prisma.landingExtracurricular.findMany({ orderBy: { orderNumber: "asc" } });
+}
+export async function saveExtracurricular(formData: FormData) {
+  await requireCmsAuth();
+  const id = String(formData.get("id") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const schedule = String(formData.get("schedule") ?? "").trim();
+  const icon = String(formData.get("icon") ?? "").trim() || "Sparkles";
+  const color = String(formData.get("color") ?? "").trim() || "from-blue-500 to-indigo-600";
+  const imageUrl = String(formData.get("imageUrl") ?? "").trim();
+  if (!name || !category) return { error: "Nama dan kategori wajib diisi" };
+  const data = { name, category, description, schedule: schedule || null, icon, color, imageUrl: imageUrl || null };
+  if (id) await prisma.landingExtracurricular.update({ where: { id }, data });
+  else {
+    const count = await prisma.landingExtracurricular.count();
+    await prisma.landingExtracurricular.create({ data: { ...data, orderNumber: count } });
+  }
+  revalidateLanding(); revalidatePath("/cms/extracurriculars");
+  return { success: true };
+}
+export async function deleteExtracurricular(id: string) {
+  await requireCmsAuth();
+  await prisma.landingExtracurricular.delete({ where: { id } });
+  revalidateLanding(); revalidatePath("/cms/extracurriculars");
   return { success: true };
 }
 

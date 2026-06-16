@@ -1,10 +1,21 @@
 import { Users } from "lucide-react";
-import { TEACHERS } from "@/lib/landing-static";
+import { prisma } from "@/lib/prisma";
+import { TEACHERS, type Teacher } from "@/lib/landing-static";
 import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Guru & Tenaga Pendidik – SMK Hutama" };
 
-export default function GuruPage() {
+export default async function GuruPage() {
+  const rows = await prisma.landingTeacher
+    .findMany({ where: { isActive: true }, orderBy: { orderNumber: "asc" } })
+    .catch(() => []);
+
+  const teachers: Teacher[] = rows.length > 0
+    ? rows.map((t) => ({ name: t.name, position: t.position, subject: t.subject ?? "", photo: t.photoUrl }))
+    : TEACHERS;
+
   return (
     <>
       <section className="relative overflow-hidden mesh-bg text-white">
@@ -29,7 +40,7 @@ export default function GuruPage() {
       <section className="bg-slate-50 dark:bg-slate-900">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <RevealContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {TEACHERS.map((t, i) => (
+            {teachers.map((t, i) => (
               <RevealCard key={i}>
                 <div className="group flex flex-col items-center rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 text-center shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-xl h-full">
                   <div className="relative">
@@ -46,7 +57,7 @@ export default function GuruPage() {
                   <span className="mt-2 inline-block rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300">
                     {t.position}
                   </span>
-                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t.subject}</p>
+                  {t.subject && <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t.subject}</p>}
                 </div>
               </RevealCard>
             ))}
