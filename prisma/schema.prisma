@@ -1,0 +1,523 @@
+// Prisma Schema - CBT SMK HUTAMA
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  LANDING_ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  MULTIPLE_CHOICE_COMPLEX
+  TRUE_FALSE
+  MATCHING
+  SHORT_ANSWER
+  ESSAY
+}
+
+enum MediaType {
+  NONE
+  IMAGE
+  AUDIO
+  VIDEO
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ExamStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum ExamType {
+  UH      // Ulangan Harian
+  UTS     // Ujian Tengah Semester
+  UAS     // Ujian Akhir Semester
+  US      // Ujian Sekolah
+  TRYOUT  // Tryout / Latihan
+  LAINNYA
+}
+
+enum AttemptStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  AUTO_SUBMITTED
+}
+
+enum Semester {
+  GANJIL
+  GENAP
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+/// Profil sekolah (hanya 1 record)
+model SchoolProfile {
+  id              String   @id @default(uuid())
+  name            String
+  logo            String?
+  address         String?
+  npsn            String?
+  principalName   String?  @map("principal_name")
+  letterhead      String?
+  digitalSignature String? @map("digital_signature")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("school_profiles")
+}
+
+/// Tahun ajaran
+model AcademicYear {
+  id        String   @id @default(uuid())
+  year      String   // e.g. "2025/2026"
+  semester  Semester
+  isActive  Boolean  @default(false) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  exams Exam[]
+
+  @@map("academic_years")
+}
+
+/// User (admin, guru, siswa)
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  username     String   @unique
+  email        String?  @unique
+  passwordHash String   @map("password_hash")
+  role         Role
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  student Student?
+  teacher Teacher?
+
+  @@map("users")
+}
+
+/// Jurusan
+model Major {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  classes  Class[]
+  students Student[]
+  subjects Subject[]
+
+  @@map("majors")
+}
+
+/// Kelas
+model Class {
+  id        String   @id @default(uuid())
+  name      String   // e.g. "XII TKJ 1"
+  grade     String   // X, XI, XII
+  majorId   String   @map("major_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  major    Major     @relation(fields: [majorId], references: [id])
+  students Student[]
+  examParticipants ExamClass[]
+
+  @@map("classes")
+}
+
+/// Mata pelajaran
+model Subject {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  majorId   String?  @map("major_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  major     Major?    @relation(fields: [majorId], references: [id])
+  teachers  Teacher[]
+  questions Question[]
+  exams     Exam[]
+
+  @@map("subjects")
+}
+
+/// Profil siswa
+model Student {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  nis       String?  @unique
+  nisn      String?  @unique
+  classId   String?  @map("class_id")
+  majorId   String?  @map("major_id")
+  gender    Gender?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class    Class?  @relation(fields: [classId], references: [id])
+  major    Major?  @relation(fields: [majorId], references: [id])
+  attempts StudentExamAttempt[]
+
+  @@map("students")
+}
+
+/// Profil guru
+model Teacher {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  nip       String?  @unique
+  subjectId String?  @map("subject_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   Subject? @relation(fields: [subjectId], references: [id])
+  questions Question[]
+  exams     Exam[]
+
+  @@map("teachers")
+}
+
+/// Bank soal
+model Question {
+  id             String       @id @default(uuid())
+  subjectId      String       @map("subject_id")
+  teacherId      String       @map("teacher_id")
+  questionType   QuestionType @map("question_type")
+  questionText   String       @map("question_text")
+  mediaType      MediaType    @default(NONE) @map("media_type")
+  mediaUrl       String?      @map("media_url")
+  difficulty     Difficulty   @default(MEDIUM)
+  scoreWeight    Float        @default(1) @map("score_weight")
+  explanation    String?
+  material       String?
+  competency     String?
+  grade          String?
+  isActive       Boolean      @default(true) @map("is_active")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  subject  Subject          @relation(fields: [subjectId], references: [id])
+  teacher  Teacher          @relation(fields: [teacherId], references: [id])
+  options  QuestionOption[]
+  examQuestions ExamQuestion[]
+  answers  StudentAnswer[]
+
+  @@map("questions")
+}
+
+/// Opsi jawaban (untuk soal PG, PGK, BS, Menjodohkan)
+model QuestionOption {
+  id          String  @id @default(uuid())
+  questionId  String  @map("question_id")
+  optionLabel String  @map("option_label") // A, B, C, D, E
+  optionText  String  @map("option_text")
+  mediaUrl    String? @map("media_url")
+  isCorrect   Boolean @default(false) @map("is_correct")
+  orderNumber Int     @default(0) @map("order_number")
+
+  question Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  StudentAnswer[]
+
+  @@map("question_options")
+}
+
+/// Ujian / Paket Ujian
+model Exam {
+  id                 String     @id @default(uuid())
+  title              String
+  subjectId          String     @map("subject_id")
+  teacherId          String     @map("teacher_id")
+  academicYearId     String?    @map("academic_year_id")
+  durationMinutes    Int        @map("duration_minutes")
+  startAt            DateTime   @map("start_at")
+  endAt              DateTime   @map("end_at")
+  randomizeQuestions Boolean    @default(false) @map("randomize_questions")
+  randomizeOptions   Boolean    @default(false) @map("randomize_options")
+  showResult         Boolean    @default(false) @map("show_result")
+  showExplanation    Boolean    @default(false) @map("show_explanation")
+  passingScore       Float?     @map("passing_score") // KKM
+  status             ExamStatus @default(DRAFT)
+  examType           ExamType   @default(UH) @map("exam_type")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
+
+  subject       Subject            @relation(fields: [subjectId], references: [id])
+  teacher       Teacher            @relation(fields: [teacherId], references: [id])
+  academicYear  AcademicYear?      @relation(fields: [academicYearId], references: [id])
+  questions     ExamQuestion[]
+  classes       ExamClass[]
+  sessions      ExamSession[]
+  tokens        ExamToken[]
+  attempts      StudentExamAttempt[]
+
+  @@map("exams")
+}
+
+/// Soal dalam ujian (relasi many-to-many)
+model ExamQuestion {
+  id          String @id @default(uuid())
+  examId      String @map("exam_id")
+  questionId  String @map("question_id")
+  orderNumber Int    @default(0) @map("order_number")
+
+  exam     Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([examId, questionId])
+  @@map("exam_questions")
+}
+
+/// Kelas peserta ujian
+model ExamClass {
+  id      String @id @default(uuid())
+  examId  String @map("exam_id")
+  classId String @map("class_id")
+
+  exam  Exam  @relation(fields: [examId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id])
+
+  @@unique([examId, classId])
+  @@map("exam_classes")
+}
+
+/// Sesi ujian
+model ExamSession {
+  id          String   @id @default(uuid())
+  examId      String   @map("exam_id")
+  sessionName String   @map("session_name")
+  roomName    String?  @map("room_name")
+  startAt     DateTime @map("start_at")
+  endAt       DateTime @map("end_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@map("exam_sessions")
+}
+
+/// Token ujian
+model ExamToken {
+  id        String   @id @default(uuid())
+  examId    String   @map("exam_id")
+  token     String   @unique
+  expiredAt DateTime @map("expired_at")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@map("exam_tokens")
+}
+
+/// Percobaan ujian siswa
+model StudentExamAttempt {
+  id          String        @id @default(uuid())
+  examId      String        @map("exam_id")
+  studentId   String        @map("student_id")
+  startedAt   DateTime?     @map("started_at")
+  submittedAt DateTime?     @map("submitted_at")
+  status      AttemptStatus @default(NOT_STARTED)
+  score       Float?
+  loginStatus Boolean       @default(false) @map("login_status")
+  ipAddress   String?       @map("ip_address")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  exam    Exam            @relation(fields: [examId], references: [id])
+  student Student         @relation(fields: [studentId], references: [id])
+  answers StudentAnswer[]
+
+  @@unique([examId, studentId])
+  @@map("student_exam_attempts")
+}
+
+/// Jawaban siswa
+model StudentAnswer {
+  id               String   @id @default(uuid())
+  attemptId        String   @map("attempt_id")
+  questionId       String   @map("question_id")
+  selectedOptionId String?  @map("selected_option_id")
+  answerText       String?  @map("answer_text")
+  isDoubtful       Boolean  @default(false) @map("is_doubtful")
+  isCorrect        Boolean? @map("is_correct")
+  score            Float?
+  savedAt          DateTime @default(now()) @map("saved_at")
+
+  attempt        StudentExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question       Question           @relation(fields: [questionId], references: [id])
+  selectedOption QuestionOption?    @relation(fields: [selectedOptionId], references: [id])
+
+  @@unique([attemptId, questionId])
+  @@map("student_answers")
+}
+
+/// Audit log (opsional)
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  entity    String?
+  entityId  String?  @map("entity_id")
+  details   String?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+/// Pengaturan sistem (key-value)
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  category  String?
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("system_settings")
+}
+
+// ============================================
+// LANDING PAGE / CMS MODELS
+// ============================================
+
+enum RegistrationStatus {
+  PENDING
+  VERIFIED
+  ACCEPTED
+  REJECTED
+}
+
+/// Profil & konten hero landing page (single record)
+model LandingProfile {
+  id           String   @id @default(uuid())
+  schoolName   String   @default("SMK Hutama Pondok Gede") @map("school_name")
+  shortName    String   @default("SMK Hutama") @map("short_name")
+  tagline      String?
+  logoUrl      String?  @map("logo_url")
+  heroBadge    String?  @map("hero_badge")
+  heroTitle    String?  @map("hero_title")
+  heroSubtitle String?  @map("hero_subtitle")
+  address      String?
+  phone        String?
+  whatsapp     String?
+  email        String?
+  officialUrl  String?  @map("official_url")
+  instagram    String?
+  facebook     String?
+  youtube      String?
+  ppdbOpen     Boolean  @default(true) @map("ppdb_open")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("landing_profiles")
+}
+
+/// Gambar carousel hero
+model LandingHeroImage {
+  id          String   @id @default(uuid())
+  imageUrl    String   @map("image_url")
+  caption     String?
+  orderNumber Int      @default(0) @map("order_number")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("landing_hero_images")
+}
+
+/// Statistik sekolah (akreditasi, jumlah siswa, dll)
+model LandingStat {
+  id          String   @id @default(uuid())
+  label       String
+  value       String
+  orderNumber Int      @default(0) @map("order_number")
+
+  @@map("landing_stats")
+}
+
+/// Program keahlian / jurusan landing
+model LandingMajor {
+  id          String   @id @default(uuid())
+  code        String
+  name        String
+  description String
+  orderNumber Int      @default(0) @map("order_number")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  @@map("landing_majors")
+}
+
+/// Berita & kegiatan
+model LandingNews {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String?
+  imageUrl    String?  @map("image_url")
+  publishedAt DateTime @default(now()) @map("published_at")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_news")
+}
+
+/// Pendaftaran online (PPDB)
+model Registration {
+  id            String             @id @default(uuid())
+  registNumber  String             @unique @map("regist_number")
+  fullName      String             @map("full_name")
+  nisn          String?
+  gender        Gender?
+  birthPlace    String?            @map("birth_place")
+  birthDate     DateTime?          @map("birth_date")
+  address       String?
+  phone         String?
+  email         String?
+  parentName    String?            @map("parent_name")
+  parentPhone   String?            @map("parent_phone")
+  originSchool  String?            @map("origin_school")
+  selectedMajor String?            @map("selected_major")
+  status        RegistrationStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  @@map("registrations")
+}

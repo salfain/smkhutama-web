@@ -1,0 +1,259 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/session";
+import { revalidatePath } from "next/cache";
+
+export async function validateToken(examId: string, tokenInput: string) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) return { error: "Akun siswa tidak valid" };
+
+  const trimmed = tokenInput.trim().toUpperCase();
+  if (!trimmed) return { error: "Token wajib diisi" };
+
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    include: { classes: true },
+  });
+  if (!exam) return { error: "Ujian tidak ditemukan" };
+  if (exam.status !== "ACTIVE") return { error: "Ujian belum aktif" };
+  const now = new Date();
+  if (now < exam.startAt) return { error: "Ujian belum dimulai" };
+  if (now > exam.endAt) return { error: "Ujian sudah berakhir" };
+
+  // Cek peserta
+  const isParticipant = exam.classes.some((c) => c.classId === user.student!.classId);
+  if (!isParticipant && exam.classes.length > 0) {
+    return { error: "Anda bukan peserta ujian ini" };
+  }
+
+  // Validasi token
+  const token = await prisma.examToken.findFirst({
+    where: { examId, token: trimmed, isActive: true },
+  });
+  if (!token) return { error: "Token tidak valid" };
+  if (token.expiredAt < now) return { error: "Token sudah kadaluarsa" };
+
+  return { success: true };
+}
+
+export async function startAttempt(examId: string) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) throw new Error("Akun siswa tidak valid");
+
+  const studentId = user.student.id;
+  const existing = await prisma.studentExamAttempt.findUnique({
+    where: { examId_studentId: { examId, studentId } },
+  });
+
+  if (existing) {
+    if (existing.status === "SUBMITTED" || existing.status === "AUTO_SUBMITTED") {
+      return { error: "Ujian sudah dikerjakan" };
+    }
+    // Resume attempt
+    if (!existing.startedAt) {
+      await prisma.studentExamAttempt.update({
+        where: { id: existing.id },
+        data: { startedAt: new Date(), status: "IN_PROGRESS", loginStatus: true },
+      });
+    }
+    return { success: true };
+  }
+
+  await prisma.studentExamAttempt.create({
+    data: {
+      examId, studentId,
+      startedAt: new Date(),
+      status: "IN_PROGRESS",
+      loginStatus: true,
+    },
+  });
+
+  return { success: true };
+}
+
+export async function getExamForTaking(examId: string) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) return null;
+
+  const [exam, attempt] = await Promise.all([
+    prisma.exam.findUnique({
+      where: { id: examId },
+      include: {
+        subject: { select: { code: true, name: true } },
+        questions: {
+          orderBy: { orderNumber: "asc" },
+          include: {
+            question: {
+              include: {
+                options: { orderBy: { orderNumber: "asc" } },
+              },
+            },
+          },
+        },
+      },
+    }),
+    prisma.studentExamAttempt.findUnique({
+      where: { examId_studentId: { examId, studentId: user.student.id } },
+      include: {
+        answers: {
+          select: {
+            questionId: true, selectedOptionId: true,
+            answerText: true, isDoubtful: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  if (!exam || !attempt) return null;
+  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
+    return { ...exam, attempt, finished: true };
+  }
+
+  return { ...exam, attempt, finished: false };
+}
+
+export async function saveAnswer(input: {
+  examId: string;
+  questionId: string;
+  selectedOptionId?: string | null;
+  answerText?: string | null;
+  isDoubtful?: boolean;
+}) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) return { error: "Tidak diizinkan" };
+
+  const attempt = await prisma.studentExamAttempt.findUnique({
+    where: { examId_studentId: { examId: input.examId, studentId: user.student.id } },
+  });
+  if (!attempt) return { error: "Attempt tidak ditemukan" };
+  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
+    return { error: "Ujian sudah disubmit" };
+  }
+
+  await prisma.studentAnswer.upsert({
+    where: { attemptId_questionId: { attemptId: attempt.id, questionId: input.questionId } },
+    update: {
+      selectedOptionId: input.selectedOptionId ?? null,
+      answerText: input.answerText ?? null,
+      isDoubtful: input.isDoubtful ?? false,
+      savedAt: new Date(),
+    },
+    create: {
+      attemptId: attempt.id,
+      questionId: input.questionId,
+      selectedOptionId: input.selectedOptionId ?? null,
+      answerText: input.answerText ?? null,
+      isDoubtful: input.isDoubtful ?? false,
+    },
+  });
+
+  return { success: true };
+}
+
+export async function submitExam(examId: string, isAuto = false) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) return { error: "Tidak diizinkan" };
+
+  const attempt = await prisma.studentExamAttempt.findUnique({
+    where: { examId_studentId: { examId, studentId: user.student.id } },
+    include: {
+      answers: { include: { question: { include: { options: true } } } },
+      exam: {
+        select: {
+          showResult: true,
+          questions: {
+            include: { question: { select: { id: true, scoreWeight: true, questionType: true } } },
+          },
+        },
+      },
+    },
+  });
+  if (!attempt) return { error: "Attempt tidak ditemukan" };
+  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
+    return { success: true };
+  }
+
+  // Ambil SEMUA soal dalam ujian (termasuk yang tidak dijawab)
+  const allExamQuestions = attempt.exam.questions;
+  const answeredMap = new Map(attempt.answers.map((a) => [a.questionId, a]));
+
+  // Hitung total bobot dari SELURUH soal dalam ujian
+  let totalWeight = 0;
+  let earnedWeight = 0;
+  const answerUpdates: { id: string; isCorrect: boolean | null; score: number | null }[] = [];
+  let hasUngradedEssay = false;
+
+  for (const eq of allExamQuestions) {
+    const q = eq.question;
+    const weight = q.scoreWeight ?? 1;
+    totalWeight += weight;
+
+    const ans = answeredMap.get(q.id);
+
+    // Soal Esai / Isian Singkat: perlu koreksi manual guru
+    if (q.questionType === "ESSAY" || q.questionType === "SHORT_ANSWER") {
+      hasUngradedEssay = true;
+      if (ans) answerUpdates.push({ id: ans.id, isCorrect: null, score: null });
+      continue;
+    }
+
+    // Soal tidak dijawab = salah (0 poin)
+    if (!ans || !ans.selectedOptionId) {
+      if (ans) answerUpdates.push({ id: ans.id, isCorrect: false, score: 0 });
+      continue;
+    }
+
+    // PG Tunggal / Benar-Salah: cocokkan selectedOptionId dengan opsi yang isCorrect
+    if (q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE") {
+      const correctOpt = ans.question.options.find((o) => o.isCorrect);
+      const isCorrect = !!correctOpt && ans.selectedOptionId === correctOpt.id;
+      answerUpdates.push({ id: ans.id, isCorrect, score: isCorrect ? 100 : 0 });
+      if (isCorrect) earnedWeight += weight;
+      continue;
+    }
+
+    // PG Kompleks: cocokkan 1 opsi yang dipilih dengan salah satu yang benar
+    if (q.questionType === "MULTIPLE_CHOICE_COMPLEX") {
+      const correctIds = ans.question.options.filter((o) => o.isCorrect).map((o) => o.id);
+      const isCorrect = correctIds.includes(ans.selectedOptionId!);
+      answerUpdates.push({ id: ans.id, isCorrect, score: isCorrect ? 100 : 0 });
+      if (isCorrect) earnedWeight += weight;
+      continue;
+    }
+
+    // Jenis lainnya: tandai null untuk koreksi manual
+    if (ans) {
+      answerUpdates.push({ id: ans.id, isCorrect: null, score: null });
+      hasUngradedEssay = true;
+    }
+  }
+
+  // Skor final = (bobot_benar / total_bobot_semua_soal) × 100
+  // Jika ada esai yang belum dinilai guru → score = null (ditentukan setelah koreksi)
+  const finalScore = hasUngradedEssay
+    ? null
+    : (totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0);
+
+  await prisma.$transaction([
+    ...answerUpdates.map((u) =>
+      prisma.studentAnswer.update({
+        where: { id: u.id },
+        data: { isCorrect: u.isCorrect, score: u.score },
+      })
+    ),
+    prisma.studentExamAttempt.update({
+      where: { id: attempt.id },
+      data: {
+        status: isAuto ? "AUTO_SUBMITTED" : "SUBMITTED",
+        submittedAt: new Date(),
+        score: finalScore,
+        loginStatus: false,
+      },
+    }),
+  ]);
+
+  revalidatePath(`/student/exams/${examId}`);
+  return { success: true };
+}
