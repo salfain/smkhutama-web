@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cmsLogout } from "@/app/cms/actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const nav = [
   { href: "/cms/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -69,6 +70,7 @@ function Content({ name }: { name: string }) {
           onClick={() => startTransition(async () => { await cmsLogout(); })}>
           <LogOut className="h-4 w-4" />Keluar
         </Button>
+        <ThemeToggle className="w-full justify-start gap-2 h-9" />
       </div>
     </div>
   );

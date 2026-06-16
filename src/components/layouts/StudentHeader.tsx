@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, ClipboardList, Trophy } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/student/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -36,9 +37,10 @@ export function StudentHeader({ user }: { user: UserInfo }) {
             );
           })}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-gray-800">{user.name}</p>
+            <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{user.name}</p>
             <p className="text-xs text-gray-400">
               {user.className ?? "—"}{user.nis && ` · ${user.nis}`}
             </p>

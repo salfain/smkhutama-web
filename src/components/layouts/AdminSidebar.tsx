@@ -14,6 +14,7 @@ import {
   KeyRound,
   MonitorCheck,
   BarChart3,
+  Printer,
   Settings,
   Menu,
   ChevronRight,
@@ -21,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type UserInfo = { name: string; username: string; email: string | null };
 
@@ -37,6 +39,7 @@ const navItems = [
   { href: "/admin/tokens", icon: KeyRound, label: "Token Ujian" },
   { href: "/admin/monitoring", icon: MonitorCheck, label: "Monitoring" },
   { href: "/admin/reports", icon: BarChart3, label: "Laporan" },
+  { href: "/admin/print", icon: Printer, label: "Cetak Dokumen" },
   { href: "/admin/settings", icon: Settings, label: "Pengaturan" },
 ];
 
@@ -96,6 +99,7 @@ function SidebarContent({ user }: { user: UserInfo }) {
           </div>
         </div>
         <LogoutButton />
+        <ThemeToggle className="w-full justify-start gap-2 h-9" />
       </div>
     </div>
   );

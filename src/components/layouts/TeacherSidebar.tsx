@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type UserInfo = { name: string; subjectName: string | null };
 
@@ -61,6 +62,7 @@ function SidebarContent({ user }: { user: UserInfo }) {
           </div>
         </div>
         <LogoutButton />
+        <ThemeToggle className="w-full justify-start gap-2 h-9" />
       </div>
     </div>
   );

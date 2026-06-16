@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogIn, GraduationCap } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const nav = [
   { label: "Beranda", href: "/" },
@@ -65,6 +66,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
               <LogIn className="h-4 w-4" />Login CBT
             </Button>
           </Link>
+          <ThemeToggle className={scrolled ? "" : "text-white hover:text-white hover:bg-white/10"} />
         </div>
 
         <button
