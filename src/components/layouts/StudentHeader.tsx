@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ClipboardList, Trophy } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Trophy, HeartHandshake } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -10,6 +10,7 @@ const navItems = [
   { href: "/student/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/student/exams",     icon: ClipboardList,   label: "Ujian Saya" },
   { href: "/student/results",   icon: Trophy,          label: "Nilai Saya" },
+  { href: "/student/bk",        icon: HeartHandshake,  label: "Konseling" },
 ];
 
 type UserInfo = { name: string; nis: string | null; className: string | null };

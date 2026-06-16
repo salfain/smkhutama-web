@@ -96,6 +96,14 @@ enum ViolationCategory {
   BERAT
 }
 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  SCHEDULED
+  DONE
+  REJECTED
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -216,6 +224,7 @@ model Student {
   counselingCases    CounselingCase[]
   violationRecords   ViolationRecord[]
   achievementRecords AchievementRecord[]
+  counselingRequests CounselingRequest[]
 
   @@map("students")
 }
@@ -672,4 +681,22 @@ model AchievementRecord {
   counselor Counselor @relation(fields: [counselorId], references: [id])
 
   @@map("achievement_records")
+}
+
+/// Permohonan konseling yang diajukan siswa
+model CounselingRequest {
+  id            String        @id @default(uuid())
+  studentId     String        @map("student_id")
+  topic         String
+  description   String?
+  urgency       String        @default("SEDANG")
+  preferredDate DateTime?      @map("preferred_date")
+  status        RequestStatus @default(PENDING)
+  response      String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("counseling_requests")
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, MessagesSquare, ShieldAlert, Award, ChevronRight, Menu,
+  LayoutDashboard, MessagesSquare, ShieldAlert, Award, Inbox, ChevronRight, Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -15,6 +15,7 @@ type UserInfo = { name: string };
 const navItems = [
   { href: "/counselor/dashboard",    icon: LayoutDashboard, label: "Dashboard" },
   { href: "/counselor/cases",        icon: MessagesSquare,  label: "Sesi Konseling" },
+  { href: "/counselor/requests",     icon: Inbox,           label: "Permohonan" },
   { href: "/counselor/violations",   icon: ShieldAlert,     label: "Pelanggaran" },
   { href: "/counselor/achievements", icon: Award,           label: "Prestasi" },
 ];

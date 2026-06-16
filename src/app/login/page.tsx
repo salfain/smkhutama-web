@@ -33,12 +33,12 @@ const systemConfig: Record<System, {
   },
   SIBIKONS: {
     title: "SIBIKONS — Bimbingan Konseling",
-    subtitle: "Khusus untuk Guru BK",
-    roles: ["COUNSELOR"],
+    subtitle: "Untuk Guru BK dan Siswa",
+    roles: ["COUNSELOR", "STUDENT"],
     accent: "purple",
     icon: HeartHandshake,
     tagline: "Sistem informasi bimbingan konseling untuk mengelola sesi konseling, poin pelanggaran, dan prestasi siswa.",
-    features: ["Catatan sesi konseling", "Poin pelanggaran siswa", "Pencatatan prestasi", "Rekap & monitoring BK"],
+    features: ["Catatan sesi konseling", "Poin pelanggaran siswa", "Pencatatan prestasi", "Ajukan konseling (siswa)"],
   },
 };
 
@@ -66,7 +66,11 @@ export default function LoginPage() {
     startTransition(async () => {
       const r = await loginAction(username.trim(), password, role);
       if ("error" in r) setError(r.error);
-      else window.location.href = r.redirectTo;
+      else {
+        // Siswa yang masuk lewat SIBIKONS diarahkan ke portal BK siswa
+        const dest = system === "SIBIKONS" && role === "STUDENT" ? "/student/bk" : r.redirectTo;
+        window.location.href = dest;
+      }
     });
   }
 
@@ -141,7 +145,7 @@ export default function LoginPage() {
 
             {/* Role tabs — hanya tampil bila lebih dari 1 role */}
             {sys.roles.length > 1 && (
-              <div className="mb-6 grid grid-cols-3 gap-2 rounded-xl bg-gray-100 p-1">
+              <div className={`mb-6 grid gap-2 rounded-xl bg-gray-100 p-1 ${sys.roles.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
                 {sys.roles.map((key) => (
                   <button key={key} type="button"
                     onClick={() => { setRole(key); setError(""); }}
@@ -189,7 +193,10 @@ export default function LoginPage() {
                   <p>Siswa: <span className="font-mono">2324001</span> / <span className="font-mono">siswa123</span></p>
                 </>
               ) : (
-                <p>Guru BK: <span className="font-mono">bk.hutama</span> / <span className="font-mono">bk123</span></p>
+                <>
+                  <p>Guru BK: <span className="font-mono">bk.hutama</span> / <span className="font-mono">bk123</span></p>
+                  <p>Siswa: <span className="font-mono">2324001</span> / <span className="font-mono">siswa123</span></p>
+                </>
               )}
             </div>
           </div>

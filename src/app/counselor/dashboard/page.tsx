@@ -1,5 +1,5 @@
 import { getDashboardStats } from "../actions";
-import { MessagesSquare, ShieldAlert, Award, FolderOpen } from "lucide-react";
+import { ShieldAlert, Award, FolderOpen, Inbox } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function CounselorDashboard() {
 
   const cards = [
     { label: "Kasus Aktif", value: stats.openCases, icon: FolderOpen, color: "bg-blue-500" },
-    { label: "Total Konseling", value: stats.totalCases, icon: MessagesSquare, color: "bg-purple-500" },
+    { label: "Permohonan Baru", value: stats.pendingRequests, icon: Inbox, color: "bg-pink-500" },
     { label: "Pelanggaran", value: stats.totalViolations, icon: ShieldAlert, color: "bg-red-500" },
     { label: "Prestasi", value: stats.totalAchievements, icon: Award, color: "bg-emerald-500" },
   ];

@@ -42,6 +42,8 @@ export async function getDashboardStats() {
     }),
   ]);
 
+  const pendingRequests = await prisma.counselingRequest.count({ where: { status: "PENDING" } });
+
   // Top siswa berdasarkan poin pelanggaran
   const violationsByStudent = await prisma.violationRecord.groupBy({
     by: ["studentId"],
@@ -60,7 +62,7 @@ export async function getDashboardStats() {
   );
 
   return {
-    openCases, totalCases, totalViolations, totalAchievements,
+    openCases, totalCases, totalViolations, totalAchievements, pendingRequests,
     recentCases: recentCases.map((c) => ({
       id: c.id, title: c.title, type: c.type, status: c.status,
       studentName: c.student.user.name, className: c.student.class?.name ?? "-",
@@ -247,6 +249,36 @@ export async function deleteAchievement(id: string) {
   await requireCounselorAuth();
   await prisma.achievementRecord.delete({ where: { id } });
   revalidatePath("/counselor/achievements");
+  revalidatePath("/counselor/dashboard");
+  return { success: true };
+}
+
+// ---------- COUNSELING REQUESTS (dari siswa) ----------
+export async function listRequests() {
+  await requireCounselorAuth();
+  const rows = await prisma.counselingRequest.findMany({
+    orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+    include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
+  });
+  return rows.map((r) => ({
+    id: r.id, studentName: r.student.user.name, className: r.student.class?.name ?? "-",
+    topic: r.topic, description: r.description ?? "", urgency: r.urgency,
+    status: r.status, response: r.response ?? "",
+    preferredDate: r.preferredDate, createdAt: r.createdAt,
+  }));
+}
+
+export async function respondRequest(fd: FormData) {
+  await requireCounselorAuth();
+  const id = String(fd.get("id") ?? "").trim();
+  const status = String(fd.get("status") ?? "PENDING") as "PENDING" | "APPROVED" | "SCHEDULED" | "DONE" | "REJECTED";
+  const response = String(fd.get("response") ?? "").trim();
+  if (!id) return { error: "Permohonan tidak ditemukan" };
+  await prisma.counselingRequest.update({
+    where: { id },
+    data: { status, response: response || null },
+  });
+  revalidatePath("/counselor/requests");
   revalidatePath("/counselor/dashboard");
   return { success: true };
 }
