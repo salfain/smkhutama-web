@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ArrowLeft, GraduationCap, FileText, Clock, CheckCircle2, Phone } from "lucide-react";
+import { GraduationCap, FileText, Clock, CheckCircle2, Phone } from "lucide-react";
 import { getMajorOptions } from "@/lib/landing-data";
 import { PpdbForm } from "./PpdbForm";
 
@@ -22,10 +21,7 @@ export default async function PpdbPage() {
           <div className="animate-float-slower absolute right-0 bottom-0 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
           <div className="animate-float-slow absolute left-1/2 top-1/3 h-40 w-40 rounded-full bg-cyan-400/20 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-4xl px-4 pt-10 pb-20 text-center">
-          <Link href="/" className="mb-6 inline-flex items-center gap-2 text-sm text-blue-100 hover:text-white transition-colors">
-            <ArrowLeft className="h-4 w-4" />Kembali ke beranda
-          </Link>
+        <div className="relative mx-auto max-w-4xl px-4 pt-12 pb-20 text-center">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl glass shadow-lg">
             <GraduationCap className="h-8 w-8 text-white" />
           </div>
@@ -54,7 +50,7 @@ export default async function PpdbPage() {
       </div>
 
       {/* Content: Form + Info Sidebar */}
-      <div className="mx-auto -mt-10 max-w-6xl px-4 pb-20">
+      <div className="relative z-10 mx-auto -mt-10 max-w-6xl px-4 pb-20">
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Form */}
           <div className="lg:col-span-2">
