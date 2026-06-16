@@ -19,6 +19,7 @@ enum Role {
   TEACHER
   STUDENT
   LANDING_ADMIN
+  COUNSELOR
 }
 
 enum Gender {
@@ -75,6 +76,26 @@ enum Semester {
   GENAP
 }
 
+enum CounselingType {
+  PRIBADI
+  SOSIAL
+  BELAJAR
+  KARIR
+}
+
+enum CounselingStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  REFERRED
+}
+
+enum ViolationCategory {
+  RINGAN
+  SEDANG
+  BERAT
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -123,6 +144,7 @@ model User {
 
   student Student?
   teacher Teacher?
+  counselor Counselor?
 
   @@map("users")
 }
@@ -191,6 +213,9 @@ model Student {
   class    Class?  @relation(fields: [classId], references: [id])
   major    Major?  @relation(fields: [majorId], references: [id])
   attempts StudentExamAttempt[]
+  counselingCases    CounselingCase[]
+  violationRecords   ViolationRecord[]
+  achievementRecords AchievementRecord[]
 
   @@map("students")
 }
@@ -553,4 +578,98 @@ model Registration {
   updatedAt     DateTime           @updatedAt @map("updated_at")
 
   @@map("registrations")
+}
+
+// ============================================
+// BIMBINGAN KONSELING (SIBIKONS) MODELS
+// ============================================
+
+/// Profil Guru BK / Konselor
+model Counselor {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  nip       String?  @unique
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cases        CounselingCase[]
+  violations   ViolationRecord[]
+  achievements AchievementRecord[]
+
+  @@map("counselors")
+}
+
+/// Master jenis pelanggaran + bobot poin
+model ViolationType {
+  id        String            @id @default(uuid())
+  name      String
+  category  ViolationCategory @default(RINGAN)
+  points    Int               @default(0)
+  isActive  Boolean           @default(true) @map("is_active")
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  records ViolationRecord[]
+
+  @@map("violation_types")
+}
+
+/// Sesi / kasus konseling
+model CounselingCase {
+  id             String           @id @default(uuid())
+  studentId      String           @map("student_id")
+  counselorId    String           @map("counselor_id")
+  type           CounselingType   @default(PRIBADI)
+  status         CounselingStatus @default(OPEN)
+  title          String
+  description    String?
+  followUp       String?          @map("follow_up")
+  isConfidential Boolean          @default(true) @map("is_confidential")
+  sessionDate    DateTime         @default(now()) @map("session_date")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor Counselor @relation(fields: [counselorId], references: [id])
+
+  @@map("counseling_cases")
+}
+
+/// Catatan pelanggaran siswa (poin negatif)
+model ViolationRecord {
+  id              String   @id @default(uuid())
+  studentId       String   @map("student_id")
+  counselorId     String   @map("counselor_id")
+  violationTypeId String?  @map("violation_type_id")
+  description     String
+  points          Int      @default(0)
+  sanction        String?
+  date            DateTime @default(now())
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  student       Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor     Counselor      @relation(fields: [counselorId], references: [id])
+  violationType ViolationType? @relation(fields: [violationTypeId], references: [id])
+
+  @@map("violation_records")
+}
+
+/// Catatan prestasi siswa (poin positif)
+model AchievementRecord {
+  id          String   @id @default(uuid())
+  studentId   String   @map("student_id")
+  counselorId String   @map("counselor_id")
+  title       String
+  description String?
+  points      Int      @default(0)
+  level       String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor Counselor @relation(fields: [counselorId], references: [id])
+
+  @@map("achievement_records")
 }

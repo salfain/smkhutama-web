@@ -14,6 +14,7 @@ export async function getSession() {
       include: {
         student: { include: { class: { select: { name: true } }, major: { select: { name: true, code: true } } } },
         teacher: { include: { subject: { select: { id: true, name: true, code: true } } } },
+        counselor: true,
       },
     });
     if (!user || !user.isActive) return null;
@@ -41,10 +42,17 @@ export async function clearSession() {
   c.delete(COOKIE_NAME);
 }
 
-export async function requireAuth(role?: "ADMIN" | "TEACHER" | "STUDENT" | "LANDING_ADMIN") {
+export async function requireAuth(role?: "ADMIN" | "TEACHER" | "STUDENT" | "LANDING_ADMIN" | "COUNSELOR") {
   const user = await getSession();
   if (!user) redirect("/login");
   if (role && user.role !== role) redirect("/login");
+  return user;
+}
+
+export async function requireCounselorAuth() {
+  const user = await getSession();
+  if (!user) redirect("/login");
+  if (user.role !== "COUNSELOR" && user.role !== "ADMIN") redirect("/login");
   return user;
 }
 

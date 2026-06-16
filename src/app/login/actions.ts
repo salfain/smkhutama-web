@@ -12,7 +12,7 @@ type LoginResult =
 export async function loginAction(
   username: string,
   password: string,
-  expectedRole: "ADMIN" | "TEACHER" | "STUDENT"
+  expectedRole: "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR"
 ): Promise<LoginResult> {
   if (!username || !password) return { error: "Username dan password wajib diisi." };
 
@@ -34,6 +34,8 @@ export async function loginAction(
         ? "/admin/dashboard"
         : user.role === "TEACHER"
         ? "/teacher/dashboard"
+        : user.role === "COUNSELOR"
+        ? "/counselor/dashboard"
         : "/student/dashboard";
 
     return { success: true, redirectTo };

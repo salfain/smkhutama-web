@@ -9,12 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, LogIn, ArrowLeft, ShieldCheck } from "lucide-react";
 import { loginAction } from "./actions";
 
-type Role = "ADMIN" | "TEACHER" | "STUDENT";
+type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR";
 
 const roleConfig: Record<Role, { label: string; bg: string; placeholder: string }> = {
   ADMIN:   { label: "Admin",  bg: "bg-blue-600 hover:bg-blue-700",       placeholder: "admin" },
   TEACHER: { label: "Guru",   bg: "bg-emerald-600 hover:bg-emerald-700", placeholder: "sari.dewi" },
   STUDENT: { label: "Siswa",  bg: "bg-orange-500 hover:bg-orange-600",   placeholder: "2324001 / NIS / Username" },
+  COUNSELOR: { label: "Guru BK", bg: "bg-purple-600 hover:bg-purple-700", placeholder: "bk.hutama" },
 };
 
 export default function LoginPage() {
@@ -80,11 +81,11 @@ export default function LoginPage() {
               <p className="mt-1 text-sm text-gray-500">Pilih role dan masukkan akun Anda</p>
             </div>
 
-            <div className="mb-6 grid grid-cols-3 gap-2 rounded-xl bg-gray-100 p-1">
+            <div className="mb-6 grid grid-cols-4 gap-2 rounded-xl bg-gray-100 p-1">
               {(Object.entries(roleConfig) as [Role, typeof cfg][]).map(([key, val]) => (
                 <button key={key} type="button"
                   onClick={() => { setRole(key); setError(""); }}
-                  className={`rounded-lg py-2 text-sm font-medium transition-all ${
+                  className={`rounded-lg py-2 text-xs font-medium transition-all ${
                     role === key ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
                   }`}>
                   {val.label}
