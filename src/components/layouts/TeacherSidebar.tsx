@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FileText, ClipboardList, MonitorCheck,
-  CheckSquare, BarChart3, TrendingUp, ChevronRight, Menu,
+  CheckSquare, BarChart3, TrendingUp, ChevronRight, Menu, HeartHandshake,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,6 +21,7 @@ const navItems = [
   { href: "/teacher/essay-grading", icon: CheckSquare,     label: "Koreksi Esai" },
   { href: "/teacher/results",       icon: BarChart3,       label: "Hasil Nilai" },
   { href: "/teacher/analysis",      icon: TrendingUp,      label: "Analisis Soal" },
+  { href: "/teacher/bk",            icon: HeartHandshake,  label: "BK Perwalian" },
 ];
 
 function SidebarContent({ user }: { user: UserInfo }) {

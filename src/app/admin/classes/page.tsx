@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Building2 } from "lucide-react";
-import { getClasses, getMajorsForSelect } from "./actions";
+import { getClasses, getMajorsForSelect, getTeachersForSelect } from "./actions";
 import { ClassTable } from "./ClassTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function ClassesPage() {
-  const [classes, majors] = await Promise.all([
+  const [classes, majors, teachers] = await Promise.all([
     getClasses().catch(() => []),
     getMajorsForSelect().catch(() => []),
+    getTeachersForSelect().catch(() => []),
   ]);
 
   return (
@@ -25,7 +26,7 @@ export default async function ClassesPage() {
           </Button>
         </Link>
       </div>
-      <ClassTable classes={classes} majors={majors} />
+      <ClassTable classes={classes} majors={majors} teachers={teachers} />
     </div>
   );
 }

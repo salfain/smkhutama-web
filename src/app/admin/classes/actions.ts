@@ -8,6 +8,7 @@ export async function getClasses() {
     orderBy: [{ grade: "asc" }, { name: "asc" }],
     include: {
       major: { select: { name: true, code: true } },
+      homeroomTeacher: { include: { user: { select: { name: true } } } },
       _count: { select: { students: true } },
     },
   });
@@ -20,14 +21,23 @@ export async function getMajorsForSelect() {
   });
 }
 
+export async function getTeachersForSelect() {
+  const teachers = await prisma.teacher.findMany({
+    include: { user: { select: { name: true } } },
+    orderBy: { user: { name: "asc" } },
+  });
+  return teachers.map((t) => ({ id: t.id, name: t.user.name }));
+}
+
 export async function createClass(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const grade = String(formData.get("grade") ?? "").trim();
   const majorId = String(formData.get("majorId") ?? "").trim();
+  const homeroomTeacherId = String(formData.get("homeroomTeacherId") ?? "").trim();
   if (!name || !grade || !majorId) return { error: "Semua field wajib diisi" };
 
   try {
-    await prisma.class.create({ data: { name, grade, majorId } });
+    await prisma.class.create({ data: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null } });
     revalidatePath("/admin/classes");
     return { success: true };
   } catch {
@@ -39,10 +49,11 @@ export async function updateClass(id: string, formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const grade = String(formData.get("grade") ?? "").trim();
   const majorId = String(formData.get("majorId") ?? "").trim();
+  const homeroomTeacherId = String(formData.get("homeroomTeacherId") ?? "").trim();
   if (!name || !grade || !majorId) return { error: "Semua field wajib diisi" };
 
   try {
-    await prisma.class.update({ where: { id }, data: { name, grade, majorId } });
+    await prisma.class.update({ where: { id }, data: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null } });
     revalidatePath("/admin/classes");
     return { success: true };
   } catch {

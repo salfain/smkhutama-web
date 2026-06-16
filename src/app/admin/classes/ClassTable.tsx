@@ -19,25 +19,30 @@ type Class = {
   name: string;
   grade: string;
   majorId: string;
+  homeroomTeacherId?: string | null;
   major: { name: string; code: string };
+  homeroomTeacher?: { user: { name: string } } | null;
   _count: { students: number };
 };
 
 type Major = { id: string; name: string; code: string };
+type Teacher = { id: string; name: string };
 
-export function ClassTable({ classes, majors }: { classes: Class[]; majors: Major[] }) {
+export function ClassTable({ classes, majors, teachers }: { classes: Class[]; majors: Major[]; teachers: Teacher[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Class | null>(null);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [grade, setGrade] = useState("X");
   const [majorId, setMajorId] = useState<string>("");
+  const [homeroomTeacherId, setHomeroomTeacherId] = useState<string>("none");
   const [pending, startTransition] = useTransition();
 
   function openCreate() {
     setEditing(null);
     setGrade("X");
     setMajorId(majors[0]?.id ?? "");
+    setHomeroomTeacherId("none");
     setError("");
     setOpen(true);
   }
@@ -46,6 +51,7 @@ export function ClassTable({ classes, majors }: { classes: Class[]; majors: Majo
     setEditing(c);
     setGrade(c.grade);
     setMajorId(c.majorId);
+    setHomeroomTeacherId(c.homeroomTeacherId ?? "none");
     setError("");
     setOpen(true);
   }
@@ -54,6 +60,7 @@ export function ClassTable({ classes, majors }: { classes: Class[]; majors: Majo
     setError("");
     formData.set("grade", grade);
     formData.set("majorId", majorId);
+    formData.set("homeroomTeacherId", homeroomTeacherId === "none" ? "" : homeroomTeacherId);
     startTransition(async () => {
       const result = editing
         ? await updateClass(editing.id, formData)
@@ -123,6 +130,9 @@ export function ClassTable({ classes, majors }: { classes: Class[]; majors: Majo
                       </div>
                     </div>
                     <p className="mb-3 text-xs text-gray-400">{c.major.name}</p>
+                    {c.homeroomTeacher && (
+                      <p className="mb-3 -mt-2 text-xs text-purple-600">Wali: {c.homeroomTeacher.user.name}</p>
+                    )}
                     <div className="flex gap-1">
                       <Button variant="outline" size="sm" className="flex-1 gap-1 text-xs" onClick={() => openEdit(c)}>
                         <Pencil className="h-3 w-3" />Edit
@@ -173,6 +183,18 @@ export function ClassTable({ classes, majors }: { classes: Class[]; majors: Majo
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Wali Kelas (Guru BK access)</Label>
+              <Select value={homeroomTeacherId} onValueChange={setHomeroomTeacherId}>
+                <SelectTrigger><SelectValue placeholder="Pilih wali kelas..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Tidak ada —</SelectItem>
+                  {teachers.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">

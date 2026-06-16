@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  ShieldAlert, Award, MessagesSquare, Plus, Lock, Trash2, Send, Scale,
+  ShieldAlert, Award, MessagesSquare, Plus, Lock, Trash2, Send, Scale, ClipboardList, ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
 import { submitCounselingRequest, cancelCounselingRequest } from "./actions";
 
 type Violation = { id: string; typeName: string | null; description: string; points: number; sanction: string; date: string | Date };
@@ -21,6 +22,7 @@ type Data = {
   violationPoints: number; achievementPoints: number; netPoints: number;
   violations: Violation[]; achievements: Achievement[]; cases: Case[]; requests: Request[];
 };
+type Survey = { id: string; title: string; description: string; questionCount: number; answered: boolean };
 
 const typeLabel: Record<string, string> = { PRIBADI: "Pribadi", SOSIAL: "Sosial", BELAJAR: "Belajar", KARIR: "Karir" };
 const caseStatus: Record<string, { label: string; cls: string }> = {
@@ -38,8 +40,8 @@ const reqStatus: Record<string, { label: string; cls: string }> = {
 };
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
-export function StudentBkClient({ data }: { data: Data }) {
-  const [tab, setTab] = useState<"konseling" | "pelanggaran" | "prestasi" | "permohonan">("konseling");
+export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey[] }) {
+  const [tab, setTab] = useState<"konseling" | "pelanggaran" | "prestasi" | "permohonan" | "angket">("konseling");
   const [open, setOpen] = useState(false);
   const [urgency, setUrgency] = useState("SEDANG");
   const [err, setErr] = useState("");
@@ -63,6 +65,7 @@ export function StudentBkClient({ data }: { data: Data }) {
     { key: "pelanggaran" as const, label: "Pelanggaran", count: data.violations.length },
     { key: "prestasi" as const, label: "Prestasi", count: data.achievements.length },
     { key: "permohonan" as const, label: "Permohonan", count: data.requests.length },
+    { key: "angket" as const, label: "Angket", count: surveys.filter((s) => !s.answered).length },
   ];
 
   return (
@@ -185,6 +188,31 @@ export function StudentBkClient({ data }: { data: Data }) {
                     <Trash2 className="h-3.5 w-3.5" />Batalkan
                   </Button>
                 )}
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
+      {tab === "angket" && (
+        surveys.length === 0 ? <Empty icon={ClipboardList} text="Belum ada angket yang tersedia." /> : (
+          <div className="space-y-3">
+            {surveys.map((s) => (
+              <div key={s.id} className="rounded-xl border bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900">{s.title}</p>
+                    {s.description && <p className="text-xs text-gray-500 line-clamp-2">{s.description}</p>}
+                    <p className="mt-1 text-[11px] text-gray-400">{s.questionCount} pertanyaan</p>
+                  </div>
+                  {s.answered ? (
+                    <span className="shrink-0 rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-semibold text-green-700">Sudah diisi</span>
+                  ) : (
+                    <Link href={`/student/bk/survey/${s.id}`}>
+                      <Button size="sm" className="gap-1 bg-purple-600 hover:bg-purple-700">Isi <ChevronRight className="h-3.5 w-3.5" /></Button>
+                    </Link>
+                  )}
+                </div>
               </div>
             ))}
           </div>
