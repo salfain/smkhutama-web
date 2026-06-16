@@ -19,6 +19,7 @@ import {
   createExam, updateExam, deleteExam, changeExamStatus,
 } from "./actions";
 import { EXAM_TYPES, getExamTypeInfo } from "@/lib/exam-types";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Exam = {
   id: string;
@@ -77,6 +78,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
   const [filterType, setFilterType] = useState<string>("all");
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   // controlled fields
   const [subjectId, setSubjectId] = useState("");
@@ -131,14 +133,16 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
   }
 
   function handleDelete(e: Exam) {
-    if (!confirm(`Hapus ujian "${e.title}"?`)) return;
     startTransition(async () => {
+      if (!(await confirm({ title: "Hapus ujian?", description: `Ujian "${e.title}" akan dihapus.`, confirmText: "Hapus" }))) return;
       const r = await deleteExam(e.id);
       if (r.error) {
         if ("hasAttempts" in r && r.hasAttempts) {
-          const forceConfirm = confirm(
-            `${r.error}\n\n⚠️ PERHATIAN: Hapus paksa akan menghapus SEMUA jawaban & nilai siswa yang terkait ujian ini. Data tidak bisa dikembalikan.\n\nYakin ingin hapus paksa?`
-          );
+          const forceConfirm = await confirm({
+            title: "Hapus paksa?",
+            description: `${r.error} PERHATIAN: hapus paksa akan menghapus SEMUA jawaban & nilai siswa terkait ujian ini. Data tidak bisa dikembalikan.`,
+            confirmText: "Hapus Paksa", variant: "danger", icon: "warning",
+          });
           if (forceConfirm) {
             const r2 = await deleteExam(e.id, true);
             if (r2.error) alert(r2.error);

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2, ClipboardList, BarChart3 } from "lucide-react";
 import { saveQuestion, deleteQuestion } from "../../survey-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Survey = { id: string; title: string; questions: { id: string; text: string; category: string; orderNumber: number }[] };
 type Results = {
@@ -20,6 +21,7 @@ export function SurveyDetailClient({ survey, results }: { survey: Survey; result
   const [tab, setTab] = useState<"pertanyaan" | "hasil">("pertanyaan");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function addQuestion(fd: FormData) {
     setErr("");
@@ -29,8 +31,8 @@ export function SurveyDetailClient({ survey, results }: { survey: Survey; result
       if (r.error) setErr(r.error);
     });
   }
-  function removeQuestion(id: string) {
-    if (!confirm("Hapus pertanyaan ini?")) return;
+  async function removeQuestion(id: string) {
+    if (!(await confirm("Hapus pertanyaan ini?"))) return;
     startTransition(async () => { await deleteQuestion(id, survey.id); });
   }
 

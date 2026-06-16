@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, GraduationCap } from "lucide-react";
 import { saveMajor, deleteMajor } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Major = { id: string; code: string; name: string; description: string };
 
@@ -17,6 +18,7 @@ export function MajorsClient({ majors }: { majors: Major[] }) {
   const [editing, setEditing] = useState<Major | null>(null);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function submit(fd: FormData) {
     setErr("");
@@ -26,8 +28,8 @@ export function MajorsClient({ majors }: { majors: Major[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus jurusan ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus jurusan ini?"))) return;
     startTransition(async () => { await deleteMajor(id); });
   }
 

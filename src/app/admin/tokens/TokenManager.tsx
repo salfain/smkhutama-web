@@ -13,6 +13,7 @@ import {
   Trash2, Power, PowerOff, AlertCircle,
 } from "lucide-react";
 import { createToken, regenerateToken, toggleTokenStatus, deleteToken } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Token = {
   id: string;
@@ -39,6 +40,7 @@ export function TokenManager({ tokens, exams }: { tokens: Token[]; exams: Exam[]
   const [latestToken, setLatestToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function copy(id: string, val: string) {
     navigator.clipboard.writeText(val);
@@ -62,8 +64,8 @@ export function TokenManager({ tokens, exams }: { tokens: Token[]; exams: Exam[]
     });
   }
 
-  function handleRegen(id: string) {
-    if (!confirm("Regenerate token? Token lama akan diganti.")) return;
+  async function handleRegen(id: string) {
+    if (!(await confirm("Regenerate token? Token lama akan diganti."))) return;
     startTransition(async () => {
       const r = await regenerateToken(id);
       if (r.error) alert(r.error);
@@ -77,8 +79,8 @@ export function TokenManager({ tokens, exams }: { tokens: Token[]; exams: Exam[]
     });
   }
 
-  function handleDelete(id: string) {
-    if (!confirm("Hapus token ini?")) return;
+  async function handleDelete(id: string) {
+    if (!(await confirm("Hapus token ini?"))) return;
     startTransition(async () => {
       const r = await deleteToken(id);
       if (r.error) alert(r.error);

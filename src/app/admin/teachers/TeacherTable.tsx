@@ -20,6 +20,7 @@ import {
   toggleTeacherStatus, resetTeacherPassword,
   exportTeachersExcel, importTeachersExcel, getTeacherImportTemplate,
 } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Teacher = {
   id: string;
@@ -41,6 +42,7 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
   const [importMsg, setImportMsg]   = useState<{ msg: string; errors?: string[] } | null>(null);
   const [pending, startTransition]  = useTransition();
   const importFileRef               = useRef<HTMLInputElement>(null);
+  const confirm = useConfirm();
 
   // ---------- handlers ----------
   function openCreate() {
@@ -61,8 +63,8 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
     });
   }
 
-  function handleDelete(t: Teacher) {
-    if (!confirm(`Hapus guru "${t.user.name}"? Akun login juga akan dihapus.`)) return;
+  async function handleDelete(t: Teacher) {
+    if (!(await confirm(`Hapus guru "${t.user.name}"? Akun login juga akan dihapus.`))) return;
     startTransition(async () => {
       const result = await deleteTeacher(t.id);
       if (result.error) alert(result.error);
@@ -73,8 +75,8 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
     startTransition(async () => { await toggleTeacherStatus(t.id); });
   }
 
-  function handleReset(t: Teacher) {
-    if (!confirm(`Reset password "${t.user.name}" ke "guru123"?`)) return;
+  async function handleReset(t: Teacher) {
+    if (!(await confirm(`Reset password "${t.user.name}" ke "guru123"?`))) return;
     startTransition(async () => {
       const result = await resetTeacherPassword(t.id);
       if (result.error) alert(result.error);

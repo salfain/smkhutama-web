@@ -4,13 +4,23 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { logoutAction } from "@/app/login/actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 export function LogoutButton({ variant = "ghost", className = "" }: { variant?: "ghost" | "outline"; className?: string }) {
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function handleLogout() {
-    if (!confirm("Yakin ingin keluar?")) return;
     startTransition(async () => {
+      const ok = await confirm({
+        title: "Keluar dari akun?",
+        description: "Anda akan keluar dari sesi ini dan kembali ke halaman login.",
+        confirmText: "Ya, Keluar",
+        cancelText: "Batal",
+        variant: "danger",
+        icon: "logout",
+      });
+      if (!ok) return;
       await logoutAction();
     });
   }

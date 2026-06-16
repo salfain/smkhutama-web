@@ -13,6 +13,7 @@ import {
   Upload, FileDown, AlertCircle, CheckCircle,
 } from "lucide-react";
 import { deleteQuestion, toggleQuestionActive, importQuestionsExcel, getQuestionImportTemplate } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Question = {
   id: string;
@@ -48,9 +49,10 @@ export function QuestionsList({ questions }: { questions: Question[] }) {
   const [importMsg, setImportMsg] = useState<{ msg: string; errors?: string[] } | null>(null);
   const [pending, startTransition] = useTransition();
   const importFileRef = useRef<HTMLInputElement>(null);
+  const confirm = useConfirm();
 
-  function handleDelete(q: Question) {
-    if (!confirm("Hapus soal ini?")) return;
+  async function handleDelete(q: Question) {
+    if (!(await confirm("Hapus soal ini?"))) return;
     startTransition(async () => {
       const r = await deleteQuestion(q.id);
       if (r.error) alert(r.error);

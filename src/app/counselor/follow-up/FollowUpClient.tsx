@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Gavel, FileText, Trash2, CheckCircle2, Send } from "lucide-react";
 import { createSummon, updateSummonStatus, deleteSummon } from "../reports-actions";
 import { SP_THRESHOLDS } from "@/lib/bk-points";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type SpLevel = { level: string; min: number; label: string };
 type StudentRow = { studentId: string; name: string; className: string; points: number; recommended: SpLevel | null; lastSummonLevel: string | null };
@@ -33,6 +34,7 @@ export function FollowUpClient({ students, summons }: { students: StudentRow[]; 
   const [level, setLevel] = useState("SP1");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openSummon(s: StudentRow) {
     setTarget(s); setLevel(s.recommended?.level ?? "SP1"); setErr(""); setOpen(true);
@@ -51,8 +53,8 @@ export function FollowUpClient({ students, summons }: { students: StudentRow[]; 
   function setStatus(id: string, status: "SENT" | "DONE") {
     startTransition(async () => { await updateSummonStatus(id, status); });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus surat pemanggilan ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus surat pemanggilan ini?"))) return;
     startTransition(async () => { await deleteSummon(id); });
   }
 

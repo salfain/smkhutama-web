@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, UserCog } from "lucide-react";
 import { saveTeacher, deleteTeacher } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Teacher = { id: string; name: string; position: string; subject: string; photoUrl: string };
 
@@ -16,6 +17,7 @@ export function TeachersClient({ teachers }: { teachers: Teacher[] }) {
   const [editing, setEditing] = useState<Teacher | null>(null);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function submit(fd: FormData) {
     setErr("");
@@ -25,8 +27,8 @@ export function TeachersClient({ teachers }: { teachers: Teacher[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus data guru ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus data guru ini?"))) return;
     startTransition(async () => { await deleteTeacher(id); });
   }
 

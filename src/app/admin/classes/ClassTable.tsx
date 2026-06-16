@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Building2, Search, Users } from "lucide-react";
 import { createClass, updateClass, deleteClass } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Class = {
   id: string;
@@ -37,6 +38,7 @@ export function ClassTable({ classes, majors, teachers }: { classes: Class[]; ma
   const [majorId, setMajorId] = useState<string>("");
   const [homeroomTeacherId, setHomeroomTeacherId] = useState<string>("none");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null);
@@ -70,8 +72,8 @@ export function ClassTable({ classes, majors, teachers }: { classes: Class[]; ma
     });
   }
 
-  function handleDelete(c: Class) {
-    if (!confirm(`Hapus kelas "${c.name}"?`)) return;
+  async function handleDelete(c: Class) {
+    if (!(await confirm(`Hapus kelas "${c.name}"?`))) return;
     startTransition(async () => {
       const result = await deleteClass(c.id);
       if (result.error) alert(result.error);

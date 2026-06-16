@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Newspaper } from "lucide-react";
 import { saveNews, deleteNews } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type News = { id: string; title: string; excerpt: string; content: string | null; imageUrl: string | null; isPublished: boolean; publishedAt: string };
 
@@ -18,6 +19,7 @@ export function NewsClient({ news }: { news: News[] }) {
   const [published, setPublished] = useState(true);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() { setEditing(null); setPublished(true); setErr(""); setOpen(true); }
   function openEdit(n: News) { setEditing(n); setPublished(n.isPublished); setErr(""); setOpen(true); }
@@ -31,8 +33,8 @@ export function NewsClient({ news }: { news: News[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus berita ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus berita ini?"))) return;
     startTransition(async () => { await deleteNews(id); });
   }
 

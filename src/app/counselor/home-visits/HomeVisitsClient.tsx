@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Home as HomeIcon, FileText } from "lucide-react";
 import { saveHomeVisit, deleteHomeVisit } from "../bk-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Student = { id: string; name: string; nis: string; className: string };
 type Visit = {
@@ -24,6 +25,7 @@ export function HomeVisitsClient({ visits, students }: { visits: Visit[]; studen
   const [studentId, setStudentId] = useState("");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() { setEditing(null); setStudentId(""); setErr(""); setOpen(true); }
   function openEdit(v: Visit) { setEditing(v); setStudentId(v.studentId); setErr(""); setOpen(true); }
@@ -36,8 +38,8 @@ export function HomeVisitsClient({ visits, students }: { visits: Visit[]; studen
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus catatan kunjungan ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus catatan kunjungan ini?"))) return;
     startTransition(async () => { await deleteHomeVisit(id); });
   }
 

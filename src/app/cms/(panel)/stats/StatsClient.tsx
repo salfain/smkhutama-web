@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { saveStat, deleteStat } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Stat = { id: string; label: string; value: string };
 
@@ -15,6 +16,7 @@ export function StatsClient({ stats }: { stats: Stat[] }) {
   const [editing, setEditing] = useState<Stat | null>(null);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function submit(fd: FormData) {
     setErr("");
@@ -24,8 +26,8 @@ export function StatsClient({ stats }: { stats: Stat[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus statistik ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus statistik ini?"))) return;
     startTransition(async () => { await deleteStat(id); });
   }
 

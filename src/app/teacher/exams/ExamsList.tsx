@@ -15,6 +15,7 @@ import {
 import { changeMyExamStatus, deleteMyExam, createTokenByTeacher } from "./actions";
 import { getExamTypeInfo } from "@/lib/exam-types";
 import { canTeacherCreateToken } from "@/lib/exam-permissions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Exam = {
   id: string;
@@ -45,6 +46,7 @@ function fmt(d: Date) {
 
 export function ExamsList({ exams }: { exams: Exam[] }) {
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
   const [tokenDialog, setTokenDialog] = useState<{ examId: string; title: string } | null>(null);
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [tokenDuration, setTokenDuration] = useState("60");
@@ -57,14 +59,16 @@ export function ExamsList({ exams }: { exams: Exam[] }) {
   }
 
   function handleDelete(e: Exam) {
-    if (!confirm(`Hapus ujian "${e.title}"?`)) return;
     startTransition(async () => {
+      if (!(await confirm({ title: "Hapus ujian?", description: `Ujian "${e.title}" akan dihapus.`, confirmText: "Hapus" }))) return;
       const r = await deleteMyExam(e.id);
       if (r.error) {
         if ("hasAttempts" in r && r.hasAttempts) {
-          const forceConfirm = confirm(
-            `${r.error}\n\n⚠️ PERHATIAN: Hapus paksa akan menghapus SEMUA jawaban & nilai siswa terkait ujian ini. Data tidak bisa dikembalikan.\n\nYakin ingin hapus paksa?`
-          );
+          const forceConfirm = await confirm({
+            title: "Hapus paksa?",
+            description: `${r.error} PERHATIAN: hapus paksa akan menghapus SEMUA jawaban & nilai siswa terkait ujian ini. Data tidak bisa dikembalikan.`,
+            confirmText: "Hapus Paksa", variant: "danger", icon: "warning",
+          });
           if (forceConfirm) {
             const r2 = await deleteMyExam(e.id, true);
             if (r2.error) alert(r2.error);

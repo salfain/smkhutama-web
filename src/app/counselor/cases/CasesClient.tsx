@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, MessagesSquare, Lock, FileDown } from "lucide-react";
 import { saveCase, deleteCase } from "../actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Student = { id: string; name: string; nis: string; className: string };
 type Case = {
@@ -37,6 +38,7 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
   const [status, setStatus] = useState("OPEN");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const activeCases = cases.filter((c) => c.status !== "RESOLVED");
   const historyCases = cases.filter((c) => c.status === "RESOLVED");
@@ -57,8 +59,8 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus sesi konseling ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus sesi konseling ini?"))) return;
     startTransition(async () => { await deleteCase(id); });
   }
 

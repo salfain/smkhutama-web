@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Sparkles } from "lucide-react";
 import { saveExtracurricular, deleteExtracurricular } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Ekskul = {
   id: string; name: string; category: string; description: string;
@@ -34,6 +35,7 @@ export function ExtracurricularsClient({ items }: { items: Ekskul[] }) {
   const [color, setColor] = useState(COLOR_OPTIONS[0].value);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null); setIcon("Sparkles"); setColor(COLOR_OPTIONS[0].value); setErr(""); setOpen(true);
@@ -51,8 +53,8 @@ export function ExtracurricularsClient({ items }: { items: Ekskul[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus ekstrakurikuler ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus ekstrakurikuler ini?"))) return;
     startTransition(async () => { await deleteExtracurricular(id); });
   }
 

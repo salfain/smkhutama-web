@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, ShieldAlert, Settings2 } from "lucide-react";
 import { saveViolation, deleteViolation, saveViolationType, deleteViolationType } from "../actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Student = { id: string; name: string; nis: string; className: string };
 type VType = { id: string; name: string; category: string; points: number };
@@ -32,6 +33,7 @@ export function ViolationsClient({ violations, types, students }: { violations: 
   const [points, setPoints] = useState(0);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null); setStudentId(""); setTypeId("none"); setPoints(0); setErr(""); setOpen(true);
@@ -55,8 +57,8 @@ export function ViolationsClient({ violations, types, students }: { violations: 
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus catatan pelanggaran ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus catatan pelanggaran ini?"))) return;
     startTransition(async () => { await deleteViolation(id); });
   }
 
@@ -176,6 +178,7 @@ function ViolationTypesDialog({ open, onOpenChange, types }: { open: boolean; on
   const [category, setCategory] = useState("RINGAN");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function submit(fd: FormData) {
     setErr("");
@@ -186,8 +189,8 @@ function ViolationTypesDialog({ open, onOpenChange, types }: { open: boolean; on
       if (r.error) setErr(r.error); else { setEditing(null); setCategory("RINGAN"); }
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus jenis pelanggaran ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus jenis pelanggaran ini?"))) return;
     startTransition(async () => { await deleteViolationType(id); });
   }
 

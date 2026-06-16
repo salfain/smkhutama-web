@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, Eye, Trash2, Users } from "lucide-react";
 import { updateRegistrationStatus, deleteRegistration } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Reg = {
   id: string; registNumber: string; fullName: string; nisn: string | null;
@@ -32,12 +33,13 @@ export function RegistrationsClient({ registrations }: { registrations: Reg[] })
   const [filter, setFilter] = useState("all");
   const [detail, setDetail] = useState<Reg | null>(null);
   const [, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function setStatus(id: string, status: "PENDING" | "VERIFIED" | "ACCEPTED" | "REJECTED") {
     startTransition(async () => { await updateRegistrationStatus(id, status); });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus data pendaftar ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus data pendaftar ini?"))) return;
     startTransition(async () => { await deleteRegistration(id); });
   }
 

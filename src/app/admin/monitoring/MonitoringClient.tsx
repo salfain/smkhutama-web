@@ -12,6 +12,7 @@ import {
   RefreshCw, RotateCcw, Monitor, Clock, CheckCircle, AlertCircle, Wifi, WifiOff,
 } from "lucide-react";
 import { resetStudentLogin } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Exam = {
   id: string;
@@ -60,6 +61,7 @@ export function MonitoringClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function changeExam(id: string) {
     const sp = new URLSearchParams(searchParams);
@@ -72,8 +74,8 @@ export function MonitoringClient({
   }
 
   function handleReset(attemptId: string, name: string) {
-    if (!confirm(`Reset login siswa "${name}"? Status akan kembali ke "Belum Mulai".`)) return;
     startTransition(async () => {
+      if (!(await confirm(`Reset login siswa "${name}"? Status akan kembali ke "Belum Mulai".`))) return;
       const r = await resetStudentLogin(attemptId);
       if (r.error) alert(r.error);
     });

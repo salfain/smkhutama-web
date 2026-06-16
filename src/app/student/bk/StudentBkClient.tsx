@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { submitCounselingRequest, cancelCounselingRequest } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Violation = { id: string; typeName: string | null; description: string; points: number; sanction: string; date: string | Date };
 type Achievement = { id: string; title: string; description: string; points: number; level: string; date: string | Date };
@@ -46,6 +47,7 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
   const [urgency, setUrgency] = useState("SEDANG");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function submit(fd: FormData) {
     setErr("");
@@ -55,8 +57,8 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
       if (r.error) setErr(r.error); else { setOpen(false); setUrgency("SEDANG"); }
     });
   }
-  function cancel(id: string) {
-    if (!confirm("Batalkan permohonan ini?")) return;
+  async function cancel(id: string) {
+    if (!(await confirm("Batalkan permohonan ini?"))) return;
     startTransition(async () => { await cancelCounselingRequest(id); });
   }
 

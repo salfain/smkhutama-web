@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, ClipboardList, Settings2 } from "lucide-react";
 import { saveSurvey, deleteSurvey } from "../survey-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Survey = { id: string; title: string; description: string; isActive: boolean; questionCount: number; responseCount: number };
 
@@ -17,6 +18,7 @@ export function SurveysClient({ surveys }: { surveys: Survey[] }) {
   const [editing, setEditing] = useState<Survey | null>(null);
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function submit(fd: FormData) {
     setErr("");
@@ -26,8 +28,8 @@ export function SurveysClient({ surveys }: { surveys: Survey[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus angket ini beserta semua jawabannya?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus angket ini beserta semua jawabannya?"))) return;
     startTransition(async () => { await deleteSurvey(id); });
   }
 

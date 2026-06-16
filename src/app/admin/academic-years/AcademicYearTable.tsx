@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, CalendarDays, CheckCircle2 } from "lucide-react";
 import {
   createAcademicYear, updateAcademicYear, deleteAcademicYear, setActiveAcademicYear,
 } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type AcademicYear = {
   id: string;
@@ -31,6 +32,7 @@ export function AcademicYearTable({ years }: { years: AcademicYear[] }) {
   const [semester, setSemester] = useState<"GANJIL" | "GENAP">("GANJIL");
   const [isActive, setIsActive] = useState(false);
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null);
@@ -63,8 +65,8 @@ export function AcademicYearTable({ years }: { years: AcademicYear[] }) {
     });
   }
 
-  function handleDelete(y: AcademicYear) {
-    if (!confirm(`Hapus tahun ajaran "${y.year} ${y.semester}"?`)) return;
+  async function handleDelete(y: AcademicYear) {
+    if (!(await confirm(`Hapus tahun ajaran "${y.year} ${y.semester}"?`))) return;
     startTransition(async () => {
       const result = await deleteAcademicYear(y.id);
       if (result.error) alert(result.error);

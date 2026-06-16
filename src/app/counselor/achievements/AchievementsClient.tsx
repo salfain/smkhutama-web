@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Award } from "lucide-react";
 import { saveAchievement, deleteAchievement } from "../actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Student = { id: string; name: string; nis: string; className: string };
 type Achievement = {
@@ -26,6 +27,7 @@ export function AchievementsClient({ achievements, students }: { achievements: A
   const [level, setLevel] = useState("Sekolah");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null); setStudentId(""); setLevel("Sekolah"); setErr(""); setOpen(true);
@@ -42,8 +44,8 @@ export function AchievementsClient({ achievements, students }: { achievements: A
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus catatan prestasi ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus catatan prestasi ini?"))) return;
     startTransition(async () => { await deleteAchievement(id); });
   }
 

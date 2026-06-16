@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Inbox, MessageSquareReply, CalendarPlus } from "lucide-react";
 import { respondRequest, convertRequestToCase } from "../actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Request = {
   id: string; studentName: string; className: string; topic: string; description: string;
@@ -30,6 +31,7 @@ export function RequestsClient({ requests }: { requests: Request[] }) {
   const [status, setStatus] = useState("PENDING");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openRespond(r: Request) {
     setEditing(r); setStatus(r.status); setErr(""); setOpen(true);
@@ -44,8 +46,17 @@ export function RequestsClient({ requests }: { requests: Request[] }) {
     });
   }
   function makeSession(id: string) {
-    if (!confirm("Terima permohonan ini dan buat sesi konseling? Permohonan akan ditandai 'Dijadwalkan'.")) return;
-    startTransition(async () => { await convertRequestToCase(id); });
+    startTransition(async () => {
+      const ok = await confirm({
+        title: "Terima permohonan?",
+        description: "Permohonan ini akan dibuatkan sesi konseling dan ditandai 'Dijadwalkan'.",
+        confirmText: "Ya, Buat Sesi",
+        variant: "info",
+        icon: "info",
+      });
+      if (!ok) return;
+      await convertRequestToCase(id);
+    });
   }
 
   return (

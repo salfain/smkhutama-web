@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trash2, Plus, ImageOff } from "lucide-react";
 import { addHeroImage, deleteHeroImage } from "../content-actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Img = { id: string; imageUrl: string; caption: string | null };
 
 export function HeroImagesClient({ images }: { images: Img[] }) {
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function add(fd: FormData) {
     setErr("");
@@ -20,8 +22,8 @@ export function HeroImagesClient({ images }: { images: Img[] }) {
       if (r.error) setErr(r.error);
     });
   }
-  function remove(id: string) {
-    if (!confirm("Hapus gambar ini?")) return;
+  async function remove(id: string) {
+    if (!(await confirm("Hapus gambar ini?"))) return;
     startTransition(async () => { await deleteHeroImage(id); });
   }
 

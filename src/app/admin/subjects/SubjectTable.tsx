@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, BookOpen, Search } from "lucide-react";
 import { createSubject, updateSubject, deleteSubject } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Subject = {
   id: string;
@@ -39,6 +40,7 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
   const [error, setError] = useState("");
   const [majorId, setMajorId] = useState<string>("none");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null);
@@ -66,8 +68,8 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
     });
   }
 
-  function handleDelete(s: Subject) {
-    if (!confirm(`Hapus mata pelajaran "${s.name}"?`)) return;
+  async function handleDelete(s: Subject) {
+    if (!(await confirm(`Hapus mata pelajaran "${s.name}"?`))) return;
     startTransition(async () => {
       const result = await deleteSubject(s.id);
       if (result.error) alert(result.error);

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { createMajor, updateMajor, deleteMajor } from "./actions";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Major = {
   id: string;
@@ -21,6 +22,7 @@ export function MajorTable({ majors }: { majors: Major[] }) {
   const [editing, setEditing] = useState<Major | null>(null);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function openCreate() {
     setEditing(null);
@@ -44,8 +46,8 @@ export function MajorTable({ majors }: { majors: Major[] }) {
     });
   }
 
-  function handleDelete(m: Major) {
-    if (!confirm(`Hapus jurusan "${m.name}"?`)) return;
+  async function handleDelete(m: Major) {
+    if (!(await confirm(`Hapus jurusan "${m.name}"?`))) return;
     startTransition(async () => {
       const result = await deleteMajor(m.id);
       if (result.error) alert(result.error);
