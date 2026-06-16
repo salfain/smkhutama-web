@@ -22,7 +22,7 @@ export default function CmsLoginPage() {
     startTransition(async () => {
       const r = await cmsLogin(username.trim(), password);
       if ("error" in r && r.error) setError(r.error);
-      else router.push("/cms/dashboard");
+      else window.location.href = "/cms/dashboard";
     });
   }
 

@@ -34,7 +34,7 @@ export default function LoginPage() {
     startTransition(async () => {
       const r = await loginAction(username.trim(), password, role);
       if ("error" in r) setError(r.error);
-      else router.push(r.redirectTo);
+      else window.location.href = r.redirectTo;
     });
   }
 
