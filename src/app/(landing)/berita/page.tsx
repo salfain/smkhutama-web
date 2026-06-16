@@ -1,13 +1,16 @@
-import { HomeNews } from "@/components/landing/HomeSections";
-import { getLandingContent } from "@/lib/landing-data";
+import { prisma } from "@/lib/prisma";
 import { Newspaper } from "lucide-react";
+import { NewsGrid } from "@/components/landing/NewsGrid";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Berita & Kegiatan – SMK Hutama" };
 
 export default async function BeritaPage() {
-  const { news } = await getLandingContent().catch(() => ({ news: [] }));
+  const news = await prisma.landingNews.findMany({
+    where: { isPublished: true },
+    orderBy: { publishedAt: "desc" },
+  });
 
   return (
     <>
@@ -26,10 +29,19 @@ export default async function BeritaPage() {
           </p>
         </div>
         <svg viewBox="0 0 1440 80" className="block w-full" preserveAspectRatio="none">
-          <path fill="white" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
+          <path fill="white" className="fill-white dark:fill-slate-900" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
         </svg>
       </section>
-      <HomeNews news={news} />
+
+      <section className="bg-white dark:bg-slate-900 py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          {news.length === 0 ? (
+            <p className="text-center text-slate-400">Belum ada berita.</p>
+          ) : (
+            <NewsGrid news={news} />
+          )}
+        </div>
+      </section>
     </>
   );
 }

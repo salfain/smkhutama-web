@@ -12,6 +12,7 @@ const newsData = [
     slug: "penerimaan-peserta-didik-baru-2026",
     title: "Penerimaan Peserta Didik Baru Tahun Ajaran 2026/2027",
     excerpt: "SMK HUTAMA membuka pendaftaran siswa baru untuk tahun ajaran 2026/2027. Segera daftarkan diri Anda melalui jalur online maupun offline.",
+    imageUrl: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80",
     content: `<p>SMK HUTAMA dengan bangga mengumumkan pembukaan Penerimaan Peserta Didik Baru (PPDB) untuk Tahun Ajaran 2026/2027.</p>
 <p>Pendaftaran dibuka mulai tanggal 1 Juni hingga 15 Juli 2026. Calon siswa dapat mendaftar melalui website resmi sekolah atau datang langsung ke sekretariat PPDB.</p>
 <h3>Persyaratan:</h3>
@@ -28,6 +29,7 @@ const newsData = [
     slug: "juara-lomba-kompetensi-siswa-2026",
     title: "Siswa SMK HUTAMA Raih Juara 1 Lomba Kompetensi Siswa Tingkat Provinsi",
     excerpt: "Prestasi membanggakan diraih oleh siswa jurusan RPL yang berhasil meraih juara pertama dalam ajang LKS tingkat provinsi bidang Web Technology.",
+    imageUrl: "https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80",
     content: `<p>Selamat kepada Muhammad Rizky Pratama, siswa kelas XII RPL yang telah meraih Juara 1 dalam Lomba Kompetensi Siswa (LKS) Tingkat Provinsi bidang Web Technology.</p>
 <p>Kompetisi yang diselenggarakan pada tanggal 15-17 Mei 2026 ini diikuti oleh 35 peserta dari berbagai SMK se-provinsi. Rizky berhasil mengungguli seluruh peserta dengan nilai tertinggi pada kategori Front-End Development dan Full-Stack Application.</p>
 <p>Kepala Sekolah, Bapak Drs. Ahmad Sudrajat, M.Pd., menyatakan kebanggaannya atas prestasi ini dan berharap dapat menjadi motivasi bagi siswa lainnya.</p>
@@ -38,6 +40,7 @@ const newsData = [
     slug: "workshop-industri-4-0",
     title: "Workshop Industri 4.0: Mempersiapkan Siswa Menghadapi Era Digital",
     excerpt: "SMK HUTAMA menggelar workshop bertema Industri 4.0 dengan menghadirkan praktisi dari perusahaan teknologi ternama sebagai narasumber.",
+    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
     content: `<p>Dalam rangka mempersiapkan lulusan yang siap menghadapi tantangan era digital, SMK HUTAMA menggelar Workshop Industri 4.0 pada tanggal 10 Mei 2026.</p>
 <p>Workshop ini menghadirkan narasumber dari berbagai perusahaan teknologi ternama, antara lain:</p>
 <ul>
@@ -53,6 +56,7 @@ const newsData = [
     slug: "kunjungan-industri-ke-jakarta",
     title: "Kunjungan Industri Siswa Kelas XI ke Perusahaan IT di Jakarta",
     excerpt: "Sebanyak 120 siswa kelas XI melakukan kunjungan industri ke beberapa perusahaan IT di Jakarta untuk mengenal dunia kerja secara langsung.",
+    imageUrl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80",
     content: `<p>Pada tanggal 25-26 April 2026, sebanyak 120 siswa kelas XI SMK HUTAMA melaksanakan kegiatan Kunjungan Industri (KI) ke beberapa perusahaan IT terkemuka di Jakarta.</p>
 <p>Perusahaan yang dikunjungi antara lain:</p>
 <ol>
@@ -68,6 +72,7 @@ const newsData = [
     slug: "pelaksanaan-ujian-berbasis-komputer",
     title: "SMK HUTAMA Resmi Terapkan Ujian Berbasis Komputer (CBT) untuk Semua Mata Pelajaran",
     excerpt: "Mulai semester ini, seluruh ujian di SMK HUTAMA dilaksanakan secara online menggunakan sistem CBT yang dikembangkan sendiri oleh tim IT sekolah.",
+    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
     content: `<p>SMK HUTAMA resmi menerapkan sistem Ujian Berbasis Komputer (Computer Based Test/CBT) untuk seluruh mata pelajaran mulai semester genap tahun ajaran 2025/2026.</p>
 <p>Sistem CBT ini dikembangkan secara mandiri oleh tim IT sekolah dengan fitur-fitur unggulan:</p>
 <ul>
