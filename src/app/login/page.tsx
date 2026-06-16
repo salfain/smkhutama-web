@@ -2,14 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, LogIn, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, LogIn, ArrowLeft, GraduationCap, HeartHandshake } from "lucide-react";
 import { loginAction } from "./actions";
 
 type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR";
+type System = "CBT" | "SIBIKONS";
 
 const roleConfig: Record<Role, { label: string; bg: string; placeholder: string }> = {
   ADMIN:   { label: "Admin",  bg: "bg-blue-600 hover:bg-blue-700",       placeholder: "admin" },
@@ -18,8 +18,32 @@ const roleConfig: Record<Role, { label: string; bg: string; placeholder: string 
   COUNSELOR: { label: "Guru BK", bg: "bg-purple-600 hover:bg-purple-700", placeholder: "bk.hutama" },
 };
 
+const systemConfig: Record<System, {
+  title: string; subtitle: string; roles: Role[]; accent: string; icon: typeof GraduationCap;
+  tagline: string; features: string[];
+}> = {
+  CBT: {
+    title: "CBT — Ujian Online",
+    subtitle: "Untuk Admin, Guru, dan Siswa",
+    roles: ["ADMIN", "TEACHER", "STUDENT"],
+    accent: "blue",
+    icon: GraduationCap,
+    tagline: "Sistem ujian digital berbasis web yang modern, aman, dan responsif untuk seluruh civitas SMK HUTAMA.",
+    features: ["Ujian bergaya TKA/CBT", "Token ujian aman", "Autosave jawaban", "Laporan & analisis otomatis"],
+  },
+  SIBIKONS: {
+    title: "SIBIKONS — Bimbingan Konseling",
+    subtitle: "Khusus untuk Guru BK",
+    roles: ["COUNSELOR"],
+    accent: "purple",
+    icon: HeartHandshake,
+    tagline: "Sistem informasi bimbingan konseling untuk mengelola sesi konseling, poin pelanggaran, dan prestasi siswa.",
+    features: ["Catatan sesi konseling", "Poin pelanggaran siswa", "Pencatatan prestasi", "Rekap & monitoring BK"],
+  },
+};
+
 export default function LoginPage() {
-  const router = useRouter();
+  const [system, setSystem] = useState<System>("CBT");
   const [role, setRole] = useState<Role>("STUDENT");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +51,14 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
 
+  const sys = systemConfig[system];
   const cfg = roleConfig[role];
+
+  function selectSystem(s: System) {
+    setSystem(s);
+    setRole(systemConfig[s].roles[0]);
+    setError("");
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,22 +70,24 @@ export default function LoginPage() {
     });
   }
 
+  const leftPanelBg = system === "CBT"
+    ? "from-blue-700 to-indigo-700"
+    : "from-purple-700 to-fuchsia-700";
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Left panel */}
-      <div className="hidden flex-1 flex-col items-center justify-center bg-gradient-to-br from-blue-700 to-indigo-700 p-12 text-white lg:flex">
+      <div className={`hidden flex-1 flex-col items-center justify-center bg-gradient-to-br ${leftPanelBg} p-12 text-white lg:flex transition-colors duration-500`}>
         <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/api/school/logo" alt="Logo" className="h-20 w-20 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         </div>
-        <h2 className="font-heading text-3xl font-bold text-center">CBT SMK HUTAMA</h2>
-        <p className="mt-3 max-w-xs text-center text-blue-200 text-sm leading-relaxed">
-          Sistem ujian digital berbasis web yang modern, aman, dan responsif untuk seluruh civitas SMK HUTAMA.
-        </p>
+        <h2 className="font-heading text-3xl font-bold text-center">{sys.title}</h2>
+        <p className="mt-3 max-w-xs text-center text-white/80 text-sm leading-relaxed">{sys.tagline}</p>
         <div className="mt-10 w-full max-w-xs space-y-3">
-          {["Ujian bergaya TKA/CBT", "Token ujian aman", "Autosave jawaban", "Laporan & analisis otomatis"].map((t) => (
-            <div key={t} className="flex items-center gap-3 text-sm text-blue-100">
-              <div className="h-1.5 w-1.5 rounded-full bg-blue-300" />{t}
+          {sys.features.map((t) => (
+            <div key={t} className="flex items-center gap-3 text-sm text-white/90">
+              <div className="h-1.5 w-1.5 rounded-full bg-white/60" />{t}
             </div>
           ))}
         </div>
@@ -67,31 +100,59 @@ export default function LoginPage() {
             <ArrowLeft className="h-4 w-4" />Kembali ke beranda
           </Link>
 
+          {/* System selector */}
+          <div className="mb-5 grid grid-cols-2 gap-3">
+            {(Object.entries(systemConfig) as [System, typeof sys][]).map(([key, val]) => {
+              const Icon = val.icon;
+              const selected = system === key;
+              const selBlue = key === "CBT";
+              return (
+                <button key={key} type="button" onClick={() => selectSystem(key)}
+                  className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition-all ${
+                    selected
+                      ? selBlue
+                        ? "border-blue-600 bg-blue-50 shadow-sm"
+                        : "border-purple-600 bg-purple-50 shadow-sm"
+                      : "border-gray-200 bg-white hover:border-gray-300"
+                  }`}>
+                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${
+                    selected ? (selBlue ? "bg-blue-600" : "bg-purple-600") : "bg-gray-100"
+                  }`}>
+                    <Icon className={`h-5 w-5 ${selected ? "text-white" : "text-gray-400"}`} />
+                  </div>
+                  <div>
+                    <p className={`text-sm font-bold ${selected ? (selBlue ? "text-blue-700" : "text-purple-700") : "text-gray-700"}`}>
+                      {key === "CBT" ? "CBT" : "SIBIKONS"}
+                    </p>
+                    <p className="text-[11px] leading-tight text-gray-500">
+                      {key === "CBT" ? "Ujian Online" : "Bimbingan Konseling"}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
           <div className="rounded-2xl border bg-white p-8 shadow-sm">
             <div className="mb-6">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50 mb-4 overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/api/school/logo" alt="Logo SMK HUTAMA" className="h-12 w-12 object-contain" onError={(e) => {
-                  const el = e.target as HTMLImageElement;
-                  el.style.display = 'none';
-                  el.parentElement!.innerHTML = '<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>';
-                }} />
-              </div>
-              <h1 className="font-heading text-2xl font-bold text-gray-900">Masuk ke Sistem</h1>
-              <p className="mt-1 text-sm text-gray-500">Pilih role dan masukkan akun Anda</p>
+              <h1 className="font-heading text-2xl font-bold text-gray-900">{sys.title}</h1>
+              <p className="mt-1 text-sm text-gray-500">{sys.subtitle}</p>
             </div>
 
-            <div className="mb-6 grid grid-cols-4 gap-2 rounded-xl bg-gray-100 p-1">
-              {(Object.entries(roleConfig) as [Role, typeof cfg][]).map(([key, val]) => (
-                <button key={key} type="button"
-                  onClick={() => { setRole(key); setError(""); }}
-                  className={`rounded-lg py-2 text-xs font-medium transition-all ${
-                    role === key ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-                  }`}>
-                  {val.label}
-                </button>
-              ))}
-            </div>
+            {/* Role tabs — hanya tampil bila lebih dari 1 role */}
+            {sys.roles.length > 1 && (
+              <div className="mb-6 grid grid-cols-3 gap-2 rounded-xl bg-gray-100 p-1">
+                {sys.roles.map((key) => (
+                  <button key={key} type="button"
+                    onClick={() => { setRole(key); setError(""); }}
+                    className={`rounded-lg py-2 text-sm font-medium transition-all ${
+                      role === key ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+                    }`}>
+                    {roleConfig[key].label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
@@ -121,10 +182,15 @@ export default function LoginPage() {
 
             <div className="mt-5 rounded-lg bg-gray-50 border border-dashed border-gray-200 p-3 text-xs text-gray-500">
               <p className="font-semibold mb-1 text-gray-600">Akun default:</p>
-              <p>Admin: <span className="font-mono">admin</span> / <span className="font-mono">admin123</span></p>
-              <p>Guru: <span className="font-mono">sari.dewi</span> / <span className="font-mono">guru123</span></p>
-              <p>Siswa: <span className="font-mono">2324001</span> / <span className="font-mono">siswa123</span></p>
-              <p className="mt-1 text-gray-400 italic">Jalankan <code>npm run db:seed</code> untuk membuat akun.</p>
+              {system === "CBT" ? (
+                <>
+                  <p>Admin: <span className="font-mono">admin</span> / <span className="font-mono">admin123</span></p>
+                  <p>Guru: <span className="font-mono">sari.dewi</span> / <span className="font-mono">guru123</span></p>
+                  <p>Siswa: <span className="font-mono">2324001</span> / <span className="font-mono">siswa123</span></p>
+                </>
+              ) : (
+                <p>Guru BK: <span className="font-mono">bk.hutama</span> / <span className="font-mono">bk123</span></p>
+              )}
             </div>
           </div>
         </div>
