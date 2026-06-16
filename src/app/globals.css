@@ -433,3 +433,16 @@
   border-left-color: #60a5fa;
   color: #94a3b8;
 }
+
+/* ============================================
+   PRINT FIX — pastikan kontainer scroll tidak memotong cetakan
+   ============================================ */
+@media print {
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .h-screen { height: auto !important; }
+  .overflow-hidden { overflow: visible !important; }
+  main, .overflow-y-auto { overflow: visible !important; height: auto !important; }
+}

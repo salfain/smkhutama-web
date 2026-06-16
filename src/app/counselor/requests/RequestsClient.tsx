@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Inbox, MessageSquareReply } from "lucide-react";
-import { respondRequest } from "../actions";
+import { Inbox, MessageSquareReply, CalendarPlus } from "lucide-react";
+import { respondRequest, convertRequestToCase } from "../actions";
 
 type Request = {
   id: string; studentName: string; className: string; topic: string; description: string;
@@ -43,6 +43,10 @@ export function RequestsClient({ requests }: { requests: Request[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
+  function makeSession(id: string) {
+    if (!confirm("Terima permohonan ini dan buat sesi konseling? Permohonan akan ditandai 'Dijadwalkan'.")) return;
+    startTransition(async () => { await convertRequestToCase(id); });
+  }
 
   return (
     <div>
@@ -70,7 +74,12 @@ export function RequestsClient({ requests }: { requests: Request[] }) {
               {r.description && <p className="mt-2 text-sm text-gray-600">{r.description}</p>}
               <p className="text-[11px] text-gray-400 mt-1">Diajukan {fmt(r.createdAt)}{r.preferredDate && ` · Preferensi: ${fmt(r.preferredDate)}`}</p>
               {r.response && <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">Tanggapan: {r.response}</p>}
-              <div className="mt-3 flex justify-end">
+              <div className="mt-3 flex justify-end gap-2">
+                {(r.status === "PENDING" || r.status === "APPROVED") && (
+                  <Button variant="outline" size="sm" className="gap-1.5 text-purple-600 border-purple-200 hover:bg-purple-50" onClick={() => makeSession(r.id)} disabled={pending}>
+                    <CalendarPlus className="h-3.5 w-3.5" />Jadikan Sesi
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={() => openRespond(r)}>
                   <MessageSquareReply className="h-3.5 w-3.5" />Tanggapi
                 </Button>

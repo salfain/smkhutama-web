@@ -82,7 +82,7 @@ export async function listCases() {
   return cases.map((c) => ({
     id: c.id, studentId: c.studentId, studentName: c.student.user.name,
     className: c.student.class?.name ?? "-", type: c.type, status: c.status,
-    title: c.title, description: c.description ?? "", followUp: c.followUp ?? "",
+    title: c.title, description: c.description ?? "", notes: c.notes ?? "", followUp: c.followUp ?? "",
     isConfidential: c.isConfidential, sessionDate: c.sessionDate,
   }));
 }
@@ -95,6 +95,7 @@ export async function saveCase(fd: FormData) {
   const status = String(fd.get("status") ?? "OPEN") as "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REFERRED";
   const title = String(fd.get("title") ?? "").trim();
   const description = String(fd.get("description") ?? "").trim();
+  const notes = String(fd.get("notes") ?? "").trim();
   const followUp = String(fd.get("followUp") ?? "").trim();
   const isConfidential = fd.get("isConfidential") === "on";
   const sessionDate = String(fd.get("sessionDate") ?? "").trim();
@@ -103,6 +104,7 @@ export async function saveCase(fd: FormData) {
   const data = {
     type, status, title,
     description: description || null,
+    notes: notes || null,
     followUp: followUp || null,
     isConfidential,
     sessionDate: sessionDate ? new Date(sessionDate) : new Date(),
@@ -281,4 +283,70 @@ export async function respondRequest(fd: FormData) {
   revalidatePath("/counselor/requests");
   revalidatePath("/counselor/dashboard");
   return { success: true };
+}
+
+/** Terima permohonan & langsung buat sesi konseling dari datanya. */
+export async function convertRequestToCase(id: string) {
+  const counselorId = await currentCounselorId();
+  const req = await prisma.counselingRequest.findUnique({
+    where: { id },
+    include: { student: true },
+  });
+  if (!req) return { error: "Permohonan tidak ditemukan" };
+
+  await prisma.$transaction([
+    prisma.counselingCase.create({
+      data: {
+        studentId: req.studentId,
+        counselorId,
+        type: "PRIBADI",
+        status: "IN_PROGRESS",
+        title: req.topic,
+        description: req.description || null,
+        sessionDate: req.preferredDate ?? new Date(),
+        isConfidential: true,
+      },
+    }),
+    prisma.counselingRequest.update({
+      where: { id },
+      data: {
+        status: "SCHEDULED",
+        response: req.response || "Permohonan diterima. Sesi konseling telah dijadwalkan.",
+      },
+    }),
+  ]);
+
+  revalidatePath("/counselor/requests");
+  revalidatePath("/counselor/cases");
+  revalidatePath("/counselor/dashboard");
+  revalidatePath("/student/bk");
+  return { success: true };
+}
+
+/** Ambil detail sesi konseling untuk cetak/PDF. */
+export async function getCaseDetail(id: string) {
+  await requireCounselorAuth();
+  const c = await prisma.counselingCase.findUnique({
+    where: { id },
+    include: {
+      student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } },
+      counselor: { include: { user: { select: { name: true } } } },
+    },
+  });
+  if (!c) return null;
+  return {
+    id: c.id,
+    title: c.title,
+    type: c.type,
+    status: c.status,
+    description: c.description ?? "",
+    notes: c.notes ?? "",
+    followUp: c.followUp ?? "",
+    isConfidential: c.isConfidential,
+    sessionDate: c.sessionDate,
+    studentName: c.student.user.name,
+    studentNis: c.student.nis ?? "",
+    className: c.student.class?.name ?? "-",
+    counselorName: c.counselor.user.name,
+  };
 }

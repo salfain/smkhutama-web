@@ -7,13 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, MessagesSquare, Lock } from "lucide-react";
+import { Plus, Pencil, Trash2, MessagesSquare, Lock, FileDown } from "lucide-react";
 import { saveCase, deleteCase } from "../actions";
 
 type Student = { id: string; name: string; nis: string; className: string };
 type Case = {
   id: string; studentId: string; studentName: string; className: string;
-  type: string; status: string; title: string; description: string; followUp: string;
+  type: string; status: string; title: string; description: string; notes: string; followUp: string;
   isConfidential: boolean; sessionDate: string | Date;
 };
 
@@ -29,6 +29,7 @@ function toDateInput(d: string | Date) {
 }
 
 export function CasesClient({ cases, students }: { cases: Case[]; students: Student[] }) {
+  const [tab, setTab] = useState<"active" | "history">("active");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Case | null>(null);
   const [studentId, setStudentId] = useState("");
@@ -36,6 +37,10 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
   const [status, setStatus] = useState("OPEN");
   const [err, setErr] = useState("");
   const [pending, startTransition] = useTransition();
+
+  const activeCases = cases.filter((c) => c.status !== "RESOLVED");
+  const historyCases = cases.filter((c) => c.status === "RESOLVED");
+  const shown = tab === "active" ? activeCases : historyCases;
 
   function openCreate() {
     setEditing(null); setStudentId(""); setType("PRIBADI"); setStatus("OPEN"); setErr(""); setOpen(true);
@@ -59,20 +64,37 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
+        {/* Toggle: Sesi Aktif / Riwayat */}
+        <div className="flex gap-1 rounded-xl bg-gray-100 p-1">
+          <button onClick={() => setTab("active")}
+            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
+              tab === "active" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+            }`}>
+            Sesi Aktif <span className="text-xs text-gray-400">({activeCases.length})</span>
+          </button>
+          <button onClick={() => setTab("history")}
+            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
+              tab === "history" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+            }`}>
+            Riwayat <span className="text-xs text-gray-400">({historyCases.length})</span>
+          </button>
+        </div>
         <Button size="sm" className="gap-1.5 bg-purple-600 hover:bg-purple-700" onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Sesi
         </Button>
       </div>
 
-      {cases.length === 0 ? (
+      {shown.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
           <MessagesSquare className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-          <p className="text-sm text-gray-500">Belum ada sesi konseling.</p>
+          <p className="text-sm text-gray-500">
+            {tab === "active" ? "Belum ada sesi konseling aktif." : "Belum ada riwayat sesi selesai."}
+          </p>
         </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
-          {cases.map((c) => (
+          {shown.map((c) => (
             <div key={c.id} className="rounded-xl border bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -92,6 +114,13 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
                   {TYPES.find(([k]) => k === c.type)?.[1]} · {new Date(c.sessionDate).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
                 <div className="flex gap-1">
+                  {c.status === "RESOLVED" && (
+                    <a href={`/counselor/cases/${c.id}/print`} target="_blank" rel="noopener noreferrer">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Ekspor PDF">
+                        <FileDown className="h-3.5 w-3.5" />
+                      </Button>
+                    </a>
+                  )}
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-purple-600 hover:bg-purple-50" onClick={() => openEdit(c)}>
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
@@ -137,6 +166,7 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
             </div>
             <div className="space-y-1.5"><Label>Tanggal Sesi</Label><Input name="sessionDate" type="date" defaultValue={editing ? toDateInput(editing.sessionDate) : toDateInput(new Date())} /></div>
             <div className="space-y-1.5"><Label>Deskripsi / Permasalahan</Label><Textarea name="description" defaultValue={editing?.description ?? ""} rows={3} placeholder="Uraian permasalahan" /></div>
+            <div className="space-y-1.5"><Label>Catatan Konseling</Label><Textarea name="notes" defaultValue={editing?.notes ?? ""} rows={3} placeholder="Catatan selama sesi konseling berlangsung" /></div>
             <div className="space-y-1.5"><Label>Tindak Lanjut</Label><Textarea name="followUp" defaultValue={editing?.followUp ?? ""} rows={2} placeholder="Rencana / hasil tindak lanjut" /></div>
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input type="checkbox" name="isConfidential" defaultChecked={editing ? editing.isConfidential : true} className="h-4 w-4 rounded border-gray-300" />

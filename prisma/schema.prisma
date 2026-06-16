@@ -634,6 +634,7 @@ model CounselingCase {
   status         CounselingStatus @default(OPEN)
   title          String
   description    String?
+  notes          String?          @map("session_notes")
   followUp       String?          @map("follow_up")
   isConfidential Boolean          @default(true) @map("is_confidential")
   sessionDate    DateTime         @default(now()) @map("session_date")
