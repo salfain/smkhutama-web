@@ -102,7 +102,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
           </Link>
           <Link href="/login">
             <Button size="sm" className="ml-1 gap-1.5 rounded-full bg-blue-600 hover:bg-blue-700">
-              <LogIn className="h-4 w-4" />Login CBT
+              <LogIn className="h-4 w-4" />Login
             </Button>
           </Link>
           <ThemeToggle className={scrolled ? "" : "text-white hover:text-white hover:bg-white/10"} />
@@ -152,7 +152,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
             </Link>
             <Link href="/login" onClick={() => setOpen(false)}>
               <Button size="sm" className="mt-1 w-full gap-1.5 bg-blue-600 hover:bg-blue-700">
-                <LogIn className="h-4 w-4" />Login CBT
+                <LogIn className="h-4 w-4" />Login
               </Button>
             </Link>
           </div>
