@@ -104,6 +104,12 @@ enum RequestStatus {
   REJECTED
 }
 
+enum SummonStatus {
+  PENDING
+  SENT
+  DONE
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -178,10 +184,12 @@ model Class {
   name      String   // e.g. "XII TKJ 1"
   grade     String   // X, XI, XII
   majorId   String   @map("major_id")
+  homeroomTeacherId String? @map("homeroom_teacher_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   major    Major     @relation(fields: [majorId], references: [id])
+  homeroomTeacher Teacher? @relation("Homeroom", fields: [homeroomTeacherId], references: [id])
   students Student[]
   examParticipants ExamClass[]
 
@@ -225,6 +233,9 @@ model Student {
   violationRecords   ViolationRecord[]
   achievementRecords AchievementRecord[]
   counselingRequests CounselingRequest[]
+  parentSummons      ParentSummon[]
+  homeVisits         HomeVisit[]
+  surveyResponses    SurveyResponse[]
 
   @@map("students")
 }
@@ -242,6 +253,7 @@ model Teacher {
   subject   Subject? @relation(fields: [subjectId], references: [id])
   questions Question[]
   exams     Exam[]
+  homeroomClasses Class[] @relation("Homeroom")
 
   @@map("teachers")
 }
@@ -606,6 +618,8 @@ model Counselor {
   cases        CounselingCase[]
   violations   ViolationRecord[]
   achievements AchievementRecord[]
+  parentSummons ParentSummon[]
+  homeVisits    HomeVisit[]
 
   @@map("counselors")
 }
@@ -700,4 +714,96 @@ model CounselingRequest {
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@map("counseling_requests")
+}
+
+/// Surat pemanggilan orang tua
+model ParentSummon {
+  id          String       @id @default(uuid())
+  studentId   String       @map("student_id")
+  counselorId String       @map("counselor_id")
+  level       String       // SP1 / SP2 / SP3 / PANGGILAN
+  reason      String
+  totalPoints Int          @default(0) @map("total_points")
+  meetingDate DateTime?    @map("meeting_date")
+  status      SummonStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor Counselor @relation(fields: [counselorId], references: [id])
+
+  @@map("parent_summons")
+}
+
+/// Kunjungan rumah (home visit)
+model HomeVisit {
+  id          String   @id @default(uuid())
+  studentId   String   @map("student_id")
+  counselorId String   @map("counselor_id")
+  visitDate   DateTime @default(now()) @map("visit_date")
+  purpose     String
+  address     String?
+  findings    String?
+  result      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor Counselor @relation(fields: [counselorId], references: [id])
+
+  @@map("home_visits")
+}
+
+/// Angket / asesmen kebutuhan siswa (AKPD)
+model Survey {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  questions SurveyQuestion[]
+  responses SurveyResponse[]
+
+  @@map("surveys")
+}
+
+model SurveyQuestion {
+  id          String  @id @default(uuid())
+  surveyId    String  @map("survey_id")
+  text        String
+  category    String?
+  orderNumber Int     @default(0) @map("order_number")
+
+  survey  Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers SurveyAnswer[]
+
+  @@map("survey_questions")
+}
+
+model SurveyResponse {
+  id          String   @id @default(uuid())
+  surveyId    String   @map("survey_id")
+  studentId   String   @map("student_id")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  survey  Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  student Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers SurveyAnswer[]
+
+  @@unique([surveyId, studentId])
+  @@map("survey_responses")
+}
+
+model SurveyAnswer {
+  id         String @id @default(uuid())
+  responseId String @map("response_id")
+  questionId String @map("question_id")
+  value      Int    @default(0)
+
+  response SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([responseId, questionId])
+  @@map("survey_answers")
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, MessagesSquare, ShieldAlert, Award, Inbox, ChevronRight, Menu,
+  CalendarDays, Gavel, Home, BookUser, ClipboardList, BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,10 +15,16 @@ type UserInfo = { name: string };
 
 const navItems = [
   { href: "/counselor/dashboard",    icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/counselor/cases",        icon: MessagesSquare,  label: "Sesi Konseling" },
+  { href: "/counselor/agenda",       icon: CalendarDays,    label: "Agenda" },
   { href: "/counselor/requests",     icon: Inbox,           label: "Permohonan" },
+  { href: "/counselor/cases",        icon: MessagesSquare,  label: "Sesi Konseling" },
   { href: "/counselor/violations",   icon: ShieldAlert,     label: "Pelanggaran" },
   { href: "/counselor/achievements", icon: Award,           label: "Prestasi" },
+  { href: "/counselor/follow-up",    icon: Gavel,           label: "Tindak Lanjut" },
+  { href: "/counselor/home-visits",  icon: Home,            label: "Kunjungan Rumah" },
+  { href: "/counselor/students",     icon: BookUser,        label: "Buku Siswa" },
+  { href: "/counselor/surveys",      icon: ClipboardList,   label: "Angket" },
+  { href: "/counselor/reports",      icon: BarChart3,       label: "Laporan" },
 ];
 
 function SidebarContent({ user }: { user: UserInfo }) {
