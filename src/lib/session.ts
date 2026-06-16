@@ -27,7 +27,9 @@ export async function setSession(userId: string) {
   const c = await cookies();
   c.set(COOKIE_NAME, userId, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    // Set COOKIE_SECURE=true di .env hanya jika server sudah pakai HTTPS.
+    // Di VPS HTTP, biarkan false agar cookie tetap terkirim browser.
+    secure: process.env.COOKIE_SECURE === "true",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
