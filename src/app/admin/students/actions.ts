@@ -246,67 +246,60 @@ export async function importStudentsExcel(formData: FormData) {
       let classId: string | null = null;
       let majorId: string | null = null;
 
-      // Cari kelas — normalize nama dulu (hapus titik, strip, spasi ganda)
+      // Ambil semua kelas sekali (cache di luar loop akan lebih baik, tapi fungsional dulu)
       if (className) {
-        const normalizedInput = className.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim();
+        const normalizedInput = className.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+        const allClasses = await prisma.class.findMany({ select: { id: true, name: true, majorId: true } });
 
-        // 1. Exact match (case-insensitive)
-        let cls = await prisma.class.findFirst({
-          where: { name: { equals: normalizedInput, mode: "insensitive" } },
-        });
+        // Cari exact match (normalized, case-insensitive)
+        let found = allClasses.find((c) =>
+          c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase() === normalizedInput
+        );
 
-        // 2. Contains
-        if (!cls) {
-          cls = await prisma.class.findFirst({
-            where: { name: { contains: normalizedInput, mode: "insensitive" } },
-          });
+        // Cari contains
+        if (!found) {
+          found = allClasses.find((c) =>
+            c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase().includes(normalizedInput)
+          );
         }
 
-        // 3. Ambil semua kelas dan cari secara normalized
-        if (!cls) {
-          const allClasses = await prisma.class.findMany({ select: { id: true, name: true, majorId: true } });
-          const inputLower = normalizedInput.toLowerCase();
-          const found = allClasses.find((c) => {
-            const norm = c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
-            return norm === inputLower || norm.includes(inputLower) || inputLower.includes(norm);
-          });
-          if (found) { classId = found.id; majorId = found.majorId; }
+        // Cari input contains nama kelas
+        if (!found) {
+          found = allClasses.find((c) =>
+            normalizedInput.includes(c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase())
+          );
         }
 
-        // 4. Kalau user tulis tanpa prefix tingkat (misal "TKJ 1"), coba dengan prefix
-        if (!classId && !normalizedInput.match(/^(X|XI|XII|XIII)\s/i)) {
-          for (const g of ["X", "XI", "XII"]) {
-            const attempt = await prisma.class.findFirst({
-              where: { name: { equals: `${g} ${normalizedInput}`, mode: "insensitive" } },
-            });
-            if (attempt) { classId = attempt.id; majorId = attempt.majorId; break; }
+        // Coba tambah prefix tingkat
+        if (!found && !normalizedInput.match(/^(x|xi|xii|xiii)\s/)) {
+          for (const g of ["x", "xi", "xii"]) {
+            found = allClasses.find((c) =>
+              c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase() === `${g} ${normalizedInput}`
+            );
+            if (found) break;
           }
         }
 
-        if (!classId && cls) { classId = cls.id; majorId = cls.majorId; }
+        if (found) { classId = found.id; majorId = found.majorId; }
       }
 
-      // Kalau kelas tidak ketemu tapi jurusan ada, cari majorId langsung
+      // Kalau kelas tidak ketemu tapi kolom jurusan ada, cari majorId dari jurusan
       if (!majorId && majorRaw) {
-        const major = await prisma.major.findFirst({
-          where: {
-            OR: [
-              { code: { equals: majorRaw, mode: "insensitive" } },
-              { name: { contains: majorRaw, mode: "insensitive" } },
-            ],
-          },
-        });
-        if (major) majorId = major.id;
+        const allMajors = await prisma.major.findMany({ select: { id: true, code: true, name: true } });
+        const majorLower = majorRaw.toLowerCase();
+        const foundMajor = allMajors.find((m) =>
+          m.code.toLowerCase() === majorLower || m.name.toLowerCase().includes(majorLower)
+        );
+        if (foundMajor) majorId = foundMajor.id;
       }
 
-      // Kalau ada className tapi tidak ketemu dan majorRaw → coba cari kelas berdasarkan jurusan
+      // Kalau jurusan ketemu tapi kelas belum → coba cari kelas di jurusan itu
       if (!classId && majorId && className) {
-        const normalizedInput = className.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim();
-        const allInMajor = await prisma.class.findMany({ where: { majorId }, select: { id: true, name: true, majorId: true } });
-        const inputLower = normalizedInput.toLowerCase();
-        const found = allInMajor.find((c) => {
+        const normalizedInput = className.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+        const classesInMajor = await prisma.class.findMany({ where: { majorId }, select: { id: true, name: true } });
+        const found = classesInMajor.find((c) => {
           const norm = c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
-          return norm === inputLower || norm.includes(inputLower) || inputLower.includes(norm);
+          return norm === normalizedInput || norm.includes(normalizedInput) || normalizedInput.includes(norm);
         });
         if (found) classId = found.id;
       }
