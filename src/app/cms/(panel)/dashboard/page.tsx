@@ -19,7 +19,7 @@ export default async function CmsDashboard() {
     { label: "Jurusan", value: majors, icon: GraduationCap, color: "text-blue-600", bg: "bg-blue-50", href: "/cms/majors" },
     { label: "Berita", value: news, icon: Newspaper, color: "text-indigo-600", bg: "bg-indigo-50", href: "/cms/news" },
     { label: "Pendaftar PPDB", value: registrations, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", href: "/cms/registrations" },
-    { label: "Statistik", value: stats, icon: BarChart3, color: "text-orange-600", bg: "bg-orange-50", href: "/cms/stats" },
+    { label: "Statistik", value: stats, icon: BarChart3, color: "text-blue-600", bg: "bg-blue-50", href: "/cms/stats" },
     { label: "Gambar Hero", value: heroImages, icon: ImageIcon, color: "text-cyan-600", bg: "bg-cyan-50", href: "/cms/hero-images" },
   ];
 

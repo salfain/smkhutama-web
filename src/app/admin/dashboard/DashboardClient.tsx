@@ -49,7 +49,7 @@ export function DashboardClient({ stats, recentExams, scoreChartData, schoolName
     { title: "Total Siswa", value: stats.totalStudents, icon: Users, color: "text-blue-600", bg: "bg-blue-50", change: "Terdaftar" },
     { title: "Total Guru", value: stats.totalTeachers, icon: GraduationCap, color: "text-emerald-600", bg: "bg-emerald-50", change: "Aktif" },
     { title: "Total Kelas", value: stats.totalClasses, icon: Building2, color: "text-purple-600", bg: "bg-purple-50", change: "Kelas" },
-    { title: "Mata Pelajaran", value: stats.totalSubjects, icon: BookOpen, color: "text-orange-600", bg: "bg-orange-50", change: activeYear },
+    { title: "Mata Pelajaran", value: stats.totalSubjects, icon: BookOpen, color: "text-blue-600", bg: "bg-blue-50", change: activeYear },
     { title: "Bank Soal", value: stats.totalQuestions, icon: FileText, color: "text-cyan-600", bg: "bg-cyan-50", change: "Aktif" },
     { title: "Ujian Aktif", value: stats.activeExams, icon: MonitorCheck, color: "text-red-600", bg: "bg-red-50", change: "Berlangsung" },
     { title: "Sedang Ujian", value: stats.inProgressAttempts, icon: Clock, color: "text-yellow-600", bg: "bg-yellow-50", change: "Online" },

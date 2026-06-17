@@ -34,15 +34,15 @@ export default async function GuruPage() {
                   <div className="relative">
                     {t.photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={t.photo} alt={t.name} className="h-24 w-24 rounded-full object-cover ring-4 ring-amber-100 dark:ring-amber-400/20 transition-transform group-hover:scale-105" />
+                      <img src={t.photo} alt={t.name} className="h-24 w-24 rounded-full object-cover ring-4 ring-sky-100 dark:ring-sky-400/20 transition-transform group-hover:scale-105" />
                     ) : (
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-2xl font-bold text-slate-900 ring-4 ring-amber-100">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-2xl font-bold text-slate-900 ring-4 ring-sky-100">
                         {t.name.charAt(0)}
                       </div>
                     )}
                   </div>
                   <h3 className="mt-4 text-sm font-bold text-slate-900 dark:text-white leading-snug">{t.name}</h3>
-                  <span className="mt-2 inline-block rounded-full bg-amber-100 dark:bg-amber-400/10 px-3 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                  <span className="mt-2 inline-block rounded-full bg-sky-100 dark:bg-sky-400/10 px-3 py-1 text-[11px] font-semibold text-sky-700 dark:text-sky-300">
                     {t.position}
                   </span>
                   {t.subject && <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t.subject}</p>}

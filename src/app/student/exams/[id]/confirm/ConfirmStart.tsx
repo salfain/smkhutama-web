@@ -109,7 +109,7 @@ export function ConfirmStart({
       <Button
         onClick={handleStart}
         disabled={pending}
-        className="w-full h-12 bg-orange-500 hover:bg-orange-600 font-semibold text-base gap-2"
+        className="w-full h-12 bg-blue-500 hover:bg-blue-600 font-semibold text-base gap-2"
       >
         {pending ? "Memuat..." : (
           <>

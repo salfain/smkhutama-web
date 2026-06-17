@@ -63,15 +63,15 @@ export default async function KontakPage() {
                   href={c.href ?? "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-4 rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-amber-300 cursor-pointer"
+                  className="group flex items-start gap-4 rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-sky-300 cursor-pointer"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow transition-transform group-hover:scale-110">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow transition-transform group-hover:scale-110">
                     <c.icon className="h-5 w-5 text-slate-900" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{c.label}</p>
                     <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">{c.value}</p>
-                    <p className="mt-2 text-xs font-semibold text-amber-600 dark:text-amber-400 opacity-0 transition-opacity group-hover:opacity-100">
+                    <p className="mt-2 text-xs font-semibold text-sky-600 dark:text-sky-400 opacity-0 transition-opacity group-hover:opacity-100">
                       {c.action} →
                     </p>
                   </div>

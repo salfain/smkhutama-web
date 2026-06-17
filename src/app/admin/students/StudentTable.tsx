@@ -216,7 +216,7 @@ export function StudentTable({
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="Edit" onClick={() => openEdit(s)}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-orange-600 hover:bg-orange-50" title="Reset Password" onClick={() => handleReset(s)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="Reset Password" onClick={() => handleReset(s)}>
                           <RotateCcw className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon" className={`h-8 w-8 ${s.user.isActive ? "text-yellow-600 hover:bg-yellow-50" : "text-green-600 hover:bg-green-50"}`} title={s.user.isActive ? "Nonaktifkan" : "Aktifkan"} onClick={() => handleToggle(s)}>

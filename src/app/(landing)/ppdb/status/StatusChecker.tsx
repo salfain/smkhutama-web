@@ -40,7 +40,7 @@ export function StatusChecker() {
         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nomor Pendaftaran</label>
         <div className="mt-2 flex gap-2">
           <Input value={num} onChange={(e) => setNum(e.target.value)} placeholder="PPDB-2026-12345" className="h-11" />
-          <Button type="submit" className="h-11 gap-1.5 bg-amber-400 px-5 font-semibold text-slate-900 hover:bg-amber-300" disabled={pending}>
+          <Button type="submit" className="h-11 gap-1.5 bg-sky-400 px-5 font-semibold text-slate-900 hover:bg-sky-300" disabled={pending}>
             <Search className="h-4 w-4" />{pending ? "..." : "Cek"}
           </Button>
         </div>
@@ -56,7 +56,7 @@ export function StatusChecker() {
               <>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="font-mono text-sm font-bold text-amber-600 dark:text-amber-400">{result.registNumber}</p>
+                    <p className="font-mono text-sm font-bold text-sky-600 dark:text-sky-400">{result.registNumber}</p>
                     <p className="mt-0.5 text-lg font-bold text-slate-900 dark:text-white">{result.fullName}</p>
                     <p className="text-xs text-slate-500">Pilihan: {result.selectedMajor}</p>
                   </div>

@@ -37,17 +37,17 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
           backgroundSize: "48px 48px",
         }}
       />
-      {/* Amber glow */}
+      {/* Sky glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-amber-500/20 blur-[120px] dark:bg-amber-500/20" />
-        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-orange-500/10 blur-3xl" />
-        <div className="absolute -right-20 top-40 h-72 w-72 rounded-full bg-amber-400/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-sky-500/20 blur-[120px] dark:bg-sky-500/20" />
+        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="absolute -right-20 top-40 h-72 w-72 rounded-full bg-sky-400/10 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-5xl px-4 pt-28 pb-0 text-center md:pt-32">
         <RevealContainer className="flex flex-col items-center">
           <RevealItem>
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-600 dark:border-amber-400/30 dark:text-amber-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-600 dark:border-sky-400/30 dark:text-sky-300">
               <Sparkles className="h-3.5 w-3.5" />
               {badge ?? "SMK HUTAMA PONDOK GEDE"}
             </span>
@@ -58,7 +58,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
               {title ?? (
                 <>
                   Cetak Generasi{" "}
-                  <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent dark:from-amber-300 dark:via-orange-400 dark:to-amber-500">
+                  <span className="bg-gradient-to-r from-sky-400 via-blue-500 to-sky-600 bg-clip-text text-transparent dark:from-sky-300 dark:via-blue-400 dark:to-sky-500">
                     Unggul & Berdaya Saing
                   </span>
                 </>
@@ -74,7 +74,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
 
           <RevealItem className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Link href="/ppdb">
-              <Button size="lg" className="group gap-2 rounded-full bg-amber-400 px-7 font-semibold text-slate-900 shadow-lg shadow-amber-500/25 hover:bg-amber-300">
+              <Button size="lg" className="group gap-2 rounded-full bg-sky-400 px-7 font-semibold text-slate-900 shadow-lg shadow-sky-500/25 hover:bg-sky-300">
                 Daftar Sekarang
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -96,7 +96,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
                 className={`relative ${cardPos[i]} transition-transform duration-500`}
                 style={{ marginLeft: i === 0 ? 0 : "-3rem", marginRight: i === 2 ? 0 : "-3rem" }}
               >
-                <div className="overflow-hidden rounded-3xl bg-gradient-to-b from-amber-300 to-orange-500 p-1.5 shadow-2xl shadow-amber-900/40 ring-1 ring-white/10">
+                <div className="overflow-hidden rounded-3xl bg-gradient-to-b from-sky-300 to-blue-500 p-1.5 shadow-2xl shadow-sky-900/40 ring-1 ring-white/10">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={src}
@@ -117,7 +117,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
           <RevealContainer className="relative z-30 mt-8 grid grid-cols-2 gap-3 pb-12 sm:grid-cols-4">
             {stats.slice(0, 4).map((s) => (
               <RevealItem key={s.id} className="rounded-2xl border border-slate-200 bg-white/80 px-3 py-4 shadow-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none dark:backdrop-blur">
-                <div className="font-heading text-2xl font-bold text-amber-500 dark:text-amber-300 md:text-3xl">{s.value}</div>
+                <div className="font-heading text-2xl font-bold text-sky-500 dark:text-sky-300 md:text-3xl">{s.value}</div>
                 <div className="mt-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">{s.label}</div>
               </RevealItem>
             ))}

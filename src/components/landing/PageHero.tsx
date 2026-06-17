@@ -22,13 +22,13 @@ export function PageHero({
           WebkitMaskImage: "radial-gradient(ellipse 70% 80% at 50% 0%, black, transparent)",
         }}
       />
-      {/* Amber glow */}
+      {/* Sky glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-amber-500/20 blur-[110px]" />
+        <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-sky-500/20 blur-[110px]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 pt-32 pb-16 text-center">
-        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/25">
+        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25">
           <Icon className="h-7 w-7 text-slate-900" />
         </div>
         <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-4xl">{title}</h1>

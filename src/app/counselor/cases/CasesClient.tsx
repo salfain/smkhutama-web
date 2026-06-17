@@ -21,7 +21,7 @@ type Case = {
 const TYPES = [["PRIBADI", "Pribadi"], ["SOSIAL", "Sosial"], ["BELAJAR", "Belajar"], ["KARIR", "Karir"]];
 const STATUSES = [["OPEN", "Terbuka"], ["IN_PROGRESS", "Proses"], ["RESOLVED", "Selesai"], ["REFERRED", "Rujukan"]];
 const statusCls: Record<string, string> = {
-  OPEN: "bg-blue-100 text-blue-700", IN_PROGRESS: "bg-amber-100 text-amber-700",
+  OPEN: "bg-blue-100 text-blue-700", IN_PROGRESS: "bg-sky-100 text-sky-700",
   RESOLVED: "bg-green-100 text-green-700", REFERRED: "bg-purple-100 text-purple-700",
 };
 

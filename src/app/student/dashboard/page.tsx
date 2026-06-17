@@ -55,10 +55,10 @@ export default async function StudentDashboard() {
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6">
-      <div className="mb-6 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 p-5 text-white">
-        <p className="text-orange-100 text-sm">Selamat datang,</p>
+      <div className="mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 p-5 text-white">
+        <p className="text-blue-100 text-sm">Selamat datang,</p>
         <h1 className="font-heading text-xl font-bold">{user.name}</h1>
-        <p className="text-orange-100 text-sm mt-0.5">
+        <p className="text-blue-100 text-sm mt-0.5">
           {user.student.class?.name ?? "Kelas belum ditentukan"}
           {user.student.nis && ` · NIS: ${user.student.nis}`} ·{" "}
           {now.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
@@ -67,7 +67,7 @@ export default async function StudentDashboard() {
 
       <div className="mb-6">
         <div className="mb-3 flex items-center gap-2">
-          <CalendarDays className="h-5 w-5 text-orange-600" />
+          <CalendarDays className="h-5 w-5 text-blue-600" />
           <h2 className="font-semibold text-gray-900">Ujian Hari Ini</h2>
         </div>
         {todayExams.length === 0 ? (

@@ -21,7 +21,7 @@ const ICON_OPTIONS = ["Sparkles", "Tent", "Trophy", "Volleyball", "Flag", "Moon"
 const COLOR_OPTIONS = [
   { label: "Biru", value: "from-blue-500 to-indigo-600" },
   { label: "Hijau", value: "from-green-500 to-emerald-600" },
-  { label: "Oranye", value: "from-amber-500 to-orange-600" },
+  { label: "Oranye", value: "from-sky-500 to-blue-600" },
   { label: "Merah", value: "from-red-500 to-rose-600" },
   { label: "Ungu", value: "from-purple-500 to-fuchsia-600" },
   { label: "Pink", value: "from-pink-500 to-rose-600" },

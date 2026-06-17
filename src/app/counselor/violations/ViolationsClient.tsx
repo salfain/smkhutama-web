@@ -20,7 +20,7 @@ type Violation = {
 
 const CATS = [["RINGAN", "Ringan"], ["SEDANG", "Sedang"], ["BERAT", "Berat"]];
 const catCls: Record<string, string> = {
-  RINGAN: "bg-yellow-100 text-yellow-700", SEDANG: "bg-orange-100 text-orange-700", BERAT: "bg-red-100 text-red-700",
+  RINGAN: "bg-yellow-100 text-yellow-700", SEDANG: "bg-blue-100 text-blue-700", BERAT: "bg-red-100 text-red-700",
 };
 const toDateInput = (d: string | Date) => new Date(d).toISOString().slice(0, 10);
 
@@ -100,7 +100,7 @@ export function ViolationsClient({ violations, types, students }: { violations: 
                   <td className="px-4 py-3">
                     {v.typeName && <p className="text-xs font-medium text-gray-700">{v.typeName}</p>}
                     <p className="text-xs text-gray-500">{v.description}</p>
-                    {v.sanction && <p className="text-[11px] text-amber-600">Sanksi: {v.sanction}</p>}
+                    {v.sanction && <p className="text-[11px] text-sky-600">Sanksi: {v.sanction}</p>}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">{v.points}</span>

@@ -21,7 +21,7 @@ export function StudentHeader({ user }: { user: UserInfo }) {
     <header className="sticky top-0 z-30 border-b bg-white shadow-sm">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500 font-bold text-white text-xs">CB</div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 font-bold text-white text-xs">CB</div>
           <span className="text-sm font-bold text-gray-900 hidden sm:block">CBT SMK HUTAMA</span>
         </div>
         <nav className="flex items-center gap-1">
@@ -30,7 +30,7 @@ export function StudentHeader({ user }: { user: UserInfo }) {
             return (
               <Link key={item.href} href={item.href}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  active ? "bg-orange-50 text-orange-600" : "text-gray-600 hover:bg-gray-100"
+                  active ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-100"
                 }`}>
                 <item.icon className="h-4 w-4" />
                 <span className="hidden sm:inline">{item.label}</span>

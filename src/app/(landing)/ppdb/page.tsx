@@ -27,10 +27,10 @@ export default async function PpdbPage() {
           }}
         />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-amber-500/20 blur-[110px]" />
+          <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-sky-500/20 blur-[110px]" />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 pt-32 pb-20 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/25">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25">
             <GraduationCap className="h-8 w-8 text-slate-900" />
           </div>
           <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-5xl">
@@ -143,11 +143,11 @@ export default async function PpdbPage() {
 function StepBadge({ number, label, icon }: { number: string; label: string; icon: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm dark:border-white/10 dark:bg-white/5">
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-xs font-bold text-slate-900">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-400 text-xs font-bold text-slate-900">
         {number}
       </span>
       <span className="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
-      <span className="sm:hidden text-amber-500">{icon}</span>
+      <span className="sm:hidden text-sky-500">{icon}</span>
     </div>
   );
 }

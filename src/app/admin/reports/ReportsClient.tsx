@@ -71,7 +71,7 @@ export function ReportsClient({ stats, recentClosed }: { stats: Stats; recentClo
     { label: "Total Ujian", value: stats.totalExams, sub: `${stats.activeExams} aktif · ${stats.closedExams} selesai`, icon: ClipboardList, color: "text-blue-600", bg: "bg-blue-50" },
     { label: "Total Siswa", value: stats.totalStudents, sub: "siswa terdaftar", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50" },
     { label: "Total Guru", value: stats.totalTeachers, sub: "guru aktif", icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
-    { label: "Total Kelas", value: stats.totalClasses, sub: `${stats.totalSubjects} mata pelajaran`, icon: Building2, color: "text-orange-600", bg: "bg-orange-50" },
+    { label: "Total Kelas", value: stats.totalClasses, sub: `${stats.totalSubjects} mata pelajaran`, icon: Building2, color: "text-blue-600", bg: "bg-blue-50" },
   ];
 
   return (

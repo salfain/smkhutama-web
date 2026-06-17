@@ -28,14 +28,14 @@ type Survey = { id: string; title: string; description: string; questionCount: n
 const typeLabel: Record<string, string> = { PRIBADI: "Pribadi", SOSIAL: "Sosial", BELAJAR: "Belajar", KARIR: "Karir" };
 const caseStatus: Record<string, { label: string; cls: string }> = {
   OPEN: { label: "Terbuka", cls: "bg-blue-100 text-blue-700" },
-  IN_PROGRESS: { label: "Proses", cls: "bg-amber-100 text-amber-700" },
+  IN_PROGRESS: { label: "Proses", cls: "bg-sky-100 text-sky-700" },
   RESOLVED: { label: "Selesai", cls: "bg-green-100 text-green-700" },
   REFERRED: { label: "Rujukan", cls: "bg-purple-100 text-purple-700" },
 };
 const reqStatus: Record<string, { label: string; cls: string }> = {
   PENDING: { label: "Menunggu", cls: "bg-gray-100 text-gray-700" },
   APPROVED: { label: "Disetujui", cls: "bg-blue-100 text-blue-700" },
-  SCHEDULED: { label: "Dijadwalkan", cls: "bg-amber-100 text-amber-700" },
+  SCHEDULED: { label: "Dijadwalkan", cls: "bg-sky-100 text-sky-700" },
   DONE: { label: "Selesai", cls: "bg-green-100 text-green-700" },
   REJECTED: { label: "Ditolak", cls: "bg-red-100 text-red-700" },
 };
@@ -144,7 +144,7 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
                 <div>
                   {v.typeName && <p className="text-sm font-medium text-gray-800">{v.typeName}</p>}
                   <p className="text-xs text-gray-500">{v.description}</p>
-                  {v.sanction && <p className="text-[11px] text-amber-600 mt-0.5">Sanksi: {v.sanction}</p>}
+                  {v.sanction && <p className="text-[11px] text-sky-600 mt-0.5">Sanksi: {v.sanction}</p>}
                   <p className="text-[11px] text-gray-400 mt-0.5">{fmt(v.date)}</p>
                 </div>
                 <span className="shrink-0 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">{v.points}</span>

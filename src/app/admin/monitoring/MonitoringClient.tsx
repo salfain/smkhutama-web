@@ -217,7 +217,7 @@ export function MonitoringClient({
                 {r.attempt && r.statusKey !== "SUBMITTED" && r.statusKey !== "AUTO_SUBMITTED" && (
                   <Button
                     variant="outline" size="sm"
-                    className="mt-3 w-full gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 text-xs"
+                    className="mt-3 w-full gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
                     onClick={() => handleReset(r.attempt!.id, r.user.name)}
                     disabled={pending}
                   >

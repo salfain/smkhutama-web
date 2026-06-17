@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 const typeLabel: Record<string, string> = { PRIBADI: "Pribadi", SOSIAL: "Sosial", BELAJAR: "Belajar", KARIR: "Karir" };
 const statusLabel: Record<string, { label: string; cls: string }> = {
   OPEN: { label: "Terbuka", cls: "bg-blue-100 text-blue-700" },
-  IN_PROGRESS: { label: "Proses", cls: "bg-amber-100 text-amber-700" },
+  IN_PROGRESS: { label: "Proses", cls: "bg-sky-100 text-sky-700" },
   RESOLVED: { label: "Selesai", cls: "bg-green-100 text-green-700" },
   REFERRED: { label: "Rujukan", cls: "bg-purple-100 text-purple-700" },
 };

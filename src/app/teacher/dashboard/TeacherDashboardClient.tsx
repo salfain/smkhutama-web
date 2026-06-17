@@ -47,7 +47,7 @@ export function TeacherDashboardClient({
   const stats = [
     { title: "Bank Soal",       value: d.totalQuestions,    icon: FileText,     color: "text-blue-600",    bg: "bg-blue-50" },
     { title: "Total Ujian",     value: d.totalExams,        icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { title: "Esai Belum Dikoreksi", value: d.pendingEssays, icon: CheckSquare, color: "text-orange-600",  bg: "bg-orange-50" },
+    { title: "Esai Belum Dikoreksi", value: d.pendingEssays, icon: CheckSquare, color: "text-blue-600",  bg: "bg-blue-50" },
     { title: "Total Peserta",   value: d.totalParticipants, icon: Users,        color: "text-purple-600",  bg: "bg-purple-50" },
   ];
 
@@ -69,13 +69,13 @@ export function TeacherDashboardClient({
       </div>
 
       {d.pendingEssays > 0 && (
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-orange-800">
+        <div className="mb-6 flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-blue-800">
             <CheckSquare className="h-4 w-4" />
             <span>Ada <strong>{d.pendingEssays} jawaban esai</strong> yang belum dikoreksi</span>
           </div>
           <Link href="/teacher/essay-grading">
-            <Button size="sm" className="bg-orange-600 hover:bg-orange-700 gap-1">Koreksi <ArrowRight className="h-3.5 w-3.5" /></Button>
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 gap-1">Koreksi <ArrowRight className="h-3.5 w-3.5" /></Button>
           </Link>
         </div>
       )}

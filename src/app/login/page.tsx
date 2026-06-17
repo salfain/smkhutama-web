@@ -15,7 +15,7 @@ type System = "CBT" | "SIBIKONS";
 const roleConfig: Record<Role, { label: string; bg: string; placeholder: string }> = {
   ADMIN:   { label: "Admin",  bg: "bg-blue-600 hover:bg-blue-700",       placeholder: "admin" },
   TEACHER: { label: "Guru",   bg: "bg-emerald-600 hover:bg-emerald-700", placeholder: "sari.dewi" },
-  STUDENT: { label: "Siswa",  bg: "bg-orange-500 hover:bg-orange-600",   placeholder: "2324001 / NIS / Username" },
+  STUDENT: { label: "Siswa",  bg: "bg-blue-500 hover:bg-blue-600",   placeholder: "2324001 / NIS / Username" },
   COUNSELOR: { label: "Guru BK", bg: "bg-purple-600 hover:bg-purple-700", placeholder: "bk.hutama" },
 };
 

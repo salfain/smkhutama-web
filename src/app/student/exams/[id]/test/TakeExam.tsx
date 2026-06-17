@@ -258,13 +258,13 @@ export function TakeExam({
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
-      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-orange-500" : "bg-white"}`}>
+      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-blue-500" : "bg-white"}`}>
         <div className={`text-sm font-medium ${isCritical || isWarning ? "text-white" : "text-gray-700"}`}>
           <span className="font-semibold">{subjectCode}</span>
           <span className="mx-2 opacity-40">·</span>
           <span className="text-xs opacity-75 truncate max-w-[200px] inline-block align-bottom">{title}</span>
         </div>
-        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-orange-600 text-white" : "bg-gray-100 text-gray-800"}`}>
+        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}`}>
           <Clock className="h-4 w-4" />{formatTime(timeLeft)}
         </div>
         <div className="flex items-center gap-2">
@@ -391,7 +391,7 @@ export function TakeExam({
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-orange-500" />Konfirmasi Submit Ujian
+              <AlertCircle className="h-5 w-5 text-blue-500" />Konfirmasi Submit Ujian
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -402,7 +402,7 @@ export function TakeExam({
               <div className="flex justify-between"><span className="text-gray-500">Belum dijawab</span><span className="font-semibold text-red-500">{unanswered}</span></div>
             </div>
             {unanswered > 0 && (
-              <p className="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-lg p-2.5">
+              <p className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg p-2.5">
                 Masih ada {unanswered} soal yang belum dijawab. Yakin ingin submit?
               </p>
             )}

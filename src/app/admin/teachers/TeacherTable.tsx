@@ -206,7 +206,7 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="Edit" onClick={() => openEdit(t)}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-orange-600 hover:bg-orange-50" title="Reset Password" onClick={() => handleReset(t)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="Reset Password" onClick={() => handleReset(t)}>
                           <RotateCcw className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon"

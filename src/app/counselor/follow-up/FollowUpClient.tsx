@@ -22,7 +22,7 @@ const statusCls: Record<string, { label: string; cls: string }> = {
   DONE: { label: "Selesai", cls: "bg-green-100 text-green-700" },
 };
 const levelCls: Record<string, string> = {
-  SP1: "bg-yellow-100 text-yellow-700", SP2: "bg-orange-100 text-orange-700",
+  SP1: "bg-yellow-100 text-yellow-700", SP2: "bg-blue-100 text-blue-700",
   SP3: "bg-red-100 text-red-700", PANGGILAN: "bg-purple-100 text-purple-700",
 };
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });

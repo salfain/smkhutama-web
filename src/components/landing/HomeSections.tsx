@@ -32,7 +32,7 @@ export function HomeMajors({ majors }: { majors: Major[] }) {
       <div className="mx-auto max-w-6xl px-4 py-16">
         <RevealContainer>
           <RevealItem className="mb-10 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-400/10 dark:text-amber-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700 dark:bg-sky-400/10 dark:text-sky-300">
               <GraduationCap className="h-3.5 w-3.5" />Program Keahlian
             </span>
             <h2 className="mt-3 font-heading text-3xl font-bold tracking-tight text-slate-900 dark:text-white md:text-4xl">
@@ -46,14 +46,14 @@ export function HomeMajors({ majors }: { majors: Major[] }) {
             {majors.map((m, i) => (
               <RevealCard key={m.id}
                 className="group relative overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-xl">
-                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-500/10 dark:to-orange-500/10 opacity-60 transition-transform group-hover:scale-150" />
+                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 dark:from-sky-500/10 dark:to-blue-500/10 opacity-60 transition-transform group-hover:scale-150" />
                 <div className="relative">
-                  <span className="inline-block rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 px-3 py-1 text-xs font-bold text-slate-900 shadow">
+                  <span className="inline-block rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 px-3 py-1 text-xs font-bold text-slate-900 shadow">
                     {m.code}
                   </span>
                   <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">{m.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{m.description}</p>
-                  <span className="mt-4 inline-block text-xs font-semibold text-amber-600 dark:text-amber-400">0{i + 1}</span>
+                  <span className="mt-4 inline-block text-xs font-semibold text-sky-600 dark:text-sky-400">0{i + 1}</span>
                 </div>
               </RevealCard>
             ))}

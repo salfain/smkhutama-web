@@ -38,7 +38,7 @@ export default async function FinishPage({ params }: { params: Promise<{ id: str
       <div className={`mb-5 rounded-2xl p-6 text-center text-white ${
         isWaiting ? "bg-gradient-to-br from-gray-500 to-gray-600"
         : passed ? "bg-gradient-to-br from-green-500 to-emerald-600"
-        : "bg-gradient-to-br from-orange-500 to-red-500"
+        : "bg-gradient-to-br from-blue-500 to-red-500"
       }`}>
         <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
           {isWaiting ? <Hourglass className="h-8 w-8" /> : passed ? <Trophy className="h-8 w-8" /> : <CheckCircle className="h-8 w-8" />}

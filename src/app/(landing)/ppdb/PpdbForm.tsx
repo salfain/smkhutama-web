@@ -54,7 +54,7 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
             📱 Panitia akan menghubungi Anda via WhatsApp untuk verifikasi dan informasi selanjutnya. Terima kasih telah mendaftar di SMK Hutama!
           </p>
         </div>
-        <a href="/ppdb/status" className="mt-4 inline-block text-sm font-semibold text-amber-600 hover:underline dark:text-amber-400">
+        <a href="/ppdb/status" className="mt-4 inline-block text-sm font-semibold text-sky-600 hover:underline dark:text-sky-400">
           Cek status pendaftaran →
         </a>
       </div>
@@ -186,7 +186,7 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
       {/* Submit */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 shadow-sm">
         <Button type="submit" size="lg"
-          className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-900 font-semibold text-base shadow-lg shadow-amber-500/25 transition-all hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-0.5"
+          className="w-full h-12 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-900 font-semibold text-base shadow-lg shadow-sky-500/25 transition-all hover:shadow-xl hover:shadow-sky-500/30 hover:-translate-y-0.5"
           disabled={pending}
         >
           {pending ? (

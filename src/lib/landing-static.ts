@@ -40,7 +40,7 @@ export const EXTRACURRICULARS: Extracurricular[] = [
     description: "Membentuk karakter disiplin, mandiri, dan jiwa kepemimpinan melalui kegiatan kepramukaan.",
     schedule: "Jumat, 14:00 – 16:00",
     icon: "Tent",
-    color: "from-amber-500 to-orange-600",
+    color: "from-sky-500 to-blue-600",
     image: "https://images.unsplash.com/photo-1533873984035-25970ab07461?w=600&q=80",
   },
   {
@@ -58,7 +58,7 @@ export const EXTRACURRICULARS: Extracurricular[] = [
     description: "Latihan teknik dan strategi bola basket untuk turnamen dan pengembangan fisik.",
     schedule: "Rabu, 15:30 – 17:00",
     icon: "Volleyball",
-    color: "from-orange-500 to-red-600",
+    color: "from-blue-500 to-red-600",
     image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80",
   },
   {

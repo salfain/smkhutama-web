@@ -18,10 +18,10 @@ type Request = {
 const STATUSES = [["PENDING", "Menunggu"], ["APPROVED", "Disetujui"], ["SCHEDULED", "Dijadwalkan"], ["DONE", "Selesai"], ["REJECTED", "Ditolak"]];
 const statusCls: Record<string, string> = {
   PENDING: "bg-gray-100 text-gray-700", APPROVED: "bg-blue-100 text-blue-700",
-  SCHEDULED: "bg-amber-100 text-amber-700", DONE: "bg-green-100 text-green-700", REJECTED: "bg-red-100 text-red-700",
+  SCHEDULED: "bg-sky-100 text-sky-700", DONE: "bg-green-100 text-green-700", REJECTED: "bg-red-100 text-red-700",
 };
 const urgencyCls: Record<string, string> = {
-  RENDAH: "bg-slate-100 text-slate-600", SEDANG: "bg-amber-100 text-amber-700", TINGGI: "bg-red-100 text-red-700",
+  RENDAH: "bg-slate-100 text-slate-600", SEDANG: "bg-sky-100 text-sky-700", TINGGI: "bg-red-100 text-red-700",
 };
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 

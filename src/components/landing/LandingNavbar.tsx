@@ -56,12 +56,12 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoUrl} alt={shortName} className="h-9 w-9 object-contain" />
             ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-400">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400">
                 <GraduationCap className="h-5 w-5 text-slate-900" />
               </div>
             )}
             <div className="leading-tight">
-              <div className="text-[9px] uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300/80">SMK</div>
+              <div className="text-[9px] uppercase tracking-[0.18em] text-sky-600 dark:text-sky-300/80">SMK</div>
               <div className="text-sm font-bold text-slate-900 dark:text-white">{shortName}</div>
             </div>
           </Link>
@@ -79,7 +79,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                     <div className="min-w-[210px] rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#0f0f17]">
                       {item.children.map((child) => (
                         <Link key={child.href} href={child.href}
-                          className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-amber-400/10 hover:text-amber-600 dark:text-slate-300 dark:hover:text-amber-300">
+                          className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-sky-400/10 hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-300">
                           {child.label}
                         </Link>
                       ))}
@@ -103,7 +103,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
               </Button>
             </Link>
             <Link href="/ppdb">
-              <Button size="sm" className="rounded-full bg-amber-400 px-5 font-semibold text-slate-900 hover:bg-amber-300">
+              <Button size="sm" className="rounded-full bg-sky-400 px-5 font-semibold text-slate-900 hover:bg-sky-300">
                 Daftar PPDB
               </Button>
             </Link>
@@ -132,7 +132,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                       <ChevronDown className={`h-4 w-4 transition-transform ${openGroup === item.label ? "rotate-180" : ""}`} />
                     </button>
                     {openGroup === item.label && (
-                      <div className="ml-3 flex flex-col gap-1 border-l-2 border-amber-400/40 pl-3">
+                      <div className="ml-3 flex flex-col gap-1 border-l-2 border-sky-400/40 pl-3">
                         {item.children.map((child) => (
                           <Link key={child.href} href={child.href} onClick={() => setOpen(false)}
                             className="rounded-lg py-2 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
@@ -155,7 +155,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                 </Button>
               </Link>
               <Link href="/ppdb" onClick={() => setOpen(false)}>
-                <Button size="sm" className="mt-1 w-full rounded-full bg-amber-400 font-semibold text-slate-900 hover:bg-amber-300">
+                <Button size="sm" className="mt-1 w-full rounded-full bg-sky-400 font-semibold text-slate-900 hover:bg-sky-300">
                   Daftar PPDB
                 </Button>
               </Link>

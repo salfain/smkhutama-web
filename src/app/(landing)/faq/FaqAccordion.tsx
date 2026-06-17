@@ -19,7 +19,7 @@ export function FaqAccordion({ items }: { items: Faq[] }) {
               className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
             >
               <span className="font-semibold text-slate-900 dark:text-white">{f.question}</span>
-              <ChevronDown className={`h-5 w-5 shrink-0 text-amber-500 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`h-5 w-5 shrink-0 text-sky-500 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
             <div className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
               <div className="overflow-hidden">

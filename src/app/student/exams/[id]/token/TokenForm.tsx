@@ -40,8 +40,8 @@ export function TokenForm({ examId, examTitle, subjectCode, startAt, endAt }: Pr
 
   return (
     <div className="rounded-2xl border bg-white p-8 shadow-sm text-center">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100">
-        <KeyRound className="h-8 w-8 text-orange-600" />
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100">
+        <KeyRound className="h-8 w-8 text-blue-600" />
       </div>
       <h1 className="font-heading text-xl font-bold text-gray-900">Masukkan Token Ujian</h1>
       <p className="mt-2 text-sm text-gray-500">Minta token kepada pengawas ujian</p>
@@ -70,7 +70,7 @@ export function TokenForm({ examId, examTitle, subjectCode, startAt, endAt }: Pr
           </div>
         )}
 
-        <Button type="submit" className="w-full h-12 bg-orange-500 hover:bg-orange-600 font-semibold" disabled={pending}>
+        <Button type="submit" className="w-full h-12 bg-blue-500 hover:bg-blue-600 font-semibold" disabled={pending}>
           {pending ? (
             <span className="flex items-center gap-2">
               <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />Memvalidasi...
