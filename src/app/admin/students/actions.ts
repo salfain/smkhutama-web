@@ -246,27 +246,44 @@ export async function importStudentsExcel(formData: FormData) {
       let classId: string | null = null;
       let majorId: string | null = null;
 
-      // Cari kelas — cocokkan nama persis dulu, lalu contains, lalu cari tanpa prefix tingkat
+      // Cari kelas — normalize nama dulu (hapus titik, strip, spasi ganda)
       if (className) {
+        const normalizedInput = className.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim();
+
+        // 1. Exact match (case-insensitive)
         let cls = await prisma.class.findFirst({
-          where: { name: { equals: className, mode: "insensitive" } },
+          where: { name: { equals: normalizedInput, mode: "insensitive" } },
         });
+
+        // 2. Contains
         if (!cls) {
           cls = await prisma.class.findFirst({
-            where: { name: { contains: className, mode: "insensitive" } },
+            where: { name: { contains: normalizedInput, mode: "insensitive" } },
           });
         }
-        // Kalau user tulis "X TKJ 1" atau hanya "TKJ 1", coba cari
-        if (!cls && !className.match(/^(X|XI|XII|XIII)\s/i)) {
-          // Coba tambahkan prefix tingkat umum
+
+        // 3. Ambil semua kelas dan cari secara normalized
+        if (!cls) {
+          const allClasses = await prisma.class.findMany({ select: { id: true, name: true, majorId: true } });
+          const inputLower = normalizedInput.toLowerCase();
+          const found = allClasses.find((c) => {
+            const norm = c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+            return norm === inputLower || norm.includes(inputLower) || inputLower.includes(norm);
+          });
+          if (found) { classId = found.id; majorId = found.majorId; }
+        }
+
+        // 4. Kalau user tulis tanpa prefix tingkat (misal "TKJ 1"), coba dengan prefix
+        if (!classId && !normalizedInput.match(/^(X|XI|XII|XIII)\s/i)) {
           for (const g of ["X", "XI", "XII"]) {
-            cls = await prisma.class.findFirst({
-              where: { name: { equals: `${g} ${className}`, mode: "insensitive" } },
+            const attempt = await prisma.class.findFirst({
+              where: { name: { equals: `${g} ${normalizedInput}`, mode: "insensitive" } },
             });
-            if (cls) break;
+            if (attempt) { classId = attempt.id; majorId = attempt.majorId; break; }
           }
         }
-        if (cls) { classId = cls.id; majorId = cls.majorId; }
+
+        if (!classId && cls) { classId = cls.id; majorId = cls.majorId; }
       }
 
       // Kalau kelas tidak ketemu tapi jurusan ada, cari majorId langsung
@@ -284,10 +301,14 @@ export async function importStudentsExcel(formData: FormData) {
 
       // Kalau ada className tapi tidak ketemu dan majorRaw → coba cari kelas berdasarkan jurusan
       if (!classId && majorId && className) {
-        const cls = await prisma.class.findFirst({
-          where: { majorId, name: { contains: className, mode: "insensitive" } },
+        const normalizedInput = className.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim();
+        const allInMajor = await prisma.class.findMany({ where: { majorId }, select: { id: true, name: true, majorId: true } });
+        const inputLower = normalizedInput.toLowerCase();
+        const found = allInMajor.find((c) => {
+          const norm = c.name.replace(/[.\-_]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+          return norm === inputLower || norm.includes(inputLower) || inputLower.includes(norm);
         });
-        if (cls) classId = cls.id;
+        if (found) classId = found.id;
       }
 
       await prisma.user.create({
