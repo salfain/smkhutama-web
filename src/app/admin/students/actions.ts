@@ -218,6 +218,7 @@ export async function importStudentsExcel(formData: FormData) {
     const genderRaw = (row["L/P"] ?? row["Gender"] ?? row["gender"] ?? "").trim().toUpperCase();
     const gender    = genderRaw === "L" ? "MALE" : genderRaw === "P" ? "FEMALE" : null;
     const className = (row["Kelas"] ?? row["kelas"] ?? "").trim();
+    const majorRaw  = (row["Jurusan"] ?? row["jurusan"] ?? row["Kode Jurusan"] ?? "").trim().toUpperCase();
 
     if (!name || !username) {
       errors.push(`Baris ${rowNum}: Nama Lengkap dan Username/NIS wajib diisi`);
@@ -233,11 +234,31 @@ export async function importStudentsExcel(formData: FormData) {
 
       let classId: string | null = null;
       let majorId: string | null = null;
+
+      // Cari kelas — cocokkan nama persis dulu, baru contains
       if (className) {
-        const cls = await prisma.class.findFirst({
-          where: { name: { contains: className, mode: "insensitive" } },
+        let cls = await prisma.class.findFirst({
+          where: { name: { equals: className, mode: "insensitive" } },
         });
+        if (!cls) {
+          cls = await prisma.class.findFirst({
+            where: { name: { contains: className, mode: "insensitive" } },
+          });
+        }
         if (cls) { classId = cls.id; majorId = cls.majorId; }
+      }
+
+      // Kalau kelas tidak ketemu tapi jurusan ada, cari majorId langsung
+      if (!majorId && majorRaw) {
+        const major = await prisma.major.findFirst({
+          where: {
+            OR: [
+              { code: { equals: majorRaw, mode: "insensitive" } },
+              { name: { contains: majorRaw, mode: "insensitive" } },
+            ],
+          },
+        });
+        if (major) majorId = major.id;
       }
 
       await prisma.user.create({
@@ -277,6 +298,7 @@ export async function getImportTemplate() {
     { header: "NIS",          key: "nis",      width: 14 },
     { header: "NISN",         key: "nisn",     width: 14 },
     { header: "Kelas",        key: "kelas",    width: 16 },
+    { header: "Jurusan",      key: "jurusan",  width: 12 },
     { header: "L/P",          key: "gender",   width: 6  },
   ], [
     {
@@ -285,7 +307,8 @@ export async function getImportTemplate() {
       password: "siswa123",
       nis: "2324001",
       nisn: "0012345678",
-      kelas: "XII TKJ 1",
+      kelas: "X TKJ 1",
+      jurusan: "TKJ",
       gender: "L",
     },
   ]);
