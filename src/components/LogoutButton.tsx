@@ -1,28 +1,32 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { logoutAction } from "@/app/login/actions";
 import { useConfirm } from "@/components/ConfirmDialog";
 
 export function LogoutButton({ variant = "ghost", className = "" }: { variant?: "ghost" | "outline"; className?: string }) {
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
   const confirm = useConfirm();
 
-  function handleLogout() {
-    startTransition(async () => {
-      const ok = await confirm({
-        title: "Keluar dari akun?",
-        description: "Anda akan keluar dari sesi ini dan kembali ke halaman login.",
-        confirmText: "Ya, Keluar",
-        cancelText: "Batal",
-        variant: "danger",
-        icon: "logout",
-      });
-      if (!ok) return;
-      await logoutAction();
+  async function handleLogout() {
+    if (pending) return;
+    const ok = await confirm({
+      title: "Keluar dari akun?",
+      description: "Anda akan keluar dari sesi ini dan kembali ke halaman login.",
+      confirmText: "Ya, Keluar",
+      cancelText: "Batal",
+      variant: "danger",
+      icon: "logout",
     });
+    if (!ok) return;
+    setPending(true);
+    try {
+      await logoutAction();
+    } catch {
+      setPending(false);
+    }
   }
 
   return (

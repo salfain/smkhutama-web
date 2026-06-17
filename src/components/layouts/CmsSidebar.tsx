@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTransition } from "react";
+import { useState } from "react";
 import {
   LayoutDashboard, Image, BarChart3, GraduationCap,
   Newspaper, Users, Settings, LogOut, Menu, ChevronRight, ExternalLink,
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cmsLogout } from "@/app/cms/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 const nav = [
   { href: "/cms/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -29,7 +30,23 @@ const nav = [
 
 function Content({ name }: { name: string }) {
   const pathname = usePathname();
-  const [, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
+  const confirm = useConfirm();
+
+  async function handleLogout() {
+    if (pending) return;
+    const ok = await confirm({
+      title: "Keluar dari akun?",
+      description: "Anda akan keluar dari sesi CMS dan kembali ke halaman login.",
+      confirmText: "Ya, Keluar",
+      cancelText: "Batal",
+      variant: "danger",
+      icon: "logout",
+    });
+    if (!ok) return;
+    setPending(true);
+    try { await cmsLogout(); } catch { setPending(false); }
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -72,8 +89,8 @@ function Content({ name }: { name: string }) {
           </div>
         </div>
         <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-red-500 hover:bg-red-50 hover:text-red-600"
-          onClick={() => startTransition(async () => { await cmsLogout(); })}>
-          <LogOut className="h-4 w-4" />Keluar
+          onClick={handleLogout} disabled={pending}>
+          <LogOut className="h-4 w-4" />{pending ? "Keluar..." : "Keluar"}
         </Button>
         <ThemeToggle className="w-full justify-start gap-2 h-9" />
       </div>
