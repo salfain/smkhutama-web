@@ -207,18 +207,29 @@ export async function importStudentsExcel(formData: FormData) {
   let created = 0;
   const errors: string[] = [];
 
+  // Helper: ambil nilai dari row menggunakan berbagai kemungkinan nama kolom
+  function col(row: Record<string, string>, ...keys: string[]): string {
+    for (const k of keys) {
+      // Cari key yang cocok secara case-insensitive
+      const match = Object.keys(row).find((rk) => rk.toLowerCase().trim() === k.toLowerCase());
+      if (match && row[match]) return row[match].trim();
+    }
+    return "";
+  }
+
   for (const [i, row] of rows.entries()) {
     const rowNum = i + 2;
-    const name     = (row["Nama Lengkap"] ?? row["nama"]     ?? "").trim();
-    const username = (row["Username"]     ?? row["username"] ?? row["NIS"] ?? row["nis"] ?? "").trim();
-    const nis      = (row["NIS"]          ?? row["nis"]      ?? "").trim();
-    const nisn     = (row["NISN"]         ?? row["nisn"]     ?? "").trim();
-    // Kolom Password — jika kosong, default ke username/NIS
-    const password = (row["Password"]     ?? row["password"] ?? "").trim() || username;
-    const genderRaw = (row["L/P"] ?? row["Gender"] ?? row["gender"] ?? "").trim().toUpperCase();
-    const gender    = genderRaw === "L" ? "MALE" : genderRaw === "P" ? "FEMALE" : null;
-    const className = (row["Kelas"] ?? row["kelas"] ?? "").trim();
-    const majorRaw  = (row["Jurusan"] ?? row["jurusan"] ?? row["Kode Jurusan"] ?? "").trim().toUpperCase();
+    const name     = col(row, "Nama Lengkap", "nama", "Nama", "NAMA", "nama lengkap", "nama siswa", "Nama Siswa");
+    const username = col(row, "Username", "username", "USER", "user") || col(row, "NIS", "nis", "Nis") || col(row, "NISN", "nisn");
+    const nis      = col(row, "NIS", "nis", "Nis", "No Induk", "no induk");
+    const nisn     = col(row, "NISN", "nisn", "Nisn");
+    const password = col(row, "Password", "password", "Pass", "pass") || username;
+    const genderRaw = col(row, "L/P", "Gender", "gender", "Jenis Kelamin", "jenis kelamin", "JK", "jk", "Kelamin").toUpperCase();
+    const gender    = genderRaw === "L" || genderRaw === "LAKI-LAKI" || genderRaw === "MALE" ? "MALE"
+                    : genderRaw === "P" || genderRaw === "PEREMPUAN" || genderRaw === "FEMALE" ? "FEMALE"
+                    : null;
+    const className = col(row, "Kelas", "kelas", "KELAS", "Class", "class");
+    const majorRaw  = col(row, "Jurusan", "jurusan", "JURUSAN", "Kode Jurusan", "kode jurusan", "Major", "Prodi").toUpperCase();
 
     if (!name || !username) {
       errors.push(`Baris ${rowNum}: Nama Lengkap dan Username/NIS wajib diisi`);
@@ -235,7 +246,7 @@ export async function importStudentsExcel(formData: FormData) {
       let classId: string | null = null;
       let majorId: string | null = null;
 
-      // Cari kelas — cocokkan nama persis dulu, baru contains
+      // Cari kelas — cocokkan nama persis dulu, lalu contains, lalu cari tanpa prefix tingkat
       if (className) {
         let cls = await prisma.class.findFirst({
           where: { name: { equals: className, mode: "insensitive" } },
@@ -244,6 +255,16 @@ export async function importStudentsExcel(formData: FormData) {
           cls = await prisma.class.findFirst({
             where: { name: { contains: className, mode: "insensitive" } },
           });
+        }
+        // Kalau user tulis "X TKJ 1" atau hanya "TKJ 1", coba cari
+        if (!cls && !className.match(/^(X|XI|XII|XIII)\s/i)) {
+          // Coba tambahkan prefix tingkat umum
+          for (const g of ["X", "XI", "XII"]) {
+            cls = await prisma.class.findFirst({
+              where: { name: { equals: `${g} ${className}`, mode: "insensitive" } },
+            });
+            if (cls) break;
+          }
         }
         if (cls) { classId = cls.id; majorId = cls.majorId; }
       }
@@ -259,6 +280,14 @@ export async function importStudentsExcel(formData: FormData) {
           },
         });
         if (major) majorId = major.id;
+      }
+
+      // Kalau ada className tapi tidak ketemu dan majorRaw → coba cari kelas berdasarkan jurusan
+      if (!classId && majorId && className) {
+        const cls = await prisma.class.findFirst({
+          where: { majorId, name: { contains: className, mode: "insensitive" } },
+        });
+        if (cls) classId = cls.id;
       }
 
       await prisma.user.create({
