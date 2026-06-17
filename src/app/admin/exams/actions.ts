@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { parseWIB } from "@/lib/date";
 
 export async function getExams() {
   return prisma.exam.findMany({
@@ -74,8 +75,8 @@ export async function createExam(formData: FormData) {
         teacherId,
         academicYearId: academicYearId || null,
         durationMinutes,
-        startAt: new Date(startAt),
-        endAt: new Date(endAt),
+        startAt: parseWIB(startAt),
+        endAt: parseWIB(endAt),
         passingScore: passingScoreRaw ? Number(passingScoreRaw) : null,
         randomizeQuestions,
         randomizeOptions,
@@ -124,8 +125,8 @@ export async function updateExam(id: string, formData: FormData) {
           title, subjectId, teacherId,
           academicYearId: academicYearId || null,
           durationMinutes,
-          startAt: new Date(startAt),
-          endAt: new Date(endAt),
+          startAt: parseWIB(startAt),
+          endAt: parseWIB(endAt),
           passingScore: passingScoreRaw ? Number(passingScoreRaw) : null,
           randomizeQuestions, randomizeOptions, showResult,
           status: status as "DRAFT" | "ACTIVE" | "CLOSED",

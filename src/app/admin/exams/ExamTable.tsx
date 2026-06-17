@@ -20,6 +20,7 @@ import {
 } from "./actions";
 import { EXAM_TYPES, getExamTypeInfo } from "@/lib/exam-types";
 import { useConfirm } from "@/components/ConfirmDialog";
+import { toDatetimeLocalWIB } from "@/lib/date";
 
 type Exam = {
   id: string;
@@ -66,9 +67,7 @@ function fmtDateTime(d: Date) {
 }
 
 function toDatetimeLocal(d: Date) {
-  const dt = new Date(d);
-  const tz = dt.getTimezoneOffset() * 60000;
-  return new Date(dt.getTime() - tz).toISOString().slice(0, 16);
+  return toDatetimeLocalWIB(d);
 }
 
 export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }) {

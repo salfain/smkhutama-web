@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { parseWIB } from "@/lib/date";
 
 export async function getMyExams() {
   const user = await requireAuth("TEACHER");
@@ -83,8 +84,8 @@ export async function createExamWithQuestions(formData: FormData) {
         teacherId: user.teacher.id,
         academicYearId: academicYearId || null,
         durationMinutes,
-        startAt: new Date(startAt),
-        endAt: new Date(endAt),
+        startAt: parseWIB(startAt),
+        endAt: parseWIB(endAt),
         passingScore: passingScore ? Number(passingScore) : null,
         randomizeQuestions, randomizeOptions, showResult,
         status,
