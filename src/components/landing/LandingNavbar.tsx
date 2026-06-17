@@ -14,12 +14,15 @@ const nav: (NavItem | NavGroup)[] = [
   {
     label: "Profil",
     children: [
+      { label: "Tentang Kami", href: "/tentang" },
       { label: "Program Keahlian", href: "/jurusan" },
       { label: "Data Guru", href: "/guru" },
       { label: "Ekstrakurikuler", href: "/ekstrakurikuler" },
+      { label: "Galeri", href: "/galeri" },
     ],
   },
   { label: "Berita", href: "/berita" },
+  { label: "FAQ", href: "/faq" },
   { label: "Kontak", href: "/kontak" },
 ];
 

@@ -57,6 +57,25 @@ export function ProfileForm({ profile }: { profile: P }) {
         </div>
       </div>
 
+      <div className="rounded-xl border bg-white p-5 shadow-sm space-y-4">
+        <p className="font-semibold text-gray-700">Tentang Sekolah (halaman /tentang)</p>
+        <div className="space-y-1.5"><Label>Visi</Label><Textarea name="vision" defaultValue={v("vision")} rows={2} placeholder="Visi sekolah..." /></div>
+        <div className="space-y-1.5">
+          <Label>Misi (satu poin per baris)</Label>
+          <Textarea name="mission" defaultValue={v("mission")} rows={4} placeholder={"Menyelenggarakan pendidikan vokasi...\nMembekali siswa dengan keterampilan...\n..."} />
+        </div>
+        <div className="space-y-1.5"><Label>Sejarah Singkat (opsional)</Label><Textarea name="history" defaultValue={v("history")} rows={3} /></div>
+      </div>
+
+      <div className="rounded-xl border bg-white p-5 shadow-sm space-y-4">
+        <p className="font-semibold text-gray-700">Sambutan Kepala Sekolah</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5"><Label>Nama Kepala Sekolah</Label><Input name="principalName" defaultValue={v("principalName")} /></div>
+          <div className="space-y-1.5"><Label>URL Foto Kepala Sekolah</Label><Input name="principalPhoto" defaultValue={v("principalPhoto")} placeholder="https://..." /></div>
+        </div>
+        <div className="space-y-1.5"><Label>Kata Sambutan</Label><Textarea name="principalWord" defaultValue={v("principalWord")} rows={4} /></div>
+      </div>
+
       <div className="rounded-xl border bg-white p-5 shadow-sm">
         <label className="flex items-center gap-3 cursor-pointer">
           <input type="checkbox" checked={ppdbOpen} onChange={(e) => setPpdbOpen(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-blue-600" />

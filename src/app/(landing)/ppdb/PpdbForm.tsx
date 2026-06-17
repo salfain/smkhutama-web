@@ -54,6 +54,9 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
             📱 Panitia akan menghubungi Anda via WhatsApp untuk verifikasi dan informasi selanjutnya. Terima kasih telah mendaftar di SMK Hutama!
           </p>
         </div>
+        <a href="/ppdb/status" className="mt-4 inline-block text-sm font-semibold text-amber-600 hover:underline dark:text-amber-400">
+          Cek status pendaftaran →
+        </a>
       </div>
     );
   }

@@ -60,3 +60,25 @@ export async function submitRegistration(formData: FormData) {
     return { error: "Gagal menyimpan pendaftaran. Coba lagi." };
   }
 }
+
+export async function checkRegistrationStatus(registNumber: string) {
+  const num = registNumber.trim();
+  if (!num) return { error: "Masukkan nomor pendaftaran" };
+  try {
+    const r = await prisma.registration.findUnique({ where: { registNumber: num } });
+    if (!r) return { error: "Nomor pendaftaran tidak ditemukan. Periksa kembali." };
+    return {
+      success: true as const,
+      data: {
+        registNumber: r.registNumber,
+        fullName: r.fullName,
+        selectedMajor: r.selectedMajor ?? "-",
+        status: r.status as "PENDING" | "VERIFIED" | "ACCEPTED" | "REJECTED",
+        notes: r.notes ?? "",
+        createdAt: r.createdAt,
+      },
+    };
+  } catch {
+    return { error: "Terjadi kesalahan. Coba lagi." };
+  }
+}

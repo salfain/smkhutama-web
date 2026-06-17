@@ -9,6 +9,9 @@ function revalidateLanding() {
   revalidatePath("/ppdb");
   revalidatePath("/guru");
   revalidatePath("/ekstrakurikuler");
+  revalidatePath("/galeri");
+  revalidatePath("/faq");
+  revalidatePath("/tentang");
 }
 
 // ---------- PROFILE ----------
@@ -32,6 +35,12 @@ export async function saveProfile(formData: FormData) {
     email: String(formData.get("email") ?? "").trim() || null,
     officialUrl: String(formData.get("officialUrl") ?? "").trim() || null,
     instagram: String(formData.get("instagram") ?? "").trim() || null,
+    vision: String(formData.get("vision") ?? "").trim() || null,
+    mission: String(formData.get("mission") ?? "").trim() || null,
+    history: String(formData.get("history") ?? "").trim() || null,
+    principalName: String(formData.get("principalName") ?? "").trim() || null,
+    principalPhoto: String(formData.get("principalPhoto") ?? "").trim() || null,
+    principalWord: String(formData.get("principalWord") ?? "").trim() || null,
     ppdbOpen: formData.get("ppdbOpen") === "on",
   };
   try {
@@ -219,5 +228,51 @@ export async function deleteRegistration(id: string) {
   await requireCmsAuth();
   await prisma.registration.delete({ where: { id } });
   revalidatePath("/cms/registrations");
+  return { success: true };
+}
+
+// ---------- GALLERY ----------
+export async function getGallery() {
+  return prisma.landingGallery.findMany({ orderBy: { orderNumber: "asc" } });
+}
+export async function addGalleryImage(formData: FormData) {
+  await requireCmsAuth();
+  const imageUrl = String(formData.get("imageUrl") ?? "").trim();
+  const caption = String(formData.get("caption") ?? "").trim();
+  if (!imageUrl) return { error: "URL gambar wajib diisi" };
+  const count = await prisma.landingGallery.count();
+  await prisma.landingGallery.create({ data: { imageUrl, caption: caption || null, orderNumber: count } });
+  revalidateLanding(); revalidatePath("/cms/gallery");
+  return { success: true };
+}
+export async function deleteGalleryImage(id: string) {
+  await requireCmsAuth();
+  await prisma.landingGallery.delete({ where: { id } });
+  revalidateLanding(); revalidatePath("/cms/gallery");
+  return { success: true };
+}
+
+// ---------- FAQ ----------
+export async function getFaqs() {
+  return prisma.landingFaq.findMany({ orderBy: { orderNumber: "asc" } });
+}
+export async function saveFaq(formData: FormData) {
+  await requireCmsAuth();
+  const id = String(formData.get("id") ?? "").trim();
+  const question = String(formData.get("question") ?? "").trim();
+  const answer = String(formData.get("answer") ?? "").trim();
+  if (!question || !answer) return { error: "Pertanyaan dan jawaban wajib diisi" };
+  if (id) await prisma.landingFaq.update({ where: { id }, data: { question, answer } });
+  else {
+    const count = await prisma.landingFaq.count();
+    await prisma.landingFaq.create({ data: { question, answer, orderNumber: count } });
+  }
+  revalidateLanding(); revalidatePath("/cms/faq");
+  return { success: true };
+}
+export async function deleteFaq(id: string) {
+  await requireCmsAuth();
+  await prisma.landingFaq.delete({ where: { id } });
+  revalidateLanding(); revalidatePath("/cms/faq");
   return { success: true };
 }

@@ -488,6 +488,12 @@ model LandingProfile {
   facebook     String?
   youtube      String?
   ppdbOpen     Boolean  @default(true) @map("ppdb_open")
+  vision       String?
+  mission      String?
+  history      String?
+  principalName  String? @map("principal_name")
+  principalPhoto String? @map("principal_photo")
+  principalWord  String? @map("principal_word")
   updatedAt    DateTime @updatedAt @map("updated_at")
   createdAt    DateTime @default(now()) @map("created_at")
 
@@ -599,6 +605,31 @@ model Registration {
   updatedAt     DateTime           @updatedAt @map("updated_at")
 
   @@map("registrations")
+}
+
+/// Galeri foto sekolah (landing)
+model LandingGallery {
+  id          String   @id @default(uuid())
+  imageUrl    String   @map("image_url")
+  caption     String?
+  orderNumber Int      @default(0) @map("order_number")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("landing_gallery")
+}
+
+/// FAQ (landing)
+model LandingFaq {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String
+  orderNumber Int      @default(0) @map("order_number")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_faq")
 }
 
 // ============================================
