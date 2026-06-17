@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@/components/ui/button";
-import { LogIn, ArrowRight, Sparkles, GraduationCap, Briefcase, ChevronDown, CheckCircle2 } from "lucide-react";
-import { RevealContainer, RevealItem, RevealImage } from "./Reveal";
+import { ArrowRight, Sparkles, LogIn } from "lucide-react";
+import { RevealContainer, RevealItem } from "./Reveal";
 
 type Stat = { id: string; label: string; value: string };
 type Props = {
@@ -17,171 +14,115 @@ type Props = {
   stats?: Stat[];
 };
 
-const FEATURES = ["Religius & Disiplin", "Kemitraan Industri", "Guru Profesional"];
-
 export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 4000, stopOnInteraction: false }),
-  ]);
-  const [selected, setSelected] = useState(0);
-  const [snaps, setSnaps] = useState<number[]>([]);
+  // Susun 3 kartu kipas; jika gambar kurang, ulangi yang ada.
+  const pics = images.length > 0
+    ? [0, 1, 2].map((i) => images[i % images.length]?.imageUrl).filter(Boolean) as string[]
+    : [];
 
-  useEffect(() => {
-    if (!emblaApi) return;
-    setSnaps(emblaApi.scrollSnapList());
-    const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
-    emblaApi.on("select", onSelect);
-    onSelect();
-    return () => { emblaApi.off("select", onSelect); };
-  }, [emblaApi]);
-
-  const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
-
-  const topStats = stats.slice(0, 2);
+  const cardPos = [
+    "z-10 -rotate-[10deg] -translate-x-4 translate-y-8 md:-translate-x-10 md:translate-y-10 scale-[0.86]",
+    "z-20 translate-y-0 scale-100",
+    "z-10 rotate-[10deg] translate-x-4 translate-y-8 md:translate-x-10 md:translate-y-10 scale-[0.86]",
+  ];
 
   return (
-    <section id="beranda" className="relative min-h-[calc(100vh-64px)] overflow-hidden mesh-bg text-white flex items-center">
-      {/* Floating blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="animate-float-slow absolute -left-20 top-10 h-72 w-72 rounded-full bg-blue-400/30 blur-3xl" />
-        <div className="animate-float-slower absolute right-0 top-40 h-80 w-80 rounded-full bg-indigo-500/30 blur-3xl" />
-        <div className="animate-float-slow absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl" />
-      </div>
-      {/* Grid pattern overlay */}
+    <section id="beranda" className="relative overflow-hidden bg-[#0a0a0f] text-white">
+      {/* Grid pattern */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
           backgroundImage:
             "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-          maskImage: "radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent)",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent)",
+          backgroundSize: "48px 48px",
         }}
       />
-      <div className="noise-overlay absolute inset-0" />
+      {/* Amber glow */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-amber-500/20 blur-[120px]" />
+        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-orange-600/10 blur-3xl" />
+        <div className="absolute -right-20 top-40 h-72 w-72 rounded-full bg-amber-400/10 blur-3xl" />
+      </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <RevealContainer className="flex flex-col items-center gap-12 md:flex-row">
-          <RevealItem className="flex-1 space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-50">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
+      <div className="relative mx-auto max-w-5xl px-4 pt-28 pb-0 text-center md:pt-32">
+        <RevealContainer className="flex flex-col items-center">
+          <RevealItem>
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300">
+              <Sparkles className="h-3.5 w-3.5" />
               {badge ?? "SMK HUTAMA PONDOK GEDE"}
             </span>
+          </RevealItem>
 
-            <h1 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-tight md:text-5xl lg:text-[3.5rem]">
+          <RevealItem>
+            <h1 className="mt-6 font-heading text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
               {title ?? (
                 <>
-                  Mempersiapkan generasi{" "}
-                  <span className="bg-gradient-to-r from-sky-300 via-blue-200 to-indigo-300 bg-clip-text text-transparent">
-                    siap kerja & siap kuliah
+                  Cetak Generasi{" "}
+                  <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent">
+                    Unggul & Berdaya Saing
                   </span>
                 </>
               )}
             </h1>
-
-            <p className="max-w-lg text-base leading-relaxed text-blue-100/90 md:text-lg">
-              {subtitle ?? "Lingkungan belajar modern, religius, dan disiplin dengan program keahlian unggulan serta kemitraan industri."}
-            </p>
-
-            {/* Feature pills */}
-            <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1">
-              {FEATURES.map((f) => (
-                <span key={f} className="inline-flex items-center gap-1.5 text-sm text-blue-50/90">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-300" />{f}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-3">
-              <Link href="/ppdb">
-                <Button size="lg" className="group gap-2 rounded-full bg-white px-7 font-semibold text-blue-700 shadow-lg shadow-blue-900/20 hover:bg-blue-50 shine">
-                  Daftar Sekarang
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button size="lg" variant="outline" className="gap-2 rounded-full border-white/30 glass px-7 text-white hover:bg-white/15">
-                  <LogIn className="h-4 w-4" />Login
-                </Button>
-              </Link>
-            </div>
           </RevealItem>
 
-          <RevealImage className="w-full max-w-md flex-1">
-            <div className="relative">
-              {/* Glow behind */}
-              <div className="absolute -inset-4 rounded-[36px] bg-gradient-to-tr from-blue-500/20 to-indigo-400/20 blur-2xl" />
+          <RevealItem>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-slate-400 md:text-base">
+              {subtitle ?? "Di SMK Hutama, kami percaya pada kekuatan pendidikan vokasi. Lingkungan belajar modern, religius, dan disiplin dengan program keahlian unggulan serta kemitraan industri."}
+            </p>
+          </RevealItem>
 
-              <div className="relative rounded-[28px] glass p-2.5 shadow-2xl">
-                <div className="overflow-hidden rounded-[20px]" ref={emblaRef}>
-                  <div className="flex">
-                    {images.map((image, i) => (
-                      <div key={i} className="min-w-0 flex-[0_0_100%]">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={image.imageUrl} alt={image.caption ?? "Dokumentasi SMK Hutama"}
-                          className="h-72 w-full object-cover md:h-[26rem]" loading={i === 0 ? "eager" : "lazy"} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Dots */}
-                {snaps.length > 1 && (
-                  <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-1.5">
-                    {snaps.map((_, i) => (
-                      <button key={i} onClick={() => scrollTo(i)} aria-label={`Slide ${i + 1}`}
-                        className={`h-1.5 rounded-full transition-all ${i === selected ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"}`} />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Floating stat card — top */}
-              <div className="absolute -left-4 top-6 hidden animate-float-slow rounded-2xl glass-light px-4 py-3 shadow-xl sm:block">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600">
-                    <GraduationCap className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold leading-none text-slate-900">{topStats[0]?.value ?? "A"}</p>
-                    <p className="text-[10px] font-medium text-slate-500">{topStats[0]?.label ?? "Akreditasi"}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating stat card — bottom */}
-              <div className="absolute -right-4 bottom-10 hidden animate-float-slower rounded-2xl glass-light px-4 py-3 shadow-xl sm:block">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
-                    <Briefcase className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold leading-none text-slate-900">{topStats[1]?.value ?? "20+"}</p>
-                    <p className="text-[10px] font-medium text-slate-500">{topStats[1]?.label ?? "Mitra Industri"}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </RevealImage>
+          <RevealItem className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/ppdb">
+              <Button size="lg" className="group gap-2 rounded-full bg-amber-400 px-7 font-semibold text-slate-900 shadow-lg shadow-amber-500/25 hover:bg-amber-300">
+                Daftar Sekarang
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="gap-2 rounded-full border-white/20 bg-white/5 px-7 text-white hover:bg-white/10">
+                <LogIn className="h-4 w-4" />Login
+              </Button>
+            </Link>
+          </RevealItem>
         </RevealContainer>
 
-        {/* Scroll indicator */}
-        <div className="mt-12 hidden justify-center md:flex">
-          <div className="flex flex-col items-center gap-1.5 text-blue-100/60">
-            <span className="text-[10px] uppercase tracking-[0.3em]">Gulir</span>
-            <ChevronDown className="h-4 w-4 animate-bounce" />
+        {/* Fanned image cards */}
+        {pics.length > 0 && (
+          <div className="relative mt-14 flex items-end justify-center md:mt-16">
+            {pics.map((src, i) => (
+              <div
+                key={i}
+                className={`relative ${cardPos[i]} transition-transform duration-500`}
+                style={{ marginLeft: i === 0 ? 0 : "-3rem", marginRight: i === 2 ? 0 : "-3rem" }}
+              >
+                <div className="overflow-hidden rounded-3xl bg-gradient-to-b from-amber-300 to-orange-500 p-1.5 shadow-2xl shadow-amber-900/40 ring-1 ring-white/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt="Dokumentasi SMK Hutama"
+                    className="h-56 w-40 rounded-[18px] object-cover md:h-80 md:w-60"
+                    loading={i === 1 ? "eager" : "lazy"}
+                  />
+                </div>
+              </div>
+            ))}
+            {/* fade bottom into next section */}
+            <div className="pointer-events-none absolute -bottom-1 left-0 right-0 h-24 bg-gradient-to-t from-[#0a0a0f] to-transparent" />
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Wave divider */}
-      <div className="relative">
-        <svg viewBox="0 0 1440 80" className="block w-full" preserveAspectRatio="none">
-          <path fill="#f8fafc" className="dark:fill-slate-900" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
-        </svg>
+        {/* Stat strip */}
+        {stats.length > 0 && (
+          <RevealContainer className="relative z-30 mt-8 grid grid-cols-2 gap-3 pb-12 sm:grid-cols-4">
+            {stats.slice(0, 4).map((s) => (
+              <RevealItem key={s.id} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-4 backdrop-blur">
+                <div className="font-heading text-2xl font-bold text-amber-300 md:text-3xl">{s.value}</div>
+                <div className="mt-1 text-[11px] font-medium text-slate-400">{s.label}</div>
+              </RevealItem>
+            ))}
+          </RevealContainer>
+        )}
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import { HomeHero } from "@/components/landing/HomeHero";
-import { HomeStats } from "@/components/landing/HomeSections";
 import { LandingCTA } from "@/components/landing/LandingFooter";
 import { getLandingContent } from "@/lib/landing-data";
 
@@ -20,7 +19,6 @@ export default async function HomePage() {
         images={heroImages}
         stats={stats}
       />
-      <HomeStats stats={stats} />
       <LandingCTA ppdbOpen={(p?.ppdbOpen as boolean) ?? true} />
     </>
   );
