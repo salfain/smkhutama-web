@@ -18,6 +18,7 @@ export default async function HomePage() {
         title={p?.heroTitle as string | null}
         subtitle={p?.heroSubtitle as string | null}
         images={heroImages}
+        stats={stats}
       />
       <HomeStats stats={stats} />
       <LandingCTA ppdbOpen={(p?.ppdbOpen as boolean) ?? true} />
