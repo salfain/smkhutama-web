@@ -75,16 +75,16 @@ function SidebarContent({ user }: { user: UserInfo }) {
 export function CounselorSidebar({ user }: { user: UserInfo }) {
   return (
     <>
-      <aside className="hidden w-60 shrink-0 border-r bg-white lg:flex lg:flex-col">
+      <aside className="hidden w-60 shrink-0 border-r bg-white lg:flex lg:flex-col print:hidden">
         <SidebarContent user={user} />
       </aside>
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="lg:hidden fixed top-3 left-3 z-40 bg-white shadow-md border">
+          <Button variant="ghost" size="icon" className="lg:hidden fixed top-3 left-3 z-40 bg-white shadow-md border print:hidden">
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-60 p-0">
+        <SheetContent side="left" className="w-60 p-0 print:hidden">
           <SidebarContent user={user} />
         </SheetContent>
       </Sheet>

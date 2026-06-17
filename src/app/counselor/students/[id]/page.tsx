@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShieldAlert, Award, MessagesSquare, Home as HomeIcon, Gavel, Scale } from "lucide-react";
 
+import { PrintButton } from "./PrintButton";
+
 export const dynamic = "force-dynamic";
 
 const typeLabel: Record<string, string> = { PRIBADI: "Pribadi", SOSIAL: "Sosial", BELAJAR: "Belajar", KARIR: "Karir" };
@@ -14,10 +16,13 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
   if (!s) notFound();
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <Link href="/counselor/students" className="mb-4 inline-flex items-center gap-1.5 text-sm text-purple-600 hover:underline">
-        <ArrowLeft className="h-4 w-4" />Kembali ke Buku Siswa
-      </Link>
+    <div className="p-4 md:p-6 lg:p-8 print:p-0 print:bg-white">
+      <div className="flex items-center justify-between mb-4 print:hidden">
+        <Link href="/counselor/students" className="inline-flex items-center gap-1.5 text-sm text-purple-600 hover:underline">
+          <ArrowLeft className="h-4 w-4" />Kembali ke Buku Siswa
+        </Link>
+        <PrintButton />
+      </div>
 
       {/* Header */}
       <div className="rounded-2xl bg-gradient-to-r from-purple-600 to-fuchsia-600 p-5 text-white">
