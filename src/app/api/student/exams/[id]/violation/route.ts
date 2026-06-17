@@ -16,6 +16,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id: examId } = await params;
   const body = await req.json().catch(() => ({}));
   const reason = String(body.reason ?? "Keluar aplikasi").trim();
+  // offlineCount: jumlah pelanggaran yang terjadi saat offline (dikirim setelah koneksi pulih)
+  const offlineCount = Math.min(Number(body.offlineCount ?? 1), 10); // max 10 sekaligus
+  const addCount = Math.max(1, offlineCount);
 
   const attempt = await prisma.studentExamAttempt.findUnique({
     where: { examId_studentId: { examId, studentId: student.id } },
@@ -30,14 +33,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ locked: true, violationCount: attempt.violationCount, lockReason: attempt.lockReason });
   }
 
-  const nextCount = attempt.violationCount + 1;
+  const nextCount = attempt.violationCount + addCount;
   const shouldLock = nextCount >= LOCK_THRESHOLD;
+  // Jika multiple offline violations, sebut di lockReason
+  const finalReason = addCount > 1
+    ? `${reason} (${addCount}x saat offline)`
+    : reason;
 
   const updated = await prisma.studentExamAttempt.update({
     where: { id: attempt.id },
     data: {
       violationCount: nextCount,
-      ...(shouldLock ? { isLocked: true, lockedAt: new Date(), lockReason: reason } : {}),
+      ...(shouldLock ? { isLocked: true, lockedAt: new Date(), lockReason: finalReason } : {}),
     },
   });
 
