@@ -12,25 +12,27 @@ export function MonitoringControls({ attemptId, name, isLocked }: { attemptId: s
 
   if (!isLocked) return null;
 
-  function unlock() {
+  async function unlock() {
+    // confirm() HARUS di luar startTransition agar dialog tidak nyangkut
+    if (!(await confirm({
+      title: "Buka kunci ujian?",
+      description: `Siswa "${name}" akan dapat melanjutkan ujian. Counter pelanggaran direset.`,
+      confirmText: "Ya, Buka Kunci", variant: "info", icon: "info",
+    }))) return;
     startTransition(async () => {
-      if (!(await confirm({
-        title: "Buka kunci ujian?",
-        description: `Siswa "${name}" akan dapat melanjutkan ujian. Counter pelanggaran direset.`,
-        confirmText: "Ya, Buka Kunci", variant: "info", icon: "info",
-      }))) return;
       const r = await unlockAttemptByTeacher(attemptId);
       if (r.error) alert(r.error);
     });
   }
 
-  function forceSubmit() {
+  async function forceSubmit() {
+    // confirm() HARUS di luar startTransition agar dialog tidak nyangkut
+    if (!(await confirm({
+      title: "Submit paksa?",
+      description: `Ujian "${name}" akan dikumpulkan dengan jawaban yang sudah ada. Tindakan ini tidak bisa dibatalkan.`,
+      confirmText: "Submit Paksa", variant: "danger", icon: "warning",
+    }))) return;
     startTransition(async () => {
-      if (!(await confirm({
-        title: "Submit paksa?",
-        description: `Ujian "${name}" akan dikumpulkan dengan jawaban yang sudah ada. Tindakan ini tidak bisa dibatalkan.`,
-        confirmText: "Submit Paksa", variant: "danger", icon: "warning",
-      }))) return;
       const r = await forceSubmitAttemptByTeacher(attemptId);
       if (r.error) alert(r.error);
     });

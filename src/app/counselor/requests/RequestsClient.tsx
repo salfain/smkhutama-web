@@ -45,16 +45,16 @@ export function RequestsClient({ requests }: { requests: Request[] }) {
       if (r.error) setErr(r.error); else setOpen(false);
     });
   }
-  function makeSession(id: string) {
+  async function makeSession(id: string) {
+    const ok = await confirm({
+      title: "Terima permohonan?",
+      description: "Permohonan ini akan dibuatkan sesi konseling dan ditandai 'Dijadwalkan'.",
+      confirmText: "Ya, Buat Sesi",
+      variant: "info",
+      icon: "info",
+    });
+    if (!ok) return;
     startTransition(async () => {
-      const ok = await confirm({
-        title: "Terima permohonan?",
-        description: "Permohonan ini akan dibuatkan sesi konseling dan ditandai 'Dijadwalkan'.",
-        confirmText: "Ya, Buat Sesi",
-        variant: "info",
-        icon: "info",
-      });
-      if (!ok) return;
       await convertRequestToCase(id);
     });
   }

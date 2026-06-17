@@ -77,34 +77,34 @@ export function MonitoringClient({
     router.refresh();
   }
 
-  function handleReset(attemptId: string, name: string) {
+  async function handleReset(attemptId: string, name: string) {
+    if (!(await confirm(`Reset login siswa "${name}"? Status akan kembali ke "Belum Mulai".`))) return;
     startTransition(async () => {
-      if (!(await confirm(`Reset login siswa "${name}"? Status akan kembali ke "Belum Mulai".`))) return;
       const r = await resetStudentLogin(attemptId);
       if (r.error) alert(r.error);
     });
   }
 
-  function handleUnlock(attemptId: string, name: string) {
+  async function handleUnlock(attemptId: string, name: string) {
+    if (!(await confirm({
+      title: "Buka kunci ujian?",
+      description: `Siswa "${name}" akan dapat melanjutkan ujian. Counter pelanggaran direset.`,
+      confirmText: "Ya, Buka Kunci",
+      variant: "info", icon: "info",
+    }))) return;
     startTransition(async () => {
-      if (!(await confirm({
-        title: "Buka kunci ujian?",
-        description: `Siswa "${name}" akan dapat melanjutkan ujian. Counter pelanggaran direset.`,
-        confirmText: "Ya, Buka Kunci",
-        variant: "info", icon: "info",
-      }))) return;
       const r = await unlockAttempt(attemptId);
       if (r.error) alert(r.error);
     });
   }
 
-  function handleForceSubmit(attemptId: string, name: string) {
+  async function handleForceSubmit(attemptId: string, name: string) {
+    if (!(await confirm({
+      title: "Submit paksa?",
+      description: `Ujian "${name}" akan dikumpulkan dengan jawaban yang sudah ada. Tindakan ini tidak bisa dibatalkan.`,
+      confirmText: "Submit Paksa", variant: "danger", icon: "warning",
+    }))) return;
     startTransition(async () => {
-      if (!(await confirm({
-        title: "Submit paksa?",
-        description: `Ujian "${name}" akan dikumpulkan dengan jawaban yang sudah ada. Tindakan ini tidak bisa dibatalkan.`,
-        confirmText: "Submit Paksa", variant: "danger", icon: "warning",
-      }))) return;
       const r = await forceSubmitAttempt(attemptId);
       if (r.error) alert(r.error);
     });
