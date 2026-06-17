@@ -17,17 +17,17 @@ type Profile = {
 
 export function LandingCTA({ ppdbOpen }: { ppdbOpen: boolean }) {
   return (
-    <section className="bg-white px-4 py-16">
-      <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[32px] mesh-bg px-6 py-14 text-center text-white shadow-2xl">
+    <section className="bg-[#f8fafc] px-4 py-16 dark:bg-[#0a0a0f]">
+      <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-14 text-center text-white shadow-2xl ring-1 ring-white/10">
         <div className="pointer-events-none absolute inset-0">
-          <div className="animate-float-slow absolute -left-10 top-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-          <div className="animate-float-slower absolute -right-10 bottom-0 h-56 w-56 rounded-full bg-blue-300/20 blur-3xl" />
+          <div className="absolute left-1/2 top-0 h-64 w-[30rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-amber-500/25 blur-[100px]" />
+          <div className="animate-float-slower absolute -right-10 bottom-0 h-56 w-56 rounded-full bg-orange-400/20 blur-3xl" />
         </div>
         <div className="relative">
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
             {ppdbOpen ? "Bergabung Bersama Kami" : "Sistem Ujian Digital"}
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-blue-100">
+          <p className="mx-auto mt-3 max-w-md text-slate-300">
             {ppdbOpen
               ? "Pendaftaran peserta didik baru telah dibuka. Daftar online sekarang, mudah dan cepat."
               : "Akses sistem ujian CBT kapan saja, di mana saja."}
@@ -35,15 +35,15 @@ export function LandingCTA({ ppdbOpen }: { ppdbOpen: boolean }) {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {ppdbOpen && (
               <Link href="/ppdb">
-                <Button size="lg" className="group gap-2 rounded-full bg-white px-8 font-semibold text-blue-700 hover:bg-blue-50 shine">
+                <Button size="lg" className="group gap-2 rounded-full bg-amber-400 px-8 font-semibold text-slate-900 hover:bg-amber-300 shine">
                   Daftar PPDB Online
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
             )}
             <Link href="/login">
-              <Button size="lg" variant="outline" className="gap-2 rounded-full border-white/30 glass px-8 text-white hover:bg-white/15">
-                <LogIn className="h-4 w-4" />Login CBT
+              <Button size="lg" variant="outline" className="gap-2 rounded-full border-white/30 bg-white/5 px-8 text-white hover:bg-white/15">
+                <LogIn className="h-4 w-4" />Login
               </Button>
             </Link>
           </div>
@@ -74,12 +74,12 @@ export function LandingFooter({ profile }: { profile: Profile }) {
           <div className="space-y-3 text-sm">
             <p className="font-semibold text-white">Kontak</p>
             {profile.address && (
-              <p className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />{profile.address}</p>
+              <p className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />{profile.address}</p>
             )}
-            {profile.phone && <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-blue-400" />{profile.phone}</p>}
-            {profile.email && <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-blue-400" />{profile.email}</p>}
+            {profile.phone && <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-amber-400" />{profile.phone}</p>}
+            {profile.email && <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-amber-400" />{profile.email}</p>}
             {profile.instagram && (
-              <a href={profile.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
+              <a href={profile.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-amber-400 hover:text-amber-300">
                 <Globe className="h-4 w-4" />Instagram
               </a>
             )}

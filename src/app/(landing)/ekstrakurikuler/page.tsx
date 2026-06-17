@@ -4,6 +4,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { EXTRACURRICULARS, type Extracurricular } from "@/lib/landing-static";
 import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
+import { PageHero } from "@/components/landing/PageHero";
 
 export const dynamic = "force-dynamic";
 
@@ -27,24 +28,11 @@ export default async function EkstrakurikulerPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden mesh-bg text-white">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="animate-float-slow absolute -left-16 top-0 h-56 w-56 rounded-full bg-blue-400/30 blur-3xl" />
-          <div className="animate-float-slower absolute right-0 bottom-0 h-64 w-64 rounded-full bg-indigo-500/30 blur-3xl" />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-4 pt-28 pb-14 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl glass">
-            <Sparkles className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">Ekstrakurikuler</h1>
-          <p className="mx-auto mt-3 max-w-lg text-blue-100">
-            Kembangkan bakat, minat, dan karakter melalui beragam kegiatan ekstrakurikuler.
-          </p>
-        </div>
-        <svg viewBox="0 0 1440 80" className="block w-full" preserveAspectRatio="none">
-          <path fill="white" className="fill-slate-50 dark:fill-slate-900" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
-        </svg>
-      </section>
+      <PageHero
+        icon={Sparkles}
+        title="Ekstrakurikuler"
+        subtitle="Kembangkan bakat, minat, dan karakter melalui beragam kegiatan ekstrakurikuler."
+      />
 
       <section className="bg-slate-50 dark:bg-slate-900">
         <div className="mx-auto max-w-6xl px-4 py-16">
