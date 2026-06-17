@@ -3,7 +3,8 @@ import { requireAuth } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { MonitorCheck, Clock, Users } from "lucide-react";
+import { MonitorCheck, Clock, Lock } from "lucide-react";
+import { MonitoringControls } from "./MonitoringControls";
 
 export const dynamic = "force-dynamic";
 
@@ -69,22 +70,35 @@ export default async function TeacherMonitoringPage() {
                       const progress = totalQ > 0 ? (answered / totalQ) * 100 : 0;
                       const isInProgress = a.status === "IN_PROGRESS";
                       const isSubmitted = a.status === "SUBMITTED" || a.status === "AUTO_SUBMITTED";
+                      const isLocked = a.isLocked && isInProgress;
                       return (
-                        <div key={a.id} className="rounded-lg border p-3">
+                        <div key={a.id} className={`rounded-lg border p-3 ${isLocked ? "ring-2 ring-red-300 border-red-300" : ""}`}>
                           <div className="mb-2 flex items-start justify-between">
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-gray-900 truncate">{a.student.user.name}</p>
                               <p className="text-xs text-gray-400">{a.student.class?.name ?? "—"}</p>
                             </div>
-                            <Badge className={`text-xs hover:opacity-100 shrink-0 ${
-                              isInProgress ? "bg-green-100 text-green-700 border-green-200"
-                              : isSubmitted ? "bg-blue-100 text-blue-700 border-blue-200"
-                              : "bg-gray-100 text-gray-600 border-gray-200"
-                            }`}>
-                              {isInProgress ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Mengerjakan</span>
-                              : isSubmitted ? "Selesai" : "Belum Mulai"}
-                            </Badge>
+                            <div className="flex flex-col gap-1 items-end shrink-0">
+                              <Badge className={`text-xs hover:opacity-100 ${
+                                isInProgress ? "bg-green-100 text-green-700 border-green-200"
+                                : isSubmitted ? "bg-blue-100 text-blue-700 border-blue-200"
+                                : "bg-gray-100 text-gray-600 border-gray-200"
+                              }`}>
+                                {isInProgress ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Mengerjakan</span>
+                                : isSubmitted ? "Selesai" : "Belum Mulai"}
+                              </Badge>
+                              {isLocked && (
+                                <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200 text-[10px] gap-1">
+                                  <Lock className="h-3 w-3" />Terkunci
+                                </Badge>
+                              )}
+                            </div>
                           </div>
+                          {isLocked && (
+                            <div className="mb-2 rounded-lg bg-red-50 border border-red-200 px-2.5 py-1.5 text-[11px] text-red-700">
+                              {a.lockReason ?? "Pelanggaran berulang"} · {a.violationCount}× pelanggaran
+                            </div>
+                          )}
                           <div>
                             <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
                               <span>Progress</span>
@@ -95,6 +109,7 @@ export default async function TeacherMonitoringPage() {
                           {isSubmitted && a.score !== null && (
                             <p className="mt-2 text-sm font-bold text-purple-600">Nilai: {a.score}</p>
                           )}
+                          <MonitoringControls attemptId={a.id} name={a.student.user.name} isLocked={isLocked} />
                         </div>
                       );
                     })}

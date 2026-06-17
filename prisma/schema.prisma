@@ -401,6 +401,11 @@ model StudentExamAttempt {
   score       Float?
   loginStatus Boolean       @default(false) @map("login_status")
   ipAddress   String?       @map("ip_address")
+  // Anti-cheat (mobile): kunci akses bila siswa berkali-kali keluar app
+  isLocked       Boolean   @default(false) @map("is_locked")
+  lockedAt       DateTime? @map("locked_at")
+  lockReason     String?   @map("lock_reason")
+  violationCount Int       @default(0) @map("violation_count")
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 

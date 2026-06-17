@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/select";
 import {
   RefreshCw, RotateCcw, Monitor, Clock, CheckCircle, AlertCircle, Wifi, WifiOff,
+  Lock, Unlock, Send,
 } from "lucide-react";
-import { resetStudentLogin } from "./actions";
+import { resetStudentLogin, unlockAttempt, forceSubmitAttempt } from "./actions";
 import { useConfirm } from "@/components/ConfirmDialog";
 
 type Exam = {
@@ -37,6 +38,9 @@ type StudentRow = {
     submittedAt: Date | null;
     score: number | null;
     loginStatus: boolean;
+    isLocked: boolean;
+    violationCount: number;
+    lockReason: string | null;
     _count: { answers: number };
   }[];
 };
@@ -81,6 +85,31 @@ export function MonitoringClient({
     });
   }
 
+  function handleUnlock(attemptId: string, name: string) {
+    startTransition(async () => {
+      if (!(await confirm({
+        title: "Buka kunci ujian?",
+        description: `Siswa "${name}" akan dapat melanjutkan ujian. Counter pelanggaran direset.`,
+        confirmText: "Ya, Buka Kunci",
+        variant: "info", icon: "info",
+      }))) return;
+      const r = await unlockAttempt(attemptId);
+      if (r.error) alert(r.error);
+    });
+  }
+
+  function handleForceSubmit(attemptId: string, name: string) {
+    startTransition(async () => {
+      if (!(await confirm({
+        title: "Submit paksa?",
+        description: `Ujian "${name}" akan dikumpulkan dengan jawaban yang sudah ada. Tindakan ini tidak bisa dibatalkan.`,
+        confirmText: "Submit Paksa", variant: "danger", icon: "warning",
+      }))) return;
+      const r = await forceSubmitAttempt(attemptId);
+      if (r.error) alert(r.error);
+    });
+  }
+
   // Hitung statistik
   const rows = students.map((s) => {
     const att = s.attempts[0];
@@ -92,6 +121,7 @@ export function MonitoringClient({
     inProgress: rows.filter((r) => r.statusKey === "IN_PROGRESS").length,
     submitted:  rows.filter((r) => r.statusKey === "SUBMITTED" || r.statusKey === "AUTO_SUBMITTED").length,
     notStarted: rows.filter((r) => r.statusKey === "NOT_STARTED").length,
+    locked:     rows.filter((r) => r.attempt?.isLocked && r.statusKey === "IN_PROGRESS").length,
   };
 
   return (
@@ -140,10 +170,11 @@ export function MonitoringClient({
       </div>
 
       {/* Summary cards */}
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         {[
           { label: "Total Peserta", value: students.length, color: "text-gray-700", bg: "bg-gray-50", icon: Monitor },
           { label: "Mengerjakan", value: counts.inProgress, color: "text-green-600", bg: "bg-green-50", icon: Wifi },
+          { label: "Terkunci", value: counts.locked, color: "text-red-600", bg: "bg-red-50", icon: Lock },
           { label: "Selesai Submit", value: counts.submitted, color: "text-blue-600", bg: "bg-blue-50", icon: CheckCircle },
           { label: "Belum Mulai", value: counts.notStarted, color: "text-gray-600", bg: "bg-gray-50", icon: Clock },
         ].map((s) => (
@@ -172,17 +203,32 @@ export function MonitoringClient({
             const totalQ = exam._count.questions;
             const answered = r.attempt?._count.answers ?? 0;
             const progress = totalQ > 0 ? (answered / totalQ) * 100 : 0;
+            const isLocked = r.attempt?.isLocked === true && r.statusKey === "IN_PROGRESS";
             return (
-              <div key={r.id} className="rounded-xl border bg-white p-4 shadow-sm">
+              <div key={r.id} className={`rounded-xl border bg-white p-4 shadow-sm ${isLocked ? "ring-2 ring-red-300 border-red-300" : ""}`}>
                 <div className="mb-3 flex items-start justify-between">
                   <div className="min-w-0">
                     <p className="font-semibold text-gray-900 truncate">{r.user.name}</p>
                     <p className="text-xs text-gray-400 font-mono">{r.nis ?? r.id.slice(0, 8)} · {r.class?.name ?? "—"}</p>
                   </div>
-                  <Badge className={`${info.color} hover:${info.color} text-xs shrink-0`}>
-                    {r.statusKey === "IN_PROGRESS" && "● "}{info.label}
-                  </Badge>
+                  <div className="flex flex-col gap-1 items-end shrink-0">
+                    <Badge className={`${info.color} hover:${info.color} text-xs`}>
+                      {r.statusKey === "IN_PROGRESS" && "● "}{info.label}
+                    </Badge>
+                    {isLocked && (
+                      <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200 text-[10px] gap-1">
+                        <Lock className="h-3 w-3" />Terkunci
+                      </Badge>
+                    )}
+                  </div>
                 </div>
+
+                {isLocked && (
+                  <div className="mb-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+                    <p className="font-semibold">Akses dikunci anti-cheat</p>
+                    <p className="text-[11px] mt-0.5">{r.attempt?.lockReason ?? "Pelanggaran berulang"} · {r.attempt?.violationCount ?? 0}× pelanggaran</p>
+                  </div>
+                )}
 
                 <div className="mb-3">
                   <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
@@ -215,14 +261,36 @@ export function MonitoringClient({
                 </div>
 
                 {r.attempt && r.statusKey !== "SUBMITTED" && r.statusKey !== "AUTO_SUBMITTED" && (
-                  <Button
-                    variant="outline" size="sm"
-                    className="mt-3 w-full gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
-                    onClick={() => handleReset(r.attempt!.id, r.user.name)}
-                    disabled={pending}
-                  >
-                    <RotateCcw className="h-3 w-3" />Reset Login
-                  </Button>
+                  <div className="mt-3 grid gap-1.5">
+                    {isLocked && (
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <Button
+                          variant="outline" size="sm"
+                          className="gap-1.5 text-green-700 border-green-300 hover:bg-green-50 text-xs"
+                          onClick={() => handleUnlock(r.attempt!.id, r.user.name)}
+                          disabled={pending}
+                        >
+                          <Unlock className="h-3 w-3" />Buka Kunci
+                        </Button>
+                        <Button
+                          variant="outline" size="sm"
+                          className="gap-1.5 text-red-700 border-red-300 hover:bg-red-50 text-xs"
+                          onClick={() => handleForceSubmit(r.attempt!.id, r.user.name)}
+                          disabled={pending}
+                        >
+                          <Send className="h-3 w-3" />Submit Paksa
+                        </Button>
+                      </div>
+                    )}
+                    <Button
+                      variant="outline" size="sm"
+                      className="w-full gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
+                      onClick={() => handleReset(r.attempt!.id, r.user.name)}
+                      disabled={pending}
+                    >
+                      <RotateCcw className="h-3 w-3" />Reset Login
+                    </Button>
+                  </div>
                 )}
               </div>
             );

@@ -69,3 +69,41 @@ export async function resetStudentLogin(attemptId: string) {
     return { error: "Gagal reset login" };
   }
 }
+
+/** Pengawas membuka kunci attempt yang ter-lock anti-cheat. */
+export async function unlockAttempt(attemptId: string) {
+  try {
+    await prisma.studentExamAttempt.update({
+      where: { id: attemptId },
+      data: { isLocked: false, lockedAt: null, lockReason: null, violationCount: 0 },
+    });
+    revalidatePath("/admin/monitoring");
+    return { success: true };
+  } catch {
+    return { error: "Gagal membuka kunci" };
+  }
+}
+
+/** Pengawas memaksa submit attempt (mengumpulkan jawaban yang sudah ada). */
+export async function forceSubmitAttempt(attemptId: string) {
+  try {
+    const attempt = await prisma.studentExamAttempt.findUnique({ where: { id: attemptId } });
+    if (!attempt) return { error: "Attempt tidak ditemukan" };
+    if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
+      return { error: "Sudah dikumpulkan" };
+    }
+    await prisma.studentExamAttempt.update({
+      where: { id: attemptId },
+      data: {
+        status: "AUTO_SUBMITTED",
+        submittedAt: new Date(),
+        isLocked: true,
+        lockReason: attempt.lockReason ?? "Dikumpulkan paksa oleh pengawas",
+      },
+    });
+    revalidatePath("/admin/monitoring");
+    return { success: true };
+  } catch {
+    return { error: "Gagal submit paksa" };
+  }
+}
