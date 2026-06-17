@@ -19,14 +19,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CBT SMK HUTAMA – Sistem Ujian Online",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://43.133.134.10"),
+  title: {
+    default: "CBT SMK HUTAMA – Sistem Ujian Online & Informasi Sekolah",
+    template: "%s | SMK Hutama",
+  },
   description:
-    "Sistem Computer Based Test (CBT) SMK HUTAMA. Platform ujian digital modern, aman, dan efisien.",
-  keywords: ["CBT", "ujian online", "SMK HUTAMA", "TKA"],
+    "SMK Hutama Pondok Gede — sekolah menengah kejuruan unggulan. Informasi PPDB, program keahlian, berita, serta sistem ujian online (CBT) modern, aman, dan efisien.",
+  keywords: ["SMK Hutama", "PPDB SMK Hutama", "CBT", "ujian online", "SMK Pondok Gede", "sekolah kejuruan Bekasi"],
   icons: {
     icon: "/api/school/logo",
     shortcut: "/api/school/logo",
     apple: "/api/school/logo",
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    siteName: "SMK Hutama Pondok Gede",
+    title: "CBT SMK HUTAMA – Sistem Ujian Online & Informasi Sekolah",
+    description:
+      "Sekolah menengah kejuruan unggulan. Informasi PPDB, program keahlian, berita, dan sistem ujian online (CBT).",
+    images: [{ url: "/api/school/logo", width: 512, height: 512, alt: "Logo SMK Hutama" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "CBT SMK HUTAMA",
+    description: "Sistem ujian online & informasi SMK Hutama Pondok Gede.",
+    images: ["/api/school/logo"],
   },
 };
 

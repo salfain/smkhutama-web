@@ -10,9 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Flag, ChevronLeft, ChevronRight, Send, Grid3X3,
-  Clock, CheckCircle, AlertCircle,
+  Clock, CheckCircle, AlertCircle, ShieldAlert,
 } from "lucide-react";
 import { saveAnswer, submitExam } from "../actions";
+import { MathText } from "@/components/MathText";
+
+const MAX_VIOLATIONS = 5; // setelah ini, ujian otomatis di-submit
 
 type Option = { id: string; label: string; text: string };
 type Question = {
@@ -61,7 +64,63 @@ export function TakeExam({
   const [showSubmit, setShowSubmit] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [violations, setViolations] = useState(0);
+  const [showWarning, setShowWarning] = useState(false);
   const submittedRef = useRef(false);
+
+  // Auto-submit helper
+  const autoSubmit = useRef(async () => {
+    if (submittedRef.current) return;
+    submittedRef.current = true;
+    await submitExam(examId, true);
+    router.push(`/student/exams/${examId}/finish`);
+  });
+
+  // ===== ANTI-CHEAT =====
+  useEffect(() => {
+    function registerViolation() {
+      if (submittedRef.current) return;
+      setViolations((v) => {
+        const next = v + 1;
+        if (next >= MAX_VIOLATIONS) {
+          void autoSubmit.current();
+        } else {
+          setShowWarning(true);
+        }
+        return next;
+      });
+    }
+    function onVisibility() {
+      if (document.hidden) registerViolation();
+    }
+    function onBlur() {
+      // pindah ke aplikasi/jendela lain
+      registerViolation();
+    }
+    function blockContext(e: Event) { e.preventDefault(); }
+    function blockCopy(e: Event) { e.preventDefault(); }
+    function blockKeys(e: KeyboardEvent) {
+      // blok copy/paste/cut/print/save & devtools umum
+      if ((e.ctrlKey || e.metaKey) && ["c", "v", "x", "p", "s", "u"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("contextmenu", blockContext);
+    document.addEventListener("copy", blockCopy);
+    document.addEventListener("cut", blockCopy);
+    document.addEventListener("keydown", blockKeys);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("contextmenu", blockContext);
+      document.removeEventListener("copy", blockCopy);
+      document.removeEventListener("cut", blockCopy);
+      document.removeEventListener("keydown", blockKeys);
+    };
+  }, []);
 
   // Timer + auto submit
   useEffect(() => {
@@ -209,6 +268,11 @@ export function TakeExam({
           <Clock className="h-4 w-4" />{formatTime(timeLeft)}
         </div>
         <div className="flex items-center gap-2">
+          {violations > 0 && (
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-lg bg-red-100 px-2 py-1 text-xs font-bold text-red-700">
+              <ShieldAlert className="h-3.5 w-3.5" />{violations}/{MAX_VIOLATIONS}
+            </span>
+          )}
           <Progress value={progress} className="hidden w-24 sm:block h-2" />
           <Sheet open={navOpen} onOpenChange={setNavOpen}>
             <SheetTrigger asChild>
@@ -240,9 +304,9 @@ export function TakeExam({
               </button>
             </div>
 
-            <div className="mb-6 rounded-xl border bg-white p-5 shadow-sm">
+            <div className="mb-6 rounded-xl border bg-white p-5 shadow-sm select-none">
               <p className="text-sm font-semibold text-gray-500 mb-2">Pertanyaan {currentQ + 1}</p>
-              <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">{q.questionText}</p>
+              <MathText text={q.questionText} className="block text-gray-900 leading-relaxed" />
             </div>
 
             {/* Render input sesuai jenis soal */}
@@ -263,7 +327,7 @@ export function TakeExam({
                       }`}>
                         {selected ? <CheckCircle className="h-4 w-4" /> : opt.label}
                       </div>
-                      <span className={`text-sm ${selected ? "font-medium text-blue-800" : "text-gray-700"}`}>{opt.text}</span>
+                      <MathText text={opt.text} className={`text-sm ${selected ? "font-medium text-blue-800" : "text-gray-700"}`} />
                     </button>
                   );
                 })}
@@ -301,6 +365,27 @@ export function TakeExam({
           <NumberGrid />
         </aside>
       </div>
+
+      <Dialog open={showWarning} onOpenChange={setShowWarning}>
+        <DialogContent className="max-w-sm" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <ShieldAlert className="h-5 w-5" />Peringatan Pelanggaran
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-1">
+            <p className="text-sm text-gray-600">
+              Anda terdeteksi meninggalkan halaman ujian (pindah tab/aplikasi). Tetap berada di halaman ujian hingga selesai.
+            </p>
+            <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+              Pelanggaran ke-<b>{violations}</b> dari {MAX_VIOLATIONS}. Setelah {MAX_VIOLATIONS} kali, ujian akan otomatis dikumpulkan.
+            </div>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setShowWarning(false)}>
+              Saya Mengerti
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showSubmit} onOpenChange={setShowSubmit}>
         <DialogContent className="max-w-sm">
