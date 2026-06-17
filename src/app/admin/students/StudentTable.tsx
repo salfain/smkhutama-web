@@ -15,6 +15,7 @@ import {
   createStudent, updateStudent, deleteStudent,
   toggleStudentStatus, resetStudentPassword,
   exportStudentsExcel, importStudentsExcel, getImportTemplate,
+  deleteAllStudents,
 } from "./actions";
 import { useConfirm } from "@/components/ConfirmDialog";
 
@@ -112,6 +113,34 @@ export function StudentTable({
     });
   }
 
+  async function handleDeleteAll() {
+    // Konfirmasi pertama (visual)
+    const ok1 = await confirm({
+      title: "⚠️ BAHAYA — Hapus Semua Siswa",
+      description: `Tindakan ini akan MENGHAPUS SEMUA ${students.length} siswa beserta akun, jawaban ujian, data BK, dan seluruh riwayat mereka. DATA TIDAK BISA DIKEMBALIKAN.`,
+      confirmText: "Ya, Saya Paham",
+      cancelText: "Batal",
+      variant: "danger",
+      icon: "warning",
+    });
+    if (!ok1) return;
+
+    // Konfirmasi kedua (harus ketik teks)
+    const input = window.prompt(
+      `KONFIRMASI AKHIR:\nKetik "HAPUS SEMUA SISWA" (huruf kapital, tanpa tanda petik) untuk melanjutkan.\n\nSemua data ${students.length} siswa akan dihapus permanen.`
+    );
+    if (input !== "HAPUS SEMUA SISWA") {
+      alert("Teks tidak cocok. Penghapusan dibatalkan.");
+      return;
+    }
+
+    startTransition(async () => {
+      const r = await deleteAllStudents();
+      if (r.error) { alert(r.error); return; }
+      alert(`✅ ${r.count} siswa berhasil dihapus.`);
+    });
+  }
+
   function handleDownloadTemplate() {
     startTransition(async () => {
       const result = await getImportTemplate();
@@ -161,7 +190,10 @@ export function StudentTable({
             {uniqueClasses.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
-        <div className="flex gap-2 sm:ml-auto">
+        <div className="flex gap-2 sm:ml-auto flex-wrap">
+          <Button variant="outline" size="sm" className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50" onClick={handleDeleteAll} disabled={pending}>
+            <Trash2 className="h-4 w-4" />Hapus Semua
+          </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setImportOpen(true)}>
             <Upload className="h-4 w-4" />Import
           </Button>

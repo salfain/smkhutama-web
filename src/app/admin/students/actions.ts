@@ -291,3 +291,15 @@ export async function getImportTemplate() {
   ]);
   return { data: Array.from(buf), filename: "template-import-siswa.xlsx" };
 }
+
+// ---- HAPUS SEMUA SISWA (DESTRUCTIVE) ----
+export async function deleteAllStudents() {
+  try {
+    // Hapus semua user dengan role STUDENT (cascade ke student profile + relasi)
+    const result = await prisma.user.deleteMany({ where: { role: "STUDENT" } });
+    revalidatePath("/admin/students");
+    return { success: true, count: result.count };
+  } catch {
+    return { error: "Gagal menghapus semua siswa. Mungkin ada relasi yang menghalangi." };
+  }
+}
