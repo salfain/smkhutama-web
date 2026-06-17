@@ -132,26 +132,27 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
     });
   }
 
-  function handleDelete(e: Exam) {
-    startTransition(async () => {
-      if (!(await confirm({ title: "Hapus ujian?", description: `Ujian "${e.title}" akan dihapus.`, confirmText: "Hapus" }))) return;
-      const r = await deleteExam(e.id);
-      if (r.error) {
-        if ("hasAttempts" in r && r.hasAttempts) {
-          const forceConfirm = await confirm({
-            title: "Hapus paksa?",
-            description: `${r.error} PERHATIAN: hapus paksa akan menghapus SEMUA jawaban & nilai siswa terkait ujian ini. Data tidak bisa dikembalikan.`,
-            confirmText: "Hapus Paksa", variant: "danger", icon: "warning",
-          });
-          if (forceConfirm) {
-            const r2 = await deleteExam(e.id, true);
-            if (r2.error) alert(r2.error);
-          }
-        } else {
-          alert(r.error);
-        }
+  async function handleDelete(e: Exam) {
+    // Modal konfirmasi HARUS di luar startTransition agar dialog tidak
+    // tertunda render-nya dan transisi tidak nyangkut.
+    if (!(await confirm({ title: "Hapus ujian?", description: `Ujian "${e.title}" akan dihapus.`, confirmText: "Hapus" }))) return;
+
+    const r = await deleteExam(e.id);
+    if (!r.error) return; // revalidatePath di server action menyegarkan daftar
+
+    if ("hasAttempts" in r && r.hasAttempts) {
+      const forceConfirm = await confirm({
+        title: "Hapus paksa?",
+        description: `${r.error} PERHATIAN: hapus paksa akan menghapus SEMUA jawaban & nilai siswa terkait ujian ini. Data tidak bisa dikembalikan.`,
+        confirmText: "Hapus Paksa", variant: "danger", icon: "warning",
+      });
+      if (forceConfirm) {
+        const r2 = await deleteExam(e.id, true);
+        if (r2.error) alert(r2.error);
       }
-    });
+    } else {
+      alert(r.error);
+    }
   }
 
   function handleChangeStatus(e: Exam, status: "DRAFT" | "ACTIVE" | "CLOSED") {
