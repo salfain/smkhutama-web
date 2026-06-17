@@ -17,9 +17,35 @@ export function StudentsBookClient({ students }: { students: Row[] }) {
 
   return (
     <div>
-      <div className="relative mb-4 max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / kelas / NIS..." className="pl-9" />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / kelas / NIS..." className="pl-9" />
+        </div>
+        <button
+          onClick={() => {
+            if (filtered.length === 0) return;
+            const headers = ["NIS", "Nama", "Kelas", "Poin Pelanggaran", "Poin Prestasi", "Sesi Konseling"];
+            const csvContent = [
+              headers.join(","),
+              ...filtered.map(s => `"${s.nis}","${s.name}","${s.className}",${s.violationPoints},${s.achievementPoints},${s.cases}`)
+            ].join("\n");
+            
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `Buku_Siswa_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }}
+          disabled={filtered.length === 0}
+          className="inline-flex items-center gap-2 rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          <svg className="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export CSV
+        </button>
       </div>
 
       {filtered.length === 0 ? (
