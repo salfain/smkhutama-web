@@ -41,10 +41,10 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
   return (
     <div className="fixed inset-x-0 top-0 z-50 px-3 pt-3">
       <header
-        className={`mx-auto max-w-6xl rounded-2xl transition-all duration-300 ${
+        className={`mx-auto max-w-6xl rounded-2xl border transition-all duration-300 ${
           scrolled
-            ? "border border-white/10 bg-[#0a0a0f]/85 shadow-lg shadow-black/30 backdrop-blur-xl"
-            : "border border-white/10 bg-white/5 backdrop-blur-md"
+            ? "border-slate-200 bg-white/85 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-white/10 dark:bg-[#0a0a0f]/85 dark:shadow-black/30"
+            : "border-slate-200/70 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/5"
         }`}
       >
         <nav className="flex items-center justify-between px-4 py-2.5">
@@ -58,8 +58,8 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
               </div>
             )}
             <div className="leading-tight">
-              <div className="text-[9px] uppercase tracking-[0.18em] text-amber-300/80">SMK</div>
-              <div className="text-sm font-bold text-white">{shortName}</div>
+              <div className="text-[9px] uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300/80">SMK</div>
+              <div className="text-sm font-bold text-slate-900 dark:text-white">{shortName}</div>
             </div>
           </Link>
 
@@ -68,15 +68,15 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
             {nav.map((item) =>
               isGroup(item) ? (
                 <div key={item.label} className="relative group">
-                  <button className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
+                  <button className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
                     {item.label}
                     <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
                   </button>
                   <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-                    <div className="min-w-[210px] rounded-2xl border border-white/10 bg-[#0f0f17] p-2 shadow-2xl">
+                    <div className="min-w-[210px] rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#0f0f17]">
                       {item.children.map((child) => (
                         <Link key={child.href} href={child.href}
-                          className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-amber-400/10 hover:text-amber-300">
+                          className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-amber-400/10 hover:text-amber-600 dark:text-slate-300 dark:hover:text-amber-300">
                           {child.label}
                         </Link>
                       ))}
@@ -85,7 +85,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                 </div>
               ) : (
                 <Link key={item.href} href={item.href}
-                  className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
+                  className="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
                   {item.label}
                 </Link>
               )
@@ -95,7 +95,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
           {/* Right actions */}
           <div className="hidden items-center gap-2 md:flex">
             <Link href="/login">
-              <Button size="sm" variant="outline" className="rounded-full border-white/20 bg-transparent px-5 text-white hover:bg-white/10 hover:text-white">
+              <Button size="sm" variant="outline" className="rounded-full border-slate-300 bg-transparent px-5 text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:border-white/20 dark:text-white dark:hover:bg-white/10 dark:hover:text-white">
                 Login
               </Button>
             </Link>
@@ -104,11 +104,11 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                 Daftar PPDB
               </Button>
             </Link>
-            <ThemeToggle className="text-white hover:bg-white/10 hover:text-white" />
+            <ThemeToggle className="text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-white dark:hover:bg-white/10 dark:hover:text-white" />
           </div>
 
           <button
-            className="inline-flex items-center justify-center rounded-md p-1.5 text-white md:hidden"
+            className="inline-flex items-center justify-center rounded-md p-1.5 text-slate-700 dark:text-white md:hidden"
             onClick={() => setOpen(!open)}
           >
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -116,14 +116,14 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
         </nav>
 
         {open && (
-          <div className="border-t border-white/10 md:hidden">
+          <div className="border-t border-slate-200 dark:border-white/10 md:hidden">
             <div className="flex flex-col gap-1 px-4 py-3">
               {nav.map((item) =>
                 isGroup(item) ? (
                   <div key={item.label}>
                     <button
                       onClick={() => setOpenGroup(openGroup === item.label ? null : item.label)}
-                      className="flex w-full items-center justify-between rounded-lg py-2 text-sm font-medium text-slate-200 hover:bg-white/5"
+                      className="flex w-full items-center justify-between rounded-lg py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
                     >
                       {item.label}
                       <ChevronDown className={`h-4 w-4 transition-transform ${openGroup === item.label ? "rotate-180" : ""}`} />
@@ -132,7 +132,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                       <div className="ml-3 flex flex-col gap-1 border-l-2 border-amber-400/40 pl-3">
                         {item.children.map((child) => (
                           <Link key={child.href} href={child.href} onClick={() => setOpen(false)}
-                            className="rounded-lg py-2 text-sm text-slate-400 hover:text-white">
+                            className="rounded-lg py-2 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
                             {child.label}
                           </Link>
                         ))}
@@ -141,13 +141,13 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                   </div>
                 ) : (
                   <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
-                    className="rounded-lg py-2 text-sm font-medium text-slate-200 hover:bg-white/5">
+                    className="rounded-lg py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5">
                     {item.label}
                   </Link>
                 )
               )}
               <Link href="/login" onClick={() => setOpen(false)}>
-                <Button size="sm" variant="outline" className="mt-2 w-full rounded-full border-white/20 bg-transparent text-white hover:bg-white/10">
+                <Button size="sm" variant="outline" className="mt-2 w-full rounded-full border-slate-300 bg-transparent text-slate-700 hover:bg-slate-100 dark:border-white/20 dark:text-white dark:hover:bg-white/10">
                   <LogIn className="h-4 w-4" />Login
                 </Button>
               </Link>

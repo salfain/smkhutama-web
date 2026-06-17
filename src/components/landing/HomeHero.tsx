@@ -27,27 +27,27 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
   ];
 
   return (
-    <section id="beranda" className="relative overflow-hidden bg-[#0a0a0f] text-white">
+    <section id="beranda" className="relative overflow-hidden bg-[#f8fafc] text-slate-900 dark:bg-[#0a0a0f] dark:text-white">
       {/* Grid pattern */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 text-slate-900 opacity-[0.05] dark:text-white dark:opacity-[0.06]"
         style={{
           backgroundImage:
-            "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
       {/* Amber glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-amber-500/20 blur-[120px]" />
-        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-orange-600/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-amber-500/20 blur-[120px] dark:bg-amber-500/20" />
+        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-orange-500/10 blur-3xl" />
         <div className="absolute -right-20 top-40 h-72 w-72 rounded-full bg-amber-400/10 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-5xl px-4 pt-28 pb-0 text-center md:pt-32">
         <RevealContainer className="flex flex-col items-center">
           <RevealItem>
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-600 dark:border-amber-400/30 dark:text-amber-300">
               <Sparkles className="h-3.5 w-3.5" />
               {badge ?? "SMK HUTAMA PONDOK GEDE"}
             </span>
@@ -58,7 +58,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
               {title ?? (
                 <>
                   Cetak Generasi{" "}
-                  <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent dark:from-amber-300 dark:via-orange-400 dark:to-amber-500">
                     Unggul & Berdaya Saing
                   </span>
                 </>
@@ -67,7 +67,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
           </RevealItem>
 
           <RevealItem>
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-slate-400 md:text-base">
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-slate-500 dark:text-slate-400 md:text-base">
               {subtitle ?? "Di SMK Hutama, kami percaya pada kekuatan pendidikan vokasi. Lingkungan belajar modern, religius, dan disiplin dengan program keahlian unggulan serta kemitraan industri."}
             </p>
           </RevealItem>
@@ -80,7 +80,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="gap-2 rounded-full border-white/20 bg-white/5 px-7 text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="gap-2 rounded-full border-slate-300 bg-white/90 px-7 text-slate-800 hover:bg-slate-100 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10">
                 <LogIn className="h-4 w-4" />Login
               </Button>
             </Link>
@@ -108,7 +108,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
               </div>
             ))}
             {/* fade bottom into next section */}
-            <div className="pointer-events-none absolute -bottom-1 left-0 right-0 h-24 bg-gradient-to-t from-[#0a0a0f] to-transparent" />
+            <div className="pointer-events-none absolute -bottom-1 left-0 right-0 h-24 bg-gradient-to-t from-[#f8fafc] to-transparent dark:from-[#0a0a0f]" />
           </div>
         )}
 
@@ -116,9 +116,9 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
         {stats.length > 0 && (
           <RevealContainer className="relative z-30 mt-8 grid grid-cols-2 gap-3 pb-12 sm:grid-cols-4">
             {stats.slice(0, 4).map((s) => (
-              <RevealItem key={s.id} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-4 backdrop-blur">
-                <div className="font-heading text-2xl font-bold text-amber-300 md:text-3xl">{s.value}</div>
-                <div className="mt-1 text-[11px] font-medium text-slate-400">{s.label}</div>
+              <RevealItem key={s.id} className="rounded-2xl border border-slate-200 bg-white/80 px-3 py-4 shadow-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none dark:backdrop-blur">
+                <div className="font-heading text-2xl font-bold text-amber-500 dark:text-amber-300 md:text-3xl">{s.value}</div>
+                <div className="mt-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">{s.label}</div>
               </RevealItem>
             ))}
           </RevealContainer>
