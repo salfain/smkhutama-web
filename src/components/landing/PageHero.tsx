@@ -1,4 +1,7 @@
+"use client";
+
 import type { LucideIcon } from "lucide-react";
+import { RevealContainer, RevealItem } from "./Reveal";
 
 export function PageHero({
   icon: Icon,
@@ -28,15 +31,23 @@ export function PageHero({
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 pt-32 pb-16 text-center">
-        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25">
-          <Icon className="h-7 w-7 text-slate-900" />
-        </div>
-        <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-4xl">{title}</h1>
-        {subtitle && (
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400 md:text-base">
-            {subtitle}
-          </p>
-        )}
+        <RevealContainer className="flex flex-col items-center">
+          <RevealItem>
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25">
+              <Icon className="h-7 w-7 text-slate-900" />
+            </div>
+          </RevealItem>
+          <RevealItem>
+            <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-4xl">{title}</h1>
+          </RevealItem>
+          {subtitle && (
+            <RevealItem>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400 md:text-base">
+                {subtitle}
+              </p>
+            </RevealItem>
+          )}
+        </RevealContainer>
       </div>
 
       {/* Bottom fade */}
