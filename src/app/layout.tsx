@@ -6,7 +6,7 @@ import { ConfirmProvider } from "@/components/ConfirmDialog";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://43.133.134.10"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://smkhutama.web.id"),
   title: {
     default: "CBT SMK HUTAMA – Sistem Ujian Online & Informasi Sekolah",
     template: "%s | SMK Hutama",

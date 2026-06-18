@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, Newspaper, Users, BarChart3, Image as ImageIcon, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Dashboard CMS" };
 
 export default async function CmsDashboard() {
   const [majors, news, registrations, pendingReg, stats, heroImages] = await Promise.all([

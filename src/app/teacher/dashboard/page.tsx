@@ -4,6 +4,7 @@ import { TeacherDashboardClient } from "./TeacherDashboardClient";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Dashboard Guru" };
 
 export default async function TeacherDashboard() {
   const user = await requireAuth("TEACHER");

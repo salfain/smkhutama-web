@@ -10,6 +10,7 @@ import {
 import { getExamTypeInfo } from "@/lib/exam-types";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Dashboard Siswa" };
 
 export default async function StudentDashboard() {
   const user = await requireAuth("STUDENT");

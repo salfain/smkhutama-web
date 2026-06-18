@@ -2,6 +2,7 @@ import { getDashboardStats, getChartData } from "./actions";
 import { DashboardClient } from "./DashboardClient";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Dashboard Admin" };
 
 export default async function AdminDashboard() {
   const [stats, charts] = await Promise.all([

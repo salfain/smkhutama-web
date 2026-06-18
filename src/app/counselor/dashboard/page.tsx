@@ -3,6 +3,7 @@ import { ShieldAlert, Award, FolderOpen, Inbox } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Dashboard BK" };
 
 const typeLabel: Record<string, string> = { PRIBADI: "Pribadi", SOSIAL: "Sosial", BELAJAR: "Belajar", KARIR: "Karir" };
 const statusLabel: Record<string, { label: string; cls: string }> = {
