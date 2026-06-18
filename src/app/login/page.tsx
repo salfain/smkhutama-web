@@ -5,18 +5,19 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, LogIn, ArrowLeft, GraduationCap, HeartHandshake } from "lucide-react";
+import { Eye, EyeOff, LogIn, ArrowLeft, GraduationCap, HeartHandshake, ClipboardList } from "lucide-react";
 import { loginAction } from "./actions";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 
-type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR";
-type System = "CBT" | "SIBIKONS";
+type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "PIKET";
+type System = "CBT" | "SIBIKONS" | "PIKET";
 
 const roleConfig: Record<Role, { label: string; bg: string; placeholder: string }> = {
-  ADMIN:   { label: "Admin",  bg: "bg-blue-600 hover:bg-blue-700",       placeholder: "admin" },
-  TEACHER: { label: "Guru",   bg: "bg-emerald-600 hover:bg-emerald-700", placeholder: "sari.dewi" },
-  STUDENT: { label: "Siswa",  bg: "bg-blue-500 hover:bg-blue-600",   placeholder: "2324001 / NIS / Username" },
-  COUNSELOR: { label: "Guru BK", bg: "bg-purple-600 hover:bg-purple-700", placeholder: "bk.hutama" },
+  ADMIN:   { label: "Admin",      bg: "bg-blue-600 hover:bg-blue-700",       placeholder: "admin" },
+  TEACHER: { label: "Guru",       bg: "bg-emerald-600 hover:bg-emerald-700", placeholder: "sari.dewi" },
+  STUDENT: { label: "Siswa",      bg: "bg-blue-500 hover:bg-blue-600",       placeholder: "2324001 / NIS / Username" },
+  COUNSELOR: { label: "Guru BK",  bg: "bg-purple-600 hover:bg-purple-700",   placeholder: "bk.hutama" },
+  PIKET:   { label: "Guru Piket", bg: "bg-amber-500 hover:bg-amber-600",     placeholder: "piket.hutama" },
 };
 
 const systemConfig: Record<System, {
@@ -40,6 +41,15 @@ const systemConfig: Record<System, {
     icon: HeartHandshake,
     tagline: "Sistem informasi bimbingan konseling untuk mengelola sesi konseling, poin pelanggaran, dan prestasi siswa.",
     features: ["Catatan sesi konseling", "Poin pelanggaran siswa", "Pencatatan prestasi", "Ajukan konseling (siswa)"],
+  },
+  PIKET: {
+    title: "Guru Piket",
+    subtitle: "Untuk Guru Piket",
+    roles: ["PIKET"],
+    accent: "amber",
+    icon: ClipboardList,
+    tagline: "Sistem pencatatan ketertiban harian: kehadiran guru, keterlambatan siswa, dan izin keluar/masuk.",
+    features: ["Catat keterlambatan siswa", "Pantau izin keluar/masuk", "Rekap kehadiran guru", "Dashboard harian"],
   },
 };
 
@@ -79,7 +89,9 @@ export default function LoginPage() {
 
   const leftPanelBg = system === "CBT"
     ? "from-blue-700 to-indigo-700"
-    : "from-purple-700 to-fuchsia-700";
+    : system === "SIBIKONS"
+    ? "from-purple-700 to-fuchsia-700"
+    : "from-amber-500 to-orange-500";
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
@@ -109,31 +121,38 @@ export default function LoginPage() {
           </Link>
 
           {/* System selector */}
-          <div className="mb-5 grid grid-cols-2 gap-3">
+          <div className="mb-5 grid grid-cols-3 gap-3">
             {(Object.entries(systemConfig) as [System, typeof sys][]).map(([key, val]) => {
               const Icon = val.icon;
               const selected = system === key;
-              const selBlue = key === "CBT";
+              const accentClass =
+                key === "CBT" ? "border-blue-600 bg-blue-50/70 shadow-sm dark:border-blue-500 dark:bg-blue-950/30"
+                : key === "SIBIKONS" ? "border-purple-600 bg-purple-50/70 shadow-sm dark:border-purple-500 dark:bg-purple-950/30"
+                : "border-amber-500 bg-amber-50/70 shadow-sm dark:border-amber-500 dark:bg-amber-950/30";
+              const iconClass =
+                key === "CBT" ? "bg-blue-600"
+                : key === "SIBIKONS" ? "bg-purple-600"
+                : "bg-amber-500";
+              const textClass =
+                key === "CBT" ? "text-blue-700 dark:text-blue-400"
+                : key === "SIBIKONS" ? "text-purple-700 dark:text-purple-400"
+                : "text-amber-700 dark:text-amber-400";
               return (
                 <button key={key} type="button" onClick={() => selectSystem(key)}
-                  className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition-all ${
-                    selected
-                      ? selBlue
-                        ? "border-blue-600 bg-blue-50/70 shadow-sm dark:border-blue-500 dark:bg-blue-950/30"
-                        : "border-purple-600 bg-purple-50/70 shadow-sm dark:border-purple-500 dark:bg-purple-950/30"
-                      : "border-slate-200 bg-white hover:border-gray-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
+                  className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-3 text-left transition-all ${
+                    selected ? accentClass : "border-slate-200 bg-white hover:border-gray-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
                   }`}>
-                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-                    selected ? (selBlue ? "bg-blue-600" : "bg-purple-600") : "bg-gray-100 dark:bg-slate-800"
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${
+                    selected ? iconClass : "bg-gray-100 dark:bg-slate-800"
                   }`}>
-                    <Icon className={`h-5 w-5 ${selected ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
+                    <Icon className={`h-4 w-4 ${selected ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
                   </div>
                   <div>
-                    <p className={`text-sm font-bold ${selected ? (selBlue ? "text-blue-700 dark:text-blue-400" : "text-purple-700 dark:text-purple-400") : "text-gray-700 dark:text-gray-300"}`}>
-                      {key === "CBT" ? "CBT" : "SIBIKONS"}
+                    <p className={`text-xs font-bold ${selected ? textClass : "text-gray-700 dark:text-gray-300"}`}>
+                      {key}
                     </p>
-                    <p className="text-[11px] leading-tight text-gray-500 dark:text-gray-400">
-                      {key === "CBT" ? "Ujian Online" : "Bimbingan Konseling"}
+                    <p className="text-[10px] leading-tight text-gray-500 dark:text-gray-400">
+                      {key === "CBT" ? "Ujian Online" : key === "SIBIKONS" ? "Bimbingan Konseling" : "Piket Harian"}
                     </p>
                   </div>
                 </button>
@@ -196,10 +215,14 @@ export default function LoginPage() {
                   <p>Guru: <span className="font-mono text-slate-900 dark:text-white">sari.dewi</span> / <span className="font-mono text-slate-900 dark:text-white">guru123</span></p>
                   <p>Siswa: <span className="font-mono text-slate-900 dark:text-white">2324001</span> / <span className="font-mono text-slate-900 dark:text-white">siswa123</span></p>
                 </>
-              ) : (
+              ) : system === "SIBIKONS" ? (
                 <>
                   <p>Guru BK: <span className="font-mono text-slate-900 dark:text-white">bk.hutama</span> / <span className="font-mono text-slate-900 dark:text-white">bk123</span></p>
                   <p>Siswa: <span className="font-mono text-slate-900 dark:text-white">2324001</span> / <span className="font-mono text-slate-900 dark:text-white">siswa123</span></p>
+                </>
+              ) : (
+                <>
+                  <p>Guru Piket: <span className="font-mono text-slate-900 dark:text-white">piket.hutama</span> / <span className="font-mono text-slate-900 dark:text-white">piket123</span></p>
                 </>
               )}
             </div>

@@ -20,6 +20,7 @@ enum Role {
   STUDENT
   LANDING_ADMIN
   COUNSELOR
+  PIKET
 }
 
 enum Gender {
@@ -192,6 +193,7 @@ model Class {
   homeroomTeacher Teacher? @relation("Homeroom", fields: [homeroomTeacherId], references: [id])
   students Student[]
   examParticipants ExamClass[]
+  teacherAttendances TeacherAttendance[]
 
   @@map("classes")
 }
@@ -236,6 +238,8 @@ model Student {
   parentSummons      ParentSummon[]
   homeVisits         HomeVisit[]
   surveyResponses    SurveyResponse[]
+  tardinessRecords   StudentTardiness[]
+  permits            StudentPermit[]
 
   @@map("students")
 }
@@ -254,6 +258,7 @@ model Teacher {
   questions Question[]
   exams     Exam[]
   homeroomClasses Class[] @relation("Homeroom")
+  attendances TeacherAttendance[]
 
   @@map("teachers")
 }
@@ -842,4 +847,61 @@ model SurveyAnswer {
 
   @@unique([responseId, questionId])
   @@map("survey_answers")
+}
+
+// ============================================
+// GURU PIKET MODELS
+// ============================================
+
+/// Kehadiran guru di kelas (dicatat guru piket)
+model TeacherAttendance {
+  id          String   @id @default(uuid())
+  teacherId   String   @map("teacher_id")
+  classId     String   @map("class_id")
+  recordedBy  String   @map("recorded_by")
+  status      String   // HADIR / TIDAK_HADIR / DIGANTIKAN / TUGAS_LUAR
+  period      String?
+  substitute  String?
+  note        String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_attendances")
+}
+
+/// Pendataan siswa terlambat
+model StudentTardiness {
+  id          String   @id @default(uuid())
+  studentId   String   @map("student_id")
+  recordedBy  String   @map("recorded_by")
+  arrivalTime DateTime @map("arrival_time")
+  reason      String?
+  sanction    String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("student_tardiness")
+}
+
+/// Izin keluar/masuk siswa saat jam pelajaran
+model StudentPermit {
+  id          String    @id @default(uuid())
+  studentId   String    @map("student_id")
+  recordedBy  String    @map("recorded_by")
+  type        String    // KELUAR / MASUK
+  reason      String
+  exitTime    DateTime? @map("exit_time")
+  returnTime  DateTime? @map("return_time")
+  status      String    @default("KELUAR") // KELUAR / SUDAH_KEMBALI / TIDAK_KEMBALI
+  date        DateTime  @default(now())
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("student_permits")
 }

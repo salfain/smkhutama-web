@@ -11,9 +11,10 @@ export function proxy(req: NextRequest) {
   const isTeacher = pathname.startsWith("/teacher");
   const isStudent = pathname.startsWith("/student");
   const isCounselor = pathname.startsWith("/counselor");
+  const isPiket   = pathname.startsWith("/piket");
   const isCms     = pathname.startsWith("/cms") && !pathname.startsWith("/cms/login");
 
-  if ((isAdmin || isTeacher || isStudent || isCounselor || isCms) && !sess) {
+  if ((isAdmin || isTeacher || isStudent || isCounselor || isPiket || isCms) && !sess) {
     const url = req.nextUrl.clone();
     url.pathname = isCms ? "/cms/login" : "/login";
     return NextResponse.redirect(url);
@@ -23,5 +24,5 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*", "/counselor/:path*", "/cms/:path*"],
+  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*", "/counselor/:path*", "/piket/:path*", "/cms/:path*"],
 };

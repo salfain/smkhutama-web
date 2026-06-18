@@ -56,6 +56,13 @@ export async function requireCounselorAuth() {
   return user;
 }
 
+export async function requirePiketAuth() {
+  const user = await getSession();
+  if (!user) redirect("/login");
+  if (user.role !== "PIKET" && user.role !== "ADMIN") redirect("/login");
+  return user;
+}
+
 export async function requireCmsAuth() {
   const user = await getSession();
   if (!user) redirect("/cms/login");
