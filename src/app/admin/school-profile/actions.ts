@@ -2,8 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import path from "path";
-import { writeFile, mkdir } from "fs/promises";
+import { saveUploadedFile } from "@/lib/upload";
 
 export async function getSchoolProfile() {
   return prisma.schoolProfile.findFirst();
@@ -26,13 +25,11 @@ export async function upsertSchoolProfile(formData: FormData) {
     const allowed = ["image/png", "image/jpeg", "image/webp"];
     if (!allowed.includes(logoFile.type)) return { error: "Format logo harus PNG/JPG/WEBP" };
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "school");
-    await mkdir(uploadDir, { recursive: true });
-    const ext = logoFile.name.split(".").pop() ?? "png";
-    const fileName = `logo.${ext}`;
-    const bytes = await logoFile.arrayBuffer();
-    await writeFile(path.join(uploadDir, fileName), Buffer.from(bytes));
-    logoPath = `/uploads/school/${fileName}`;
+    try {
+      logoPath = await saveUploadedFile(logoFile, "school", "logo");
+    } catch (err: any) {
+      return { error: `Gagal upload logo: ${err.message}` };
+    }
   }
 
   try {
