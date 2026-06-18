@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  # ── Aplikasi Next.js ────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cbt-smkhutama
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://root:1@db:5432/db_cbt_smk_hutama
+      JWT_SECRET: ${JWT_SECRET}
+      UPLOAD_DIR: ./public/uploads
+      MAX_IMAGE_SIZE: "2048"
+      MAX_AUDIO_SIZE: "10240"
+      MAX_VIDEO_SIZE: "51200"
+      COOKIE_SECURE: "true"
+    volumes:
+      # Persistent storage untuk file upload
+      - uploads_data:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cbt_network
+
+  # ── PostgreSQL Database ─────────────────────────────────────────────────────
+  db:
+    image: postgres:18-alpine
+    container_name: cbt-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: "1"
+      POSTGRES_DB: db_cbt_smk_hutama
+    volumes:
+      # Persistent storage untuk data database
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d db_cbt_smk_hutama"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cbt_network
+
+# ── Volumes ─────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+# ── Network ──────────────────────────────────────────────────────────────────
+networks:
+  cbt_network:
+    driver: bridge
