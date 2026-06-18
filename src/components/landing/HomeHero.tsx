@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, LogIn } from "lucide-react";
-import { RevealContainer, RevealItem } from "./Reveal";
+import { motion } from "framer-motion";
+import { RevealContainer, RevealItem, RevealImage } from "./Reveal";
 
 type Stat = { id: string; label: string; value: string };
 type Props = {
@@ -87,29 +88,53 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
           </RevealItem>
         </RevealContainer>
 
-        {/* Fanned image cards */}
+        {/* Fanned image cards with Stagger Entrance and Hover Interactions */}
         {pics.length > 0 && (
-          <div className="relative mt-14 flex items-end justify-center md:mt-16">
-            {pics.map((src, i) => (
-              <div
-                key={i}
-                className={`relative ${cardPos[i]} transition-transform duration-500`}
-                style={{ marginLeft: i === 0 ? 0 : "-3rem", marginRight: i === 2 ? 0 : "-3rem" }}
-              >
-                <div className="overflow-hidden rounded-3xl bg-gradient-to-b from-sky-300 to-blue-500 p-1.5 shadow-2xl shadow-sky-900/40 ring-1 ring-white/10">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt="Dokumentasi SMK Hutama"
-                    className="h-56 w-40 rounded-[18px] object-cover md:h-80 md:w-60"
-                    loading={i === 1 ? "eager" : "lazy"}
-                  />
-                </div>
-              </div>
-            ))}
+          <RevealContainer
+            stagger={0.12}
+            delayChildren={0.2}
+            className="relative mt-14 flex items-end justify-center md:mt-16"
+          >
+            {pics.map((src, i) => {
+              const baseRotate = i === 0 ? -10 : i === 2 ? 10 : 0;
+              return (
+                <motion.div
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 30, scale: 0.85, rotate: baseRotate },
+                    visible: {
+                      opacity: 1, y: 0, scale: 1, rotate: baseRotate,
+                      transition: { duration: 0.5, ease: [0.215, 0.61, 0.355, 1] }
+                    }
+                  }}
+                  whileHover={{
+                    scale: 1.06,
+                    y: -12,
+                    rotate: i === 0 ? -12 : i === 2 ? 12 : 0,
+                    zIndex: 40,
+                    transition: { duration: 0.2, ease: "easeOut" }
+                  }}
+                  className={`relative ${cardPos[i]} cursor-pointer`}
+                  style={{
+                    marginLeft: i === 0 ? 0 : "-3rem",
+                    marginRight: i === 2 ? 0 : "-3rem",
+                  }}
+                >
+                  <div className="overflow-hidden rounded-3xl bg-gradient-to-b from-sky-300 to-blue-500 p-1.5 shadow-2xl shadow-sky-900/40 ring-1 ring-white/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt="Dokumentasi SMK Hutama"
+                      className="h-56 w-40 rounded-[18px] object-cover md:h-80 md:w-60"
+                      loading={i === 1 ? "eager" : "lazy"}
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
             {/* fade bottom into next section */}
             <div className="pointer-events-none absolute -bottom-1 left-0 right-0 h-24 bg-gradient-to-t from-[#f8fafc] to-transparent dark:from-[#0a0a0f]" />
-          </div>
+          </RevealContainer>
         )}
 
         {/* Stat strip */}

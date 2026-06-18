@@ -15,7 +15,7 @@ export function HomeStats({ stats }: { stats: Stat[] }) {
         <RevealContainer className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {stats.map((s) => (
             <RevealCard key={s.id}
-              className="group rounded-3xl border border-white bg-white/70 px-4 py-6 text-center shadow-sm backdrop-blur transition-all hover:-translate-y-1 hover:shadow-xl">
+              className="group rounded-3xl border border-white bg-white/70 px-4 py-6 text-center shadow-sm backdrop-blur transition-all">
               <div className="font-heading text-3xl font-bold text-gradient md:text-4xl">{s.value}</div>
               <div className="mt-1.5 text-xs font-medium text-slate-500">{s.label}</div>
             </RevealCard>
@@ -45,7 +45,7 @@ export function HomeMajors({ majors }: { majors: Major[] }) {
           <div className="grid gap-5 md:grid-cols-3">
             {majors.map((m, i) => (
               <RevealCard key={m.id}
-                className="group relative overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-xl">
+                className="group relative overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm transition-all">
                 <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 dark:from-sky-500/10 dark:to-blue-500/10 opacity-60 transition-transform group-hover:scale-150" />
                 <div className="relative">
                   <span className="inline-block rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 px-3 py-1 text-xs font-bold text-slate-900 shadow">
@@ -89,7 +89,7 @@ export function HomeNews({ news }: { news: News[] }) {
               {news.slice(0, 3).map((item) => (
                 <RevealCard key={item.id}>
                   <Link href={`/berita/${item.slug}`}
-                    className="group flex flex-col overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-xl h-full">
+                    className="group flex flex-col overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm transition-all h-full">
                     {item.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={item.imageUrl} alt={item.title} className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105" />

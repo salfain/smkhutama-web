@@ -30,7 +30,22 @@ export function RevealItem({
 }
 
 export function RevealCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <RevealItem className={className} y={14} dur={0.24}>{children}</RevealItem>;
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 15, scale: 0.97 },
+        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35, ease: "easeOut" } }
+      }}
+      whileHover={{
+        y: -6,
+        scale: 1.018,
+        transition: { duration: 0.2, ease: "easeOut" }
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 export function RevealImage({ children, className = "" }: { children: ReactNode; className?: string }) {
