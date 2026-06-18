@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { RevealContainer, RevealItem, RevealImage } from "./Reveal";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type Stat = { id: string; label: string; value: string };
 type Props = {
@@ -16,6 +17,8 @@ type Props = {
 };
 
 export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) {
+  const { t } = useLanguage();
+  
   // Susun 3 kartu kipas; jika gambar kurang, ulangi yang ada.
   const pics = images.length > 0
     ? [0, 1, 2].map((i) => images[i % images.length]?.imageUrl).filter(Boolean) as string[]
@@ -50,7 +53,7 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
           <RevealItem>
             <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-600 dark:border-sky-400/30 dark:text-sky-300">
               <Sparkles className="h-3.5 w-3.5" />
-              {badge ?? "SMK HUTAMA PONDOK GEDE"}
+              {badge ?? t("hero.badge")}
             </span>
           </RevealItem>
 
@@ -58,9 +61,9 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
             <h1 className="mt-6 font-heading text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
               {title ?? (
                 <>
-                  Cetak Generasi{" "}
+                  {t("hero.title1")}{" "}
                   <span className="bg-gradient-to-r from-sky-400 via-blue-500 to-sky-600 bg-clip-text text-transparent dark:from-sky-300 dark:via-blue-400 dark:to-sky-500">
-                    Unggul & Berdaya Saing
+                    {t("hero.title2")}
                   </span>
                 </>
               )}
@@ -69,20 +72,20 @@ export function HomeHero({ badge, title, subtitle, images, stats = [] }: Props) 
 
           <RevealItem>
             <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-slate-500 dark:text-slate-400 md:text-base">
-              {subtitle ?? "Di SMK Hutama, kami percaya pada kekuatan pendidikan vokasi. Lingkungan belajar modern, religius, dan disiplin dengan program keahlian unggulan serta kemitraan industri."}
+              {subtitle ?? t("hero.subtitle")}
             </p>
           </RevealItem>
 
           <RevealItem className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Link href="/ppdb">
               <Button size="lg" className="group gap-2 rounded-full bg-sky-400 px-7 font-semibold text-slate-900 shadow-lg shadow-sky-500/25 hover:bg-sky-300">
-                Daftar Sekarang
+                {t("hero.cta.register")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
             <Link href="/login">
               <Button size="lg" variant="outline" className="gap-2 rounded-full border-slate-300 bg-white/90 px-7 text-slate-800 hover:bg-slate-100 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10">
-                <LogIn className="h-4 w-4" />Login
+                <LogIn className="h-4 w-4" />{t("hero.cta.login")}
               </Button>
             </Link>
           </RevealItem>
