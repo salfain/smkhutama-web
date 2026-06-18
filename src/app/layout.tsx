@@ -15,9 +15,11 @@ export const metadata: Metadata = {
     "SMK Hutama Pondok Gede — sekolah menengah kejuruan unggulan. Informasi PPDB, program keahlian, berita, serta sistem ujian online (CBT) modern, aman, dan efisien.",
   keywords: ["SMK Hutama", "PPDB SMK Hutama", "CBT", "ujian online", "SMK Pondok Gede", "sekolah kejuruan Bekasi"],
   icons: {
-    icon: "/api/school/logo",
-    shortcut: "/api/school/logo",
-    apple: "/api/school/logo",
+    icon: [
+      { url: "/uploads/school/logo.png", type: "image/png" }
+    ],
+    shortcut: "/uploads/school/logo.png",
+    apple: "/uploads/school/logo.png",
   },
   openGraph: {
     type: "website",
