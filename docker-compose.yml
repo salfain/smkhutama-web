@@ -10,17 +10,11 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://root:1@db:5432/db_cbt_smk_hutama
-      JWT_SECRET: ${JWT_SECRET}
-      UPLOAD_DIR: ./public/uploads
-      MAX_IMAGE_SIZE: "2048"
-      MAX_AUDIO_SIZE: "10240"
-      MAX_VIDEO_SIZE: "51200"
-      COOKIE_SECURE: "true"
     volumes:
-      # Persistent storage untuk file upload
       - uploads_data:/app/public/uploads
     depends_on:
       db:
@@ -38,7 +32,6 @@ services:
       POSTGRES_PASSWORD: "1"
       POSTGRES_DB: db_cbt_smk_hutama
     volumes:
-      # Persistent storage untuk data database
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -50,7 +43,7 @@ services:
     networks:
       - cbt_network
 
-# ── Volumes ─────────────────────────────────────────────────────────────────
+# ── Volumes ──────────────────────────────────────────────────────────────────
 volumes:
   postgres_data:
     driver: local
