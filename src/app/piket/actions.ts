@@ -68,7 +68,21 @@ export async function createTardiness(formData: FormData) {
 
   if (!studentId) return { error: "Siswa wajib dipilih" };
 
-  const arrivalTime = arrivalStr ? new Date(arrivalStr) : new Date();
+  // arrivalTime dari input[type="time"] hanya berformat "HH:mm"
+  // Gabungkan dengan tanggal hari ini agar menjadi Date yang valid
+  let arrivalTime: Date;
+  if (arrivalStr && /^\d{2}:\d{2}$/.test(arrivalStr)) {
+    const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+    arrivalTime = new Date(`${today}T${arrivalStr}:00`);
+  } else if (arrivalStr) {
+    arrivalTime = new Date(arrivalStr);
+  } else {
+    arrivalTime = new Date();
+  }
+
+  if (isNaN(arrivalTime.getTime())) {
+    arrivalTime = new Date(); // fallback ke sekarang jika masih invalid
+  }
 
   await prisma.studentTardiness.create({
     data: {
