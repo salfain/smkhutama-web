@@ -8,12 +8,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://smkhutama.web.id"),
   title: {
-    default: "CBT SMK HUTAMA – Sistem Ujian Online & Informasi Sekolah",
+    default: "SMK HUTAMA — Portal Akademik, CBT & Konseling Sekolah",
     template: "%s | SMK Hutama",
   },
   description:
-    "SMK Hutama Pondok Gede — sekolah menengah kejuruan unggulan. Informasi PPDB, program keahlian, berita, serta sistem ujian online (CBT) modern, aman, dan efisien.",
-  keywords: ["SMK Hutama", "PPDB SMK Hutama", "CBT", "ujian online", "SMK Pondok Gede", "sekolah kejuruan Bekasi"],
+    "Portal resmi SMK Hutama Pondok Gede. Akses sistem ujian online (CBT), bimbingan konseling (SIBIKONS), informasi akademik, berita sekolah, dan pendaftaran siswa baru (PPDB) terpadu.",
+  keywords: ["SMK Hutama", "PPDB SMK Hutama", "CBT SMK", "SIBIKONS", "Ujian Online SMK", "SMK Pondok Gede", "Sekolah Kejuruan Bekasi"],
   icons: {
     icon: [
       { url: "/uploads/school/logo.png", type: "image/png" }
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "SMK Hutama Pondok Gede",
-    title: "CBT SMK HUTAMA – Sistem Ujian Online & Informasi Sekolah",
+    title: "SMK HUTAMA — Portal Akademik, CBT & Konseling Sekolah",
     description:
-      "Sekolah menengah kejuruan unggulan. Informasi PPDB, program keahlian, berita, dan sistem ujian online (CBT).",
+      "Portal resmi terpadu SMK Hutama Pondok Gede. Menyediakan website profil sekolah, sistem ujian online (CBT), dan bimbingan konseling (SIBIKONS) modern.",
     images: [{ url: "/api/school/logo", width: 512, height: 512, alt: "Logo SMK Hutama" }],
   },
   twitter: {
     card: "summary",
-    title: "CBT SMK HUTAMA",
-    description: "Sistem ujian online & informasi SMK Hutama Pondok Gede.",
+    title: "SMK HUTAMA",
+    description: "Portal Akademik, CBT & Konseling SMK Hutama Pondok Gede.",
     images: ["/api/school/logo"],
   },
 };
