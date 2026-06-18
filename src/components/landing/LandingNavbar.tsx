@@ -5,28 +5,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogIn, GraduationCap, ChevronDown } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useLanguage } from "@/components/LanguageProvider";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
-type NavItem = { label: string; href: string };
-type NavGroup = { label: string; children: NavItem[] };
+type NavItem = { labelKey: string; href: string };
+type NavGroup = { labelKey: string; children: NavItem[] };
 
-const nav: (NavItem | NavGroup)[] = [
-  { label: "Beranda", href: "/" },
-  {
-    label: "Profil",
-    children: [
-      { label: "Tentang Kami", href: "/tentang" },
-      { label: "Program Keahlian", href: "/jurusan" },
-      { label: "Data Guru", href: "/guru" },
-      { label: "Ekstrakurikuler", href: "/ekstrakurikuler" },
-      { label: "Galeri", href: "/galeri" },
-    ],
-  },
-  { label: "Berita", href: "/berita" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Kontak", href: "/kontak" },
-];
-
-function isGroup(item: NavItem | NavGroup): item is NavGroup {
+function isGroup(item: any): item is NavGroup {
   return "children" in item;
 }
 
@@ -34,6 +19,24 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const { t } = useLanguage();
+
+  const nav: (NavItem | NavGroup)[] = [
+    { labelKey: "nav.home", href: "/" },
+    {
+      labelKey: "nav.about", // Profil / About
+      children: [
+        { labelKey: "nav.about", href: "/tentang" },
+        { labelKey: "nav.majors", href: "/jurusan" },
+        { labelKey: "nav.teachers", href: "/guru" },
+        { labelKey: "nav.extracurriculars", href: "/ekstrakurikuler" },
+        { labelKey: "nav.gallery", href: "/galeri" },
+      ],
+    },
+    { labelKey: "nav.news", href: "/berita" },
+    { labelKey: "nav.faq", href: "/faq" },
+    { labelKey: "nav.contact", href: "/kontak" },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -71,9 +74,10 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
           <div className="hidden items-center gap-1 md:flex">
             {nav.map((item) =>
               isGroup(item) ? (
-                <div key={item.label} className="relative group">
+                <div key={item.labelKey} className="relative group">
                   <button className="flex items-center gap-1 px-3.5 py-1.5 text-xs font-bold text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white rounded-full hover:bg-slate-100/50 dark:hover:bg-white/5">
-                    {item.label}
+                    {/* Fallback ke ID locale key */}
+                    {item.labelKey === "nav.about" ? (t("language" as any) === "EN" ? "Profile" : "Profil") : t(item.labelKey as any)}
                     <ChevronDown className="h-3 w-3 transition-transform duration-200 group-hover:rotate-180" />
                   </button>
                   <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
@@ -84,7 +88,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                           href={child.href}
                           className="block rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
                         >
-                          {child.label}
+                          {t(child.labelKey as any)}
                         </Link>
                       ))}
                     </div>
@@ -96,7 +100,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                   href={item.href}
                   className="px-3.5 py-1.5 text-xs font-bold text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white rounded-full hover:bg-slate-100/50 dark:hover:bg-white/5"
                 >
-                  {item.label}
+                  {t(item.labelKey as any)}
                 </Link>
               )
             )}
@@ -106,20 +110,22 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
           <div className="hidden items-center gap-2 md:flex">
             <Link href="/login">
               <Button size="sm" variant="ghost" className="rounded-full px-4 text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
-                Masuk
+                {t("nav.login")}
               </Button>
             </Link>
             <Link href="/ppdb">
               <Button size="sm" className="rounded-full bg-sky-600 px-5 text-xs font-extrabold text-white shadow-md shadow-sky-600/10 hover:bg-sky-500 hover:shadow-lg hover:shadow-sky-600/20 active:scale-95 transition-all h-9">
-                Daftar PPDB
+                {t("nav.ppdb")}
               </Button>
             </Link>
             <div className="h-4 w-px bg-slate-200 dark:bg-white/10 mx-1" />
+            <LanguageToggle />
             <ThemeToggle className="rounded-full h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/10" />
           </div>
 
           {/* Mobile menu trigger */}
           <div className="flex items-center gap-1.5 md:hidden">
+            <LanguageToggle />
             <ThemeToggle className="rounded-full h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/10" />
             <button
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:text-white dark:hover:bg-white/5"
@@ -136,20 +142,20 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
             <div className="flex flex-col gap-1">
               {nav.map((item) =>
                 isGroup(item) ? (
-                  <div key={item.label} className="py-0.5">
+                  <div key={item.labelKey} className="py-0.5">
                     <button
-                      onClick={() => setOpenGroup(openGroup === item.label ? null : item.label)}
+                      onClick={() => setOpenGroup(openGroup === item.labelKey ? null : item.labelKey)}
                       className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/5"
                     >
-                      {item.label}
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${openGroup === item.label ? "rotate-180" : ""}`} />
+                      {item.labelKey === "nav.about" ? (t("language" as any) === "EN" ? "Profile" : "Profil") : t(item.labelKey as any)}
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${openGroup === item.labelKey ? "rotate-180" : ""}`} />
                     </button>
-                    {openGroup === item.label && (
+                    {openGroup === item.labelKey && (
                       <div className="ml-4 mt-1 flex flex-col gap-1 border-l border-slate-100 pl-3 dark:border-white/5">
                         {item.children.map((child) => (
                           <Link key={child.href} href={child.href} onClick={() => setOpen(false)}
                             className="rounded-md py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-                            {child.label}
+                            {t(child.labelKey as any)}
                           </Link>
                         ))}
                       </div>
@@ -158,7 +164,7 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
                 ) : (
                   <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
                     className="rounded-lg px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/5">
-                    {item.label}
+                    {t(item.labelKey as any)}
                   </Link>
                 )
               )}
@@ -166,12 +172,12 @@ export function LandingNavbar({ logoUrl, shortName }: { logoUrl?: string | null;
               <div className="grid grid-cols-2 gap-2.5">
                 <Link href="/login" onClick={() => setOpen(false)}>
                   <Button size="sm" variant="outline" className="w-full rounded-full border-slate-200 text-xs font-bold text-slate-700 dark:border-white/10 dark:text-white">
-                    <LogIn className="h-3.5 w-3.5 mr-1.5" />Masuk
+                    <LogIn className="h-3.5 w-3.5 mr-1.5" />{t("nav.login")}
                   </Button>
                 </Link>
                 <Link href="/ppdb" onClick={() => setOpen(false)}>
                   <Button size="sm" className="w-full rounded-full bg-sky-600 text-xs font-bold text-white hover:bg-sky-500">
-                    Daftar PPDB
+                    {t("nav.ppdb")}
                   </Button>
                 </Link>
               </div>

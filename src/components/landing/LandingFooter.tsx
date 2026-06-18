@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogIn, ArrowRight, Phone, Mail, MapPin, Globe } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type Profile = {
   schoolName: string;
@@ -16,6 +17,7 @@ type Profile = {
 };
 
 export function LandingCTA({ ppdbOpen }: { ppdbOpen: boolean }) {
+  const { t } = useLanguage();
   return (
     <section className="bg-[#f8fafc] px-4 py-16 dark:bg-[#0a0a0f]">
       <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-14 text-center text-white shadow-2xl ring-1 ring-white/10">
@@ -25,25 +27,25 @@ export function LandingCTA({ ppdbOpen }: { ppdbOpen: boolean }) {
         </div>
         <div className="relative">
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-            {ppdbOpen ? "Bergabung Bersama Kami" : "Sistem Ujian Digital"}
+            {ppdbOpen ? t("cta.title") : (t("language" as any) === "EN" ? "Digital Examination System" : "Sistem Ujian Digital")}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-slate-300">
             {ppdbOpen
-              ? "Pendaftaran peserta didik baru telah dibuka. Daftar online sekarang, mudah dan cepat."
-              : "Akses sistem ujian CBT kapan saja, di mana saja."}
+              ? t("cta.subtitle")
+              : (t("language" as any) === "EN" ? "Access the CBT exam system anytime, anywhere." : "Akses sistem ujian CBT kapan saja, di mana saja.")}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {ppdbOpen && (
               <Link href="/ppdb">
                 <Button size="lg" className="group gap-2 rounded-full bg-sky-400 px-8 font-semibold text-slate-900 hover:bg-sky-300 shine">
-                  Daftar PPDB Online
+                  {t("cta.button")}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
             )}
             <Link href="/login">
               <Button size="lg" variant="outline" className="gap-2 rounded-full border-white/30 bg-white/5 px-8 text-white hover:bg-white/15">
-                <LogIn className="h-4 w-4" />Login
+                <LogIn className="h-4 w-4" />{t("hero.cta.login")}
               </Button>
             </Link>
           </div>
@@ -54,6 +56,7 @@ export function LandingCTA({ ppdbOpen }: { ppdbOpen: boolean }) {
 }
 
 export function LandingFooter({ profile }: { profile: Profile }) {
+  const { t } = useLanguage();
   return (
     <footer id="kontak" className="bg-slate-950 text-slate-300">
       <div className="mx-auto max-w-6xl px-4 py-14">
@@ -66,13 +69,15 @@ export function LandingFooter({ profile }: { profile: Profile }) {
               )}
               <div>
                 <p className="font-heading text-lg font-bold text-white">{profile.schoolName}</p>
-                {profile.tagline && <p className="text-xs text-slate-400">{profile.tagline}</p>}
+                <p className="text-xs text-slate-400">
+                  {t("footer.tagline")}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="space-y-3 text-sm">
-            <p className="font-semibold text-white">Kontak</p>
+            <p className="font-semibold text-white">{t("nav.contact")}</p>
             {profile.address && (
               <p className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />{profile.address}</p>
             )}
@@ -86,10 +91,10 @@ export function LandingFooter({ profile }: { profile: Profile }) {
           </div>
 
           <div className="space-y-3">
-            <p className="font-semibold text-white">Tautan</p>
+            <p className="font-semibold text-white">{t("footer.links.explore")}</p>
             <div className="flex flex-col gap-2 text-sm">
-              <Link href="/ppdb" className="hover:text-white">Pendaftaran Online (PPDB)</Link>
-              <Link href="/login" className="hover:text-white">Login Sistem CBT</Link>
+              <Link href="/ppdb" className="hover:text-white">{t("nav.ppdb")}</Link>
+              <Link href="/login" className="hover:text-white">Login CBT</Link>
               {profile.officialUrl && (
                 <a href={profile.officialUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white">Website Resmi</a>
               )}
@@ -98,7 +103,7 @@ export function LandingFooter({ profile }: { profile: Profile }) {
         </div>
 
         <div className="mt-10 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} {profile.schoolName}. Sistem CBT & Landing Page.
+          © {new Date().getFullYear()} {profile.schoolName}. {t("footer.copyright")}
         </div>
       </div>
     </footer>
