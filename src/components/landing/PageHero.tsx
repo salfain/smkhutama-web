@@ -1,8 +1,8 @@
-"use client";
-
 import type { LucideIcon } from "lucide-react";
 import { RevealContainer, RevealItem } from "./Reveal";
 
+// PageHero tetap Server Component agar LucideIcon (fungsi)
+// bisa di-pass sebagai props tanpa memicu error SSR Next.js.
 export function PageHero({
   icon: Icon,
   title,
