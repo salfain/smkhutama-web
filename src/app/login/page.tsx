@@ -82,7 +82,7 @@ export default function LoginPage() {
     : "from-purple-700 to-fuchsia-700";
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {redirecting && <FullScreenLoader message="Mengarahkan ke dashboard..." accent={system === "SIBIKONS" ? "purple" : "blue"} />}
       {/* Left panel */}
       <div className={`hidden flex-1 flex-col items-center justify-center bg-gradient-to-br ${leftPanelBg} p-12 text-white lg:flex transition-colors duration-500`}>
@@ -104,7 +104,7 @@ export default function LoginPage() {
       {/* Right panel */}
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-8">
         <div className="w-full max-w-md">
-          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
             <ArrowLeft className="h-4 w-4" />Kembali ke beranda
           </Link>
 
@@ -119,20 +119,20 @@ export default function LoginPage() {
                   className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition-all ${
                     selected
                       ? selBlue
-                        ? "border-blue-600 bg-blue-50 shadow-sm"
-                        : "border-purple-600 bg-purple-50 shadow-sm"
-                      : "border-gray-200 bg-white hover:border-gray-300"
+                        ? "border-blue-600 bg-blue-50/70 shadow-sm dark:border-blue-500 dark:bg-blue-950/30"
+                        : "border-purple-600 bg-purple-50/70 shadow-sm dark:border-purple-500 dark:bg-purple-950/30"
+                      : "border-slate-200 bg-white hover:border-gray-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
                   }`}>
                   <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-                    selected ? (selBlue ? "bg-blue-600" : "bg-purple-600") : "bg-gray-100"
+                    selected ? (selBlue ? "bg-blue-600" : "bg-purple-600") : "bg-gray-100 dark:bg-slate-800"
                   }`}>
-                    <Icon className={`h-5 w-5 ${selected ? "text-white" : "text-gray-400"}`} />
+                    <Icon className={`h-5 w-5 ${selected ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
                   </div>
                   <div>
-                    <p className={`text-sm font-bold ${selected ? (selBlue ? "text-blue-700" : "text-purple-700") : "text-gray-700"}`}>
+                    <p className={`text-sm font-bold ${selected ? (selBlue ? "text-blue-700 dark:text-blue-400" : "text-purple-700 dark:text-purple-400") : "text-gray-700 dark:text-gray-300"}`}>
                       {key === "CBT" ? "CBT" : "SIBIKONS"}
                     </p>
-                    <p className="text-[11px] leading-tight text-gray-500">
+                    <p className="text-[11px] leading-tight text-gray-500 dark:text-gray-400">
                       {key === "CBT" ? "Ujian Online" : "Bimbingan Konseling"}
                     </p>
                   </div>
@@ -141,20 +141,20 @@ export default function LoginPage() {
             })}
           </div>
 
-          <div className="rounded-2xl border bg-white p-8 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div className="mb-6">
-              <h1 className="font-heading text-2xl font-bold text-gray-900">{sys.title}</h1>
-              <p className="mt-1 text-sm text-gray-500">{sys.subtitle}</p>
+              <h1 className="font-heading text-2xl font-bold text-slate-900 dark:text-white">{sys.title}</h1>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{sys.subtitle}</p>
             </div>
 
             {/* Role tabs — hanya tampil bila lebih dari 1 role */}
             {sys.roles.length > 1 && (
-              <div className={`mb-6 grid gap-2 rounded-xl bg-gray-100 p-1 ${sys.roles.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+              <div className={`mb-6 grid gap-2 rounded-xl bg-gray-100 p-1 dark:bg-slate-950 ${sys.roles.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
                 {sys.roles.map((key) => (
                   <button key={key} type="button"
                     onClick={() => { setRole(key); setError(""); }}
                     className={`rounded-lg py-2 text-sm font-medium transition-all ${
-                      role === key ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+                      role === key ? "bg-white shadow-sm text-slate-900 dark:bg-slate-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     }`}>
                     {roleConfig[key].label}
                   </button>
@@ -164,19 +164,19 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="username">{role === "STUDENT" ? "NIS / NISN / Username" : "Username"}</Label>
-                <Input id="username" type="text" placeholder={cfg.placeholder} value={username} onChange={(e) => setUsername(e.target.value)} className="h-11" autoComplete="username" />
+                <Label htmlFor="username" className="text-slate-900 dark:text-slate-300">{role === "STUDENT" ? "NIS / NISN / Username" : "Username"}</Label>
+                <Input id="username" type="text" placeholder={cfg.placeholder} value={username} onChange={(e) => setUsername(e.target.value)} className="h-11 bg-white dark:bg-slate-950 dark:border-slate-800 dark:text-white" autoComplete="username" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-slate-900 dark:text-slate-300">Password</Label>
                 <div className="relative">
-                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 pr-10" autoComplete="current-password" />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 pr-10 bg-white dark:bg-slate-950 dark:border-slate-800 dark:text-white" autoComplete="current-password" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
-              {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
+              {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600 dark:bg-red-950/20 dark:border-red-900/50 dark:text-red-400">{error}</p>}
               <Button type="submit" className={`w-full h-11 ${cfg.bg} font-semibold`} disabled={pending}>
                 {pending ? (
                   <span className="flex items-center gap-2">
@@ -188,18 +188,18 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-5 rounded-lg bg-gray-50 border border-dashed border-gray-200 p-3 text-xs text-gray-500">
-              <p className="font-semibold mb-1 text-gray-600">Akun default:</p>
+            <div className="mt-5 rounded-lg bg-gray-50 border border-dashed border-gray-200 p-3 text-xs text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400">
+              <p className="font-semibold mb-1 text-slate-600 dark:text-slate-400">Akun default:</p>
               {system === "CBT" ? (
                 <>
-                  <p>Admin: <span className="font-mono">admin</span> / <span className="font-mono">admin123</span></p>
-                  <p>Guru: <span className="font-mono">sari.dewi</span> / <span className="font-mono">guru123</span></p>
-                  <p>Siswa: <span className="font-mono">2324001</span> / <span className="font-mono">siswa123</span></p>
+                  <p>Admin: <span className="font-mono text-slate-900 dark:text-white">admin</span> / <span className="font-mono text-slate-900 dark:text-white">admin123</span></p>
+                  <p>Guru: <span className="font-mono text-slate-900 dark:text-white">sari.dewi</span> / <span className="font-mono text-slate-900 dark:text-white">guru123</span></p>
+                  <p>Siswa: <span className="font-mono text-slate-900 dark:text-white">2324001</span> / <span className="font-mono text-slate-900 dark:text-white">siswa123</span></p>
                 </>
               ) : (
                 <>
-                  <p>Guru BK: <span className="font-mono">bk.hutama</span> / <span className="font-mono">bk123</span></p>
-                  <p>Siswa: <span className="font-mono">2324001</span> / <span className="font-mono">siswa123</span></p>
+                  <p>Guru BK: <span className="font-mono text-slate-900 dark:text-white">bk.hutama</span> / <span className="font-mono text-slate-900 dark:text-white">bk123</span></p>
+                  <p>Siswa: <span className="font-mono text-slate-900 dark:text-white">2324001</span> / <span className="font-mono text-slate-900 dark:text-white">siswa123</span></p>
                 </>
               )}
             </div>
