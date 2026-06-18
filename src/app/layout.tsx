@@ -8,12 +8,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://smkhutama.web.id"),
   title: {
-    default: "SMK HUTAMA — Portal Akademik, CBT & Konseling Sekolah",
+    default: "SMK HUTAMA — Portal Akademik",
     template: "%s | SMK Hutama",
   },
   description:
-    "Portal resmi SMK Hutama Pondok Gede. Akses sistem ujian online (CBT), bimbingan konseling (SIBIKONS), informasi akademik, berita sekolah, dan pendaftaran siswa baru (PPDB) terpadu.",
-  keywords: ["SMK Hutama", "PPDB SMK Hutama", "CBT SMK", "SIBIKONS", "Ujian Online SMK", "SMK Pondok Gede", "Sekolah Kejuruan Bekasi"],
+    "Portal Akademik resmi SMK Hutama Pondok Gede. Akses informasi sekolah, pendaftaran siswa baru (PPDB), dan layanan digital terpadu.",
+  keywords: ["SMK Hutama", "PPDB SMK Hutama", "Portal Akademik", "Pondok Gede", "Sekolah Kejuruan Bekasi"],
   icons: {
     icon: [
       { url: "/uploads/school/logo.png", type: "image/png" }
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "SMK Hutama Pondok Gede",
-    title: "SMK HUTAMA — Portal Akademik, CBT & Konseling Sekolah",
+    title: "SMK HUTAMA — Portal Akademik",
     description:
-      "Portal resmi terpadu SMK Hutama Pondok Gede. Menyediakan website profil sekolah, sistem ujian online (CBT), dan bimbingan konseling (SIBIKONS) modern.",
+      "Portal Akademik resmi terpadu SMK Hutama Pondok Gede. Menyediakan profil sekolah, informasi PPDB, dan layanan digital.",
     images: [{ url: "/api/school/logo", width: 512, height: 512, alt: "Logo SMK Hutama" }],
   },
   twitter: {
     card: "summary",
     title: "SMK HUTAMA",
-    description: "Portal Akademik, CBT & Konseling SMK Hutama Pondok Gede.",
+    description: "Portal Akademik SMK Hutama Pondok Gede.",
     images: ["/api/school/logo"],
   },
 };
