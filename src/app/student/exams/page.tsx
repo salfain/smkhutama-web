@@ -1,10 +1,16 @@
 import { requireAuth } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { StudentExamsList } from "./StudentExamsList";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentExamsPage() {
+  const c = await cookies();
+  const system = c.get("student-system")?.value || "CBT";
+  if (system === "SIBIKONS") redirect("/student/bk");
+
   const user = await requireAuth("STUDENT");
   if (!user.student) return null;
 

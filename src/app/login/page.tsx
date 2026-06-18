@@ -79,6 +79,13 @@ export default function LoginPage() {
       const r = await loginAction(username.trim(), password, role);
       if ("error" in r) setError(r.error);
       else {
+        // Simpan system aktif untuk student di cookie agar bisa dibaca di server & client
+        if (role === "STUDENT") {
+          document.cookie = `student-system=${system}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        } else {
+          document.cookie = "student-system=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
         // Siswa yang masuk lewat SIBIKONS diarahkan ke portal BK siswa
         const dest = system === "SIBIKONS" && role === "STUDENT" ? "/student/bk" : r.redirectTo;
         setRedirecting(true);

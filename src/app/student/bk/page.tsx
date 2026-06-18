@@ -1,10 +1,16 @@
 import { getMyBkData } from "./actions";
 import { listAvailableSurveys } from "./survey-actions";
 import { StudentBkClient } from "./StudentBkClient";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentBkPage() {
+  const c = await cookies();
+  const system = c.get("student-system")?.value || "CBT";
+  if (system === "CBT") redirect("/student/dashboard");
+
   const [data, surveys] = await Promise.all([
     getMyBkData(),
     listAvailableSurveys().catch(() => []),

@@ -8,11 +8,17 @@ import {
   CalendarDays, Clock, ClipboardCheck, ArrowRight, AlertCircle, Trophy,
 } from "lucide-react";
 import { getExamTypeInfo } from "@/lib/exam-types";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard Siswa" };
 
 export default async function StudentDashboard() {
+  const c = await cookies();
+  const system = c.get("student-system")?.value || "CBT";
+  if (system === "SIBIKONS") redirect("/student/bk");
+
   const user = await requireAuth("STUDENT");
   if (!user.student) return null;
 
