@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, LogOut, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, LogOut, CheckCircle2, Printer } from "lucide-react";
 import { createPermit, markPermitReturned, deletePermit } from "../actions";
 import { useConfirm } from "@/components/ConfirmDialog";
 
@@ -85,6 +85,11 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                 <Button size="sm" variant="outline" className="shrink-0 gap-1 text-green-600 border-green-200 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-900/20" onClick={() => markReturned(r.id)} disabled={pending}>
                   <CheckCircle2 className="h-3.5 w-3.5" />Kembali
                 </Button>
+                <a href={`/piket/izin/${r.id}/print`} target="_blank" rel="noopener noreferrer">
+                  <Button size="sm" variant="outline" className="shrink-0 gap-1 text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-800 dark:hover:bg-blue-900/20" title="Cetak Surat Izin">
+                    <Printer className="h-3.5 w-3.5" />Cetak Surat
+                  </Button>
+                </a>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0" onClick={() => remove(r.id)} disabled={pending}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -130,9 +135,16 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:bg-red-50" onClick={() => remove(r.id)} disabled={pending}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <a href={`/piket/izin/${r.id}/print`} target="_blank" rel="noopener noreferrer">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Cetak Surat">
+                            <Printer className="h-3.5 w-3.5" />
+                          </Button>
+                        </a>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:bg-red-50" onClick={() => remove(r.id)} disabled={pending}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
