@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ConfirmProvider } from "@/components/ConfirmDialog";
-import { LanguageProvider } from "@/components/LanguageProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -54,14 +53,12 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <ThemeProvider>
-          <LanguageProvider>
-            <Suspense fallback={null}>
-              <NavigationProgress />
-            </Suspense>
-            <ConfirmProvider>
-              {children}
-            </ConfirmProvider>
-          </LanguageProvider>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
+          <ConfirmProvider>
+            {children}
+          </ConfirmProvider>
         </ThemeProvider>
       </body>
     </html>
