@@ -181,16 +181,16 @@ export function MonitoringClient({
           <h1 className="font-heading text-2xl font-bold text-gray-900">Monitoring Ujian</h1>
           <p className="text-sm text-gray-500">{exam.title}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Select value={exam.id} onValueChange={changeExam}>
-            <SelectTrigger className="w-64"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-64"><SelectValue /></SelectTrigger>
             <SelectContent>
               {exams.map((e) => (
                 <SelectItem key={e.id} value={e.id}>{e.subject.code} – {e.title}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={refresh}>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto gap-1.5" onClick={refresh}>
             <RefreshCw className="h-4 w-4" />Refresh
           </Button>
         </div>
@@ -285,7 +285,7 @@ export function MonitoringClient({
           </div>
 
           {/* Dropdown filter status */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0 mt-2 sm:mt-0">
             <Filter className="h-3.5 w-3.5 text-gray-400" />
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
               <SelectTrigger className="h-8 w-44 text-xs">
@@ -369,9 +369,9 @@ export function MonitoringClient({
                     return (
                       <div key={r.id} className={`rounded-xl border bg-white p-4 shadow-sm ${r.isLocked ? "ring-2 ring-red-300 border-red-300" : ""}`}>
                         <div className="mb-3 flex items-start justify-between">
-                          <div className="min-w-0">
+                          <div className="flex-1 min-w-0 pr-2">
                             <p className="font-semibold text-gray-900 truncate">{r.user.name}</p>
-                            <p className="text-xs text-gray-400 font-mono">{r.nis ?? r.id.slice(0, 8)}</p>
+                            <p className="text-xs text-gray-400 font-mono truncate">{r.nis ?? r.id.slice(0, 8)}</p>
                           </div>
                           <div className="flex flex-col gap-1 items-end shrink-0">
                             <Badge className={`${info.color} hover:${info.color} text-xs`}>
