@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Plus, Search, Calendar, Clock, Users, Pencil, Trash2,
-  PlayCircle, StopCircle, FileText, ClipboardList, Filter,
+  PlayCircle, StopCircle, FileText, ClipboardList, Filter, Printer,
 } from "lucide-react";
 import {
   createExam, updateExam, deleteExam, changeExamStatus,
@@ -254,6 +254,16 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => openEdit(e)}>
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
+                  <a
+                    href={`/admin/exams/${e.id}/print-questions`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Cetak Soal PDF"
+                  >
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:bg-green-50">
+                      <Printer className="h-3.5 w-3.5" />
+                    </Button>
+                  </a>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => handleDelete(e)}>
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>

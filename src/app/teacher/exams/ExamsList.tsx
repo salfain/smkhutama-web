@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import {
   Calendar, Clock, FileText, Users, PlayCircle, StopCircle, Trash2,
-  KeyRound, Copy, Check, Eye, EyeOff,
+  KeyRound, Copy, Check, Eye, EyeOff, Printer,
 } from "lucide-react";
 import { changeMyExamStatus, deleteMyExam, createTokenByTeacher } from "./actions";
 import { getExamTypeInfo } from "@/lib/exam-types";
@@ -153,6 +153,16 @@ export function ExamsList({ exams }: { exams: Exam[] }) {
                   Token oleh Admin
                 </Badge>
               )}
+              <a
+                href={`/admin/exams/${e.id}/print-questions`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Cetak Soal PDF"
+              >
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:bg-green-50">
+                  <Printer className="h-3.5 w-3.5" />
+                </Button>
+              </a>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => handleDelete(e)} disabled={pending}>
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
