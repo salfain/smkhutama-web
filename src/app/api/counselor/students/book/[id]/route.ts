@@ -19,6 +19,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       counselingCases: { orderBy: { sessionDate: "desc" } },
       homeVisits: { orderBy: { visitDate: "desc" } },
       parentSummons: { orderBy: { createdAt: "desc" } },
+      // Data dari modul Piket
+      tardinessRecords: { orderBy: { date: "desc" }, take: 30 },
+      permits: { orderBy: { date: "desc" }, take: 30 },
     },
   });
 
@@ -73,6 +76,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       reason: p.reason, 
       status: p.status, 
       createdAt: p.createdAt 
+    })),
+    // Data dari modul Piket (read-only)
+    tardiness: s.tardinessRecords.map((t) => ({
+      id: t.id, arrivalTime: t.arrivalTime, reason: t.reason ?? "", sanction: t.sanction ?? "", date: t.date,
+    })),
+    permits: s.permits.map((p) => ({
+      id: p.id, reason: p.reason, exitTime: p.exitTime, returnTime: p.returnTime, status: p.status, date: p.date,
     })),
   });
 }

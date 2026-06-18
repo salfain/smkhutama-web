@@ -46,6 +46,9 @@ export async function getStudentBook(studentId: string) {
       counselingCases: { orderBy: { sessionDate: "desc" } },
       homeVisits: { orderBy: { visitDate: "desc" } },
       parentSummons: { orderBy: { createdAt: "desc" } },
+      // Data dari modul Piket
+      tardinessRecords: { orderBy: { date: "desc" }, take: 30 },
+      permits: { orderBy: { date: "desc" }, take: 30 },
     },
   });
   if (!s) return null;
@@ -60,6 +63,13 @@ export async function getStudentBook(studentId: string) {
     cases: s.counselingCases.map((c) => ({ id: c.id, title: c.title, type: c.type, status: c.status, sessionDate: c.sessionDate })),
     homeVisits: s.homeVisits.map((h) => ({ id: h.id, purpose: h.purpose, visitDate: h.visitDate, result: h.result ?? "" })),
     summons: s.parentSummons.map((p) => ({ id: p.id, level: p.level, reason: p.reason, status: p.status, createdAt: p.createdAt })),
+    // Data piket — read-only untuk guru BK
+    tardiness: s.tardinessRecords.map((t) => ({
+      id: t.id, arrivalTime: t.arrivalTime, reason: t.reason ?? "", sanction: t.sanction ?? "", date: t.date,
+    })),
+    permits: s.permits.map((p) => ({
+      id: p.id, reason: p.reason, exitTime: p.exitTime, returnTime: p.returnTime, status: p.status, date: p.date,
+    })),
   };
 }
 

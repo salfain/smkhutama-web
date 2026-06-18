@@ -1,7 +1,7 @@
 import { getStudentBook } from "../../bk-actions";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShieldAlert, Award, MessagesSquare, Home as HomeIcon, Gavel, Scale } from "lucide-react";
+import { ArrowLeft, ShieldAlert, Award, MessagesSquare, Home as HomeIcon, Gavel, Scale, Clock, LogOut } from "lucide-react";
 
 import { PrintButton } from "./PrintButton";
 
@@ -61,6 +61,43 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
             </>
           )}
         </Panel>
+
+        {/* ── Data Piket (read-only, sinkron dari modul Guru Piket) ── */}
+        <Panel title={`Keterlambatan (${s.tardiness.length}x)`} icon={Clock}
+          badge={s.tardiness.length > 0 ? { label: `${s.tardiness.length}x`, cls: "bg-amber-100 text-amber-700" } : undefined}>
+          {s.tardiness.length === 0 ? <Empty /> : s.tardiness.map((t) => (
+            <Item
+              key={t.id}
+              title={`Tiba ${new Date(t.arrivalTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`}
+              sub={`${fmt(t.date)}${t.reason ? ` · ${t.reason}` : ""}${t.sanction ? ` · Sanksi: ${t.sanction}` : ""}`}
+              badge={fmt(t.date)}
+              badgeCls="bg-amber-50 text-amber-600"
+            />
+          ))}
+        </Panel>
+
+        <Panel title={`Izin Keluar/Masuk (${s.permits.length}x)`} icon={LogOut}
+          badge={s.permits.filter((p) => p.status === "KELUAR").length > 0
+            ? { label: `${s.permits.filter((p) => p.status === "KELUAR").length} aktif`, cls: "bg-red-100 text-red-700" }
+            : undefined}>
+          {s.permits.length === 0 ? <Empty /> : s.permits.map((p) => (
+            <Item
+              key={p.id}
+              title={p.reason}
+              sub={`${fmt(p.date)} · ${
+                p.status === "KELUAR" ? "Belum kembali"
+                : p.status === "SUDAH_KEMBALI" ? `Kembali ${p.returnTime ? new Date(p.returnTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : ""}`
+                : "Tidak kembali"
+              }`}
+              badge={p.status === "KELUAR" ? "Keluar" : p.status === "SUDAH_KEMBALI" ? "Kembali" : "Tdk Kembali"}
+              badgeCls={
+                p.status === "KELUAR" ? "bg-red-100 text-red-700"
+                : p.status === "SUDAH_KEMBALI" ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-600"
+              }
+            />
+          ))}
+        </Panel>
       </div>
     </div>
   );
@@ -75,10 +112,18 @@ function Stat({ icon: Icon, color, value, label }: { icon: typeof ShieldAlert; c
     </div>
   );
 }
-function Panel({ title, icon: Icon, children }: { title: string; icon: typeof ShieldAlert; children: React.ReactNode }) {
+function Panel({ title, icon: Icon, children, badge }: {
+  title: string; icon: typeof ShieldAlert; children: React.ReactNode;
+  badge?: { label: string; cls: string };
+}) {
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm">
-      <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-900"><Icon className="h-4 w-4 text-gray-400" />{title}</h2>
+    <div className="rounded-2xl border bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+      <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
+        <Icon className="h-4 w-4 text-gray-400" />{title}
+        {badge && (
+          <span className={`ml-auto rounded-full px-2 py-0.5 text-[11px] font-bold ${badge.cls}`}>{badge.label}</span>
+        )}
+      </h2>
       <div className="space-y-2">{children}</div>
     </div>
   );
