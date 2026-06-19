@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://43.133.134.10";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://smkhutama.web.id";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Halaman privat/aplikasi tidak perlu di-index
-        disallow: ["/admin", "/teacher", "/student", "/counselor", "/cms", "/api"],
+        disallow: ["/admin", "/teacher", "/student", "/counselor", "/cms", "/api", "/piket"],
       },
     ],
     sitemap: `${BASE}/sitemap.xml`,
