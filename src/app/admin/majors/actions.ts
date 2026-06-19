@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getMajors() {
@@ -16,7 +17,13 @@ export async function createMajor(formData: FormData) {
   if (!name || !code) return { error: "Nama dan kode wajib diisi" };
 
   try {
-    await prisma.major.create({ data: { name, code } });
+    const created = await prisma.major.create({ data: { name, code } });
+    await logAudit({
+      action: "CREATE_MAJOR",
+      entity: "major",
+      entityId: created.id,
+      details: { name, code },
+    });
     revalidatePath("/admin/majors");
     revalidatePath("/admin/classes");
     return { success: true };
@@ -32,6 +39,12 @@ export async function updateMajor(id: string, formData: FormData) {
 
   try {
     await prisma.major.update({ where: { id }, data: { name, code } });
+    await logAudit({
+      action: "UPDATE_MAJOR",
+      entity: "major",
+      entityId: id,
+      details: { name, code },
+    });
     revalidatePath("/admin/majors");
     return { success: true };
   } catch {
@@ -41,7 +54,13 @@ export async function updateMajor(id: string, formData: FormData) {
 
 export async function deleteMajor(id: string) {
   try {
-    await prisma.major.delete({ where: { id } });
+    const deleted = await prisma.major.delete({ where: { id } });
+    await logAudit({
+      action: "DELETE_MAJOR",
+      entity: "major",
+      entityId: id,
+      details: { name: deleted.name, code: deleted.code },
+    });
     revalidatePath("/admin/majors");
     return { success: true };
   } catch {

@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getSubjects() {
@@ -27,8 +28,14 @@ export async function createSubject(formData: FormData) {
   if (!name || !code) return { error: "Nama dan kode wajib diisi" };
 
   try {
-    await prisma.subject.create({
+    const created = await prisma.subject.create({
       data: { name, code, majorId: majorId || null },
+    });
+    await logAudit({
+      action: "CREATE_SUBJECT",
+      entity: "subject",
+      entityId: created.id,
+      details: { name, code, majorId: majorId || null },
     });
     revalidatePath("/admin/subjects");
     return { success: true };
@@ -48,6 +55,12 @@ export async function updateSubject(id: string, formData: FormData) {
       where: { id },
       data: { name, code, majorId: majorId || null },
     });
+    await logAudit({
+      action: "UPDATE_SUBJECT",
+      entity: "subject",
+      entityId: id,
+      details: { name, code, majorId: majorId || null },
+    });
     revalidatePath("/admin/subjects");
     return { success: true };
   } catch {
@@ -57,7 +70,13 @@ export async function updateSubject(id: string, formData: FormData) {
 
 export async function deleteSubject(id: string) {
   try {
-    await prisma.subject.delete({ where: { id } });
+    const deleted = await prisma.subject.delete({ where: { id } });
+    await logAudit({
+      action: "DELETE_SUBJECT",
+      entity: "subject",
+      entityId: id,
+      details: { name: deleted.name, code: deleted.code, majorId: deleted.majorId },
+    });
     revalidatePath("/admin/subjects");
     return { success: true };
   } catch {

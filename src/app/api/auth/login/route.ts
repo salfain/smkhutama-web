@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth";
 import { createToken } from "@/lib/jwt";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await createToken(user.id, user.role);
+    await logAudit({
+      userId: user.id,
+      action: "API_LOGIN_SUCCESS",
+      entity: "auth",
+      entityId: user.id,
+      details: { username: user.username, role: user.role },
+    });
 
     return NextResponse.json({
       token,

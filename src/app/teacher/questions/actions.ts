@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -65,7 +66,7 @@ export async function createQuestion(formData: FormData) {
   }
 
   try {
-    await prisma.question.create({
+    const created = await prisma.question.create({
       data: {
         subjectId,
         teacherId: user.teacher.id,
@@ -86,6 +87,12 @@ export async function createQuestion(formData: FormData) {
             })) }
           : undefined,
       },
+    });
+    await logAudit({
+      action: "CREATE_QUESTION",
+      entity: "question",
+      entityId: created.id,
+      details: { subjectId, teacherId: user.teacher.id, questionType, difficulty, grade: grade || null },
     });
     revalidatePath("/teacher/questions");
     return { success: true };
@@ -151,6 +158,12 @@ export async function updateQuestion(id: string, formData: FormData) {
         }),
       ] : []),
     ]);
+    await logAudit({
+      action: "UPDATE_QUESTION",
+      entity: "question",
+      entityId: id,
+      details: { subjectId, questionType, difficulty, grade: grade || null },
+    });
     revalidatePath("/teacher/questions");
     return { success: true };
   } catch {
@@ -172,6 +185,12 @@ export async function deleteQuestion(id: string) {
       return { error: "Tidak dapat menghapus. Soal sedang dipakai dalam ujian." };
     }
     await prisma.question.delete({ where: { id } });
+    await logAudit({
+      action: "DELETE_QUESTION",
+      entity: "question",
+      entityId: id,
+      details: { subjectId: q.subjectId, questionType: q.questionType },
+    });
     revalidatePath("/teacher/questions");
     return { success: true };
   } catch {
@@ -184,7 +203,13 @@ export async function toggleQuestionActive(id: string) {
   if (!user.teacher) return { error: "Guru tidak terdaftar" };
   const q = await prisma.question.findFirst({ where: { id, teacherId: user.teacher.id } });
   if (!q) return { error: "Soal tidak ditemukan" };
-  await prisma.question.update({ where: { id }, data: { isActive: !q.isActive } });
+  const updated = await prisma.question.update({ where: { id }, data: { isActive: !q.isActive } });
+  await logAudit({
+    action: "TOGGLE_QUESTION_STATUS",
+    entity: "question",
+    entityId: id,
+    details: { isActive: updated.isActive, questionType: updated.questionType },
+  });
   revalidatePath("/teacher/questions");
   return { success: true };
 }
@@ -411,6 +436,11 @@ export async function importQuestionsExcel(formData: FormData) {
   }
 
   revalidatePath("/teacher/questions");
+  await logAudit({
+    action: "IMPORT_QUESTIONS",
+    entity: "question",
+    details: { created, failed: errors.length, teacherId },
+  });
   return {
     success: true,
     created,

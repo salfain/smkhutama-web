@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 /** Pastikan attempt ini milik ujian guru yang login. */
@@ -19,9 +20,15 @@ async function ensureOwn(attemptId: string) {
 export async function unlockAttemptByTeacher(attemptId: string) {
   const a = await ensureOwn(attemptId);
   if (!a) return { error: "Tidak diizinkan" };
-  await prisma.studentExamAttempt.update({
+  const updated = await prisma.studentExamAttempt.update({
     where: { id: a.id },
     data: { isLocked: false, lockedAt: null, lockReason: null, violationCount: 0 },
+  });
+  await logAudit({
+    action: "TEACHER_UNLOCK_EXAM_ATTEMPT",
+    entity: "studentExamAttempt",
+    entityId: attemptId,
+    details: { examId: updated.examId, studentId: updated.studentId },
   });
   revalidatePath("/teacher/monitoring");
   return { success: true };
@@ -31,7 +38,7 @@ export async function forceSubmitAttemptByTeacher(attemptId: string) {
   const a = await ensureOwn(attemptId);
   if (!a) return { error: "Tidak diizinkan" };
   if (a.status === "SUBMITTED" || a.status === "AUTO_SUBMITTED") return { error: "Sudah dikumpulkan" };
-  await prisma.studentExamAttempt.update({
+  const updated = await prisma.studentExamAttempt.update({
     where: { id: a.id },
     data: {
       status: "AUTO_SUBMITTED",
@@ -39,6 +46,12 @@ export async function forceSubmitAttemptByTeacher(attemptId: string) {
       isLocked: true,
       lockReason: a.lockReason ?? "Dikumpulkan paksa oleh pengawas",
     },
+  });
+  await logAudit({
+    action: "TEACHER_FORCE_SUBMIT_ATTEMPT",
+    entity: "studentExamAttempt",
+    entityId: attemptId,
+    details: { examId: updated.examId, studentId: updated.studentId, previousStatus: a.status },
   });
   revalidatePath("/teacher/monitoring");
   return { success: true };

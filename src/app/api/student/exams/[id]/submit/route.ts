@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "STUDENT");
@@ -73,6 +74,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { status: isAuto ? "AUTO_SUBMITTED" : "SUBMITTED", submittedAt: new Date(), score: finalScore, loginStatus: false },
     }),
   ]);
+  await logAudit({
+    userId: r.user.id,
+    action: isAuto ? "API_AUTO_SUBMIT_EXAM" : "API_SUBMIT_EXAM",
+    entity: "studentExamAttempt",
+    entityId: attempt.id,
+    details: { examId, studentId: student.id, score: finalScore },
+  });
 
   return NextResponse.json({ success: true, score: finalScore });
 }

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getTeachers() {
@@ -39,7 +40,7 @@ export async function createTeacher(formData: FormData) {
 
   try {
     const passwordHash = await hashPassword(password);
-    await prisma.user.create({
+    const created = await prisma.user.create({
       data: {
         name,
         username,
@@ -53,6 +54,13 @@ export async function createTeacher(formData: FormData) {
           },
         },
       },
+      include: { teacher: { select: { id: true } } },
+    });
+    await logAudit({
+      action: "CREATE_TEACHER",
+      entity: "teacher",
+      entityId: created.teacher?.id ?? created.id,
+      details: { name, username, email: email || null, nip: nip || null, subjectId: subjectId || null },
     });
     revalidatePath("/admin/teachers");
     return { success: true };
@@ -77,7 +85,10 @@ export async function updateTeacher(id: string, formData: FormData) {
   }
 
   try {
-    const teacher = await prisma.teacher.findUnique({ where: { id } });
+    const teacher = await prisma.teacher.findUnique({
+      where: { id },
+      include: { user: { select: { username: true } } },
+    });
     if (!teacher) return { error: "Guru tidak ditemukan" };
 
     await prisma.user.update({
@@ -92,6 +103,19 @@ export async function updateTeacher(id: string, formData: FormData) {
     await prisma.teacher.update({
       where: { id },
       data: { nip: nip || null, subjectId: subjectId || null },
+    });
+    await logAudit({
+      action: "UPDATE_TEACHER",
+      entity: "teacher",
+      entityId: id,
+      details: {
+        previousUsername: teacher.user.username,
+        username,
+        name,
+        email: email || null,
+        nip: nip || null,
+        passwordChanged: Boolean(password),
+      },
     });
     revalidatePath("/admin/teachers");
     return { success: true };
@@ -109,9 +133,15 @@ export async function toggleTeacherStatus(id: string) {
       include: { user: true },
     });
     if (!teacher) return { error: "Guru tidak ditemukan" };
-    await prisma.user.update({
+    const updated = await prisma.user.update({
       where: { id: teacher.userId },
       data: { isActive: !teacher.user.isActive },
+    });
+    await logAudit({
+      action: "TOGGLE_TEACHER_STATUS",
+      entity: "teacher",
+      entityId: id,
+      details: { username: updated.username, isActive: updated.isActive },
     });
     revalidatePath("/admin/teachers");
     return { success: true };
@@ -122,12 +152,21 @@ export async function toggleTeacherStatus(id: string) {
 
 export async function resetTeacherPassword(id: string, newPassword: string = "guru123") {
   try {
-    const teacher = await prisma.teacher.findUnique({ where: { id } });
+    const teacher = await prisma.teacher.findUnique({
+      where: { id },
+      include: { user: { select: { username: true } } },
+    });
     if (!teacher) return { error: "Guru tidak ditemukan" };
     const passwordHash = await hashPassword(newPassword);
     await prisma.user.update({
       where: { id: teacher.userId },
       data: { passwordHash },
+    });
+    await logAudit({
+      action: "RESET_TEACHER_PASSWORD",
+      entity: "teacher",
+      entityId: id,
+      details: { username: teacher.user.username },
     });
     revalidatePath("/admin/teachers");
     return { success: true, password: newPassword };
@@ -138,9 +177,18 @@ export async function resetTeacherPassword(id: string, newPassword: string = "gu
 
 export async function deleteTeacher(id: string) {
   try {
-    const teacher = await prisma.teacher.findUnique({ where: { id } });
+    const teacher = await prisma.teacher.findUnique({
+      where: { id },
+      include: { user: { select: { username: true, name: true } } },
+    });
     if (!teacher) return { error: "Guru tidak ditemukan" };
     await prisma.user.delete({ where: { id: teacher.userId } });
+    await logAudit({
+      action: "DELETE_TEACHER",
+      entity: "teacher",
+      entityId: id,
+      details: { username: teacher.user.username, name: teacher.user.name },
+    });
     revalidatePath("/admin/teachers");
     return { success: true };
   } catch {
@@ -275,6 +323,11 @@ export async function importTeachersExcel(formData: FormData) {
   }
 
   revalidatePath("/admin/teachers");
+  await logAudit({
+    action: "IMPORT_TEACHERS",
+    entity: "teacher",
+    details: { created, failed: errors.length },
+  });
   return {
     success: true,
     created,

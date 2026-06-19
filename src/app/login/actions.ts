@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth";
 import { setSession, clearSession } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { redirect } from "next/navigation";
 
 type LoginResult =
@@ -28,6 +29,13 @@ export async function loginAction(
     if (!ok) return { error: "Username atau password salah." };
 
     await setSession(user.id);
+    await logAudit({
+      userId: user.id,
+      action: "LOGIN_SUCCESS",
+      entity: "auth",
+      entityId: user.id,
+      details: { username: user.username, role: user.role },
+    });
 
     const redirectTo =
       user.role === "ADMIN"
@@ -47,6 +55,7 @@ export async function loginAction(
 }
 
 export async function logoutAction() {
+  await logAudit({ action: "LOGOUT", entity: "auth" });
   await clearSession();
   redirect("/login");
 }

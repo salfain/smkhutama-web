@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getPendingEssays() {
@@ -56,6 +57,17 @@ export async function gradeEssay(answerId: string, formData: FormData) {
     await prisma.studentAnswer.update({
       where: { id: answerId },
       data: { score, isCorrect: score >= 60 },
+    });
+    await logAudit({
+      action: "GRADE_ESSAY",
+      entity: "studentAnswer",
+      entityId: answerId,
+      details: {
+        attemptId: answer.attemptId,
+        questionId: answer.questionId,
+        score,
+        teacherId: user.teacher.id,
+      },
     });
 
     // Recompute total score for this attempt

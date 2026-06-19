@@ -16,6 +16,7 @@ import {
   BarChart3,
   Printer,
   Settings,
+  ScrollText,
   Menu,
   ChevronRight,
 } from "lucide-react";
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/admin/monitoring", icon: MonitorCheck, label: "Monitoring" },
   { href: "/admin/reports", icon: BarChart3, label: "Laporan" },
   { href: "/admin/print", icon: Printer, label: "Cetak Dokumen" },
+  { href: "/admin/audit-logs", icon: ScrollText, label: "Audit Log" },
   { href: "/admin/settings", icon: Settings, label: "Pengaturan" },
 ];
 

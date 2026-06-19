@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { LOCK_THRESHOLD } from "@/lib/exam-lock";
+import { logAudit } from "@/lib/audit";
 
 /**
  * Mobile melaporkan pelanggaran (misal siswa keluar app).
@@ -47,6 +48,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       ...(shouldLock ? { isLocked: true, lockedAt: new Date(), lockReason: finalReason } : {}),
     },
   });
+
+  if (updated.isLocked) {
+    await logAudit({
+      userId: r.user.id,
+      action: "LOCK_EXAM_ATTEMPT",
+      entity: "studentExamAttempt",
+      entityId: updated.id,
+      details: { examId, studentId: student.id, violationCount: updated.violationCount, reason: finalReason },
+    });
+  }
 
   return NextResponse.json({
     locked: updated.isLocked,

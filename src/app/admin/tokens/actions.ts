@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getTokens() {
@@ -63,6 +64,12 @@ export async function createToken(formData: FormData) {
       data: { examId, token, expiredAt, isActive: true },
     });
 
+    await logAudit({
+      action: "CREATE_EXAM_TOKEN",
+      entity: "examToken",
+      entityId: created.id,
+      details: { examId, examTitle: exam.title, expiredAt: created.expiredAt },
+    });
     revalidatePath("/admin/tokens");
     return { success: true, token: created.token };
   } catch {
@@ -87,9 +94,15 @@ export async function regenerateToken(id: string) {
       tries++;
     }
 
-    await prisma.examToken.update({
+    const updated = await prisma.examToken.update({
       where: { id },
       data: { token: newToken, isActive: true },
+    });
+    await logAudit({
+      action: "REGENERATE_EXAM_TOKEN",
+      entity: "examToken",
+      entityId: id,
+      details: { examId: t.examId, tokenChanged: updated.token !== t.token },
     });
     revalidatePath("/admin/tokens");
     return { success: true, token: newToken };
@@ -102,9 +115,15 @@ export async function toggleTokenStatus(id: string) {
   try {
     const t = await prisma.examToken.findUnique({ where: { id } });
     if (!t) return { error: "Token tidak ditemukan" };
-    await prisma.examToken.update({
+    const updated = await prisma.examToken.update({
       where: { id },
       data: { isActive: !t.isActive },
+    });
+    await logAudit({
+      action: "TOGGLE_EXAM_TOKEN",
+      entity: "examToken",
+      entityId: id,
+      details: { examId: updated.examId, isActive: updated.isActive },
     });
     revalidatePath("/admin/tokens");
     return { success: true };
@@ -115,7 +134,13 @@ export async function toggleTokenStatus(id: string) {
 
 export async function deleteToken(id: string) {
   try {
-    await prisma.examToken.delete({ where: { id } });
+    const deleted = await prisma.examToken.delete({ where: { id } });
+    await logAudit({
+      action: "DELETE_EXAM_TOKEN",
+      entity: "examToken",
+      entityId: id,
+      details: { examId: deleted.examId },
+    });
     revalidatePath("/admin/tokens");
     return { success: true };
   } catch {

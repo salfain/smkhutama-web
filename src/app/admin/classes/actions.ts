@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getClasses() {
@@ -37,7 +38,13 @@ export async function createClass(formData: FormData) {
   if (!name || !grade || !majorId) return { error: "Semua field wajib diisi" };
 
   try {
-    await prisma.class.create({ data: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null } });
+    const created = await prisma.class.create({ data: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null } });
+    await logAudit({
+      action: "CREATE_CLASS",
+      entity: "class",
+      entityId: created.id,
+      details: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null },
+    });
     revalidatePath("/admin/classes");
     return { success: true };
   } catch {
@@ -54,6 +61,12 @@ export async function updateClass(id: string, formData: FormData) {
 
   try {
     await prisma.class.update({ where: { id }, data: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null } });
+    await logAudit({
+      action: "UPDATE_CLASS",
+      entity: "class",
+      entityId: id,
+      details: { name, grade, majorId, homeroomTeacherId: homeroomTeacherId || null },
+    });
     revalidatePath("/admin/classes");
     return { success: true };
   } catch {
@@ -63,7 +76,13 @@ export async function updateClass(id: string, formData: FormData) {
 
 export async function deleteClass(id: string) {
   try {
-    await prisma.class.delete({ where: { id } });
+    const deleted = await prisma.class.delete({ where: { id } });
+    await logAudit({
+      action: "DELETE_CLASS",
+      entity: "class",
+      entityId: id,
+      details: { name: deleted.name, grade: deleted.grade, majorId: deleted.majorId },
+    });
     revalidatePath("/admin/classes");
     return { success: true };
   } catch {

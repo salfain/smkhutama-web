@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getActiveExams() {
@@ -59,9 +60,15 @@ export async function getExamMonitoring(examId: string | null) {
 
 export async function resetStudentLogin(attemptId: string) {
   try {
-    await prisma.studentExamAttempt.update({
+    const updated = await prisma.studentExamAttempt.update({
       where: { id: attemptId },
       data: { status: "NOT_STARTED", loginStatus: false, startedAt: null },
+    });
+    await logAudit({
+      action: "RESET_STUDENT_LOGIN",
+      entity: "studentExamAttempt",
+      entityId: attemptId,
+      details: { examId: updated.examId, studentId: updated.studentId },
     });
     revalidatePath("/admin/monitoring");
     return { success: true };
@@ -73,9 +80,15 @@ export async function resetStudentLogin(attemptId: string) {
 /** Pengawas membuka kunci attempt yang ter-lock anti-cheat. */
 export async function unlockAttempt(attemptId: string) {
   try {
-    await prisma.studentExamAttempt.update({
+    const updated = await prisma.studentExamAttempt.update({
       where: { id: attemptId },
       data: { isLocked: false, lockedAt: null, lockReason: null, violationCount: 0 },
+    });
+    await logAudit({
+      action: "UNLOCK_EXAM_ATTEMPT",
+      entity: "studentExamAttempt",
+      entityId: attemptId,
+      details: { examId: updated.examId, studentId: updated.studentId },
     });
     revalidatePath("/admin/monitoring");
     return { success: true };
@@ -92,7 +105,7 @@ export async function forceSubmitAttempt(attemptId: string) {
     if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
       return { error: "Sudah dikumpulkan" };
     }
-    await prisma.studentExamAttempt.update({
+    const updated = await prisma.studentExamAttempt.update({
       where: { id: attemptId },
       data: {
         status: "AUTO_SUBMITTED",
@@ -100,6 +113,12 @@ export async function forceSubmitAttempt(attemptId: string) {
         isLocked: true,
         lockReason: attempt.lockReason ?? "Dikumpulkan paksa oleh pengawas",
       },
+    });
+    await logAudit({
+      action: "FORCE_SUBMIT_ATTEMPT",
+      entity: "studentExamAttempt",
+      entityId: attemptId,
+      details: { examId: updated.examId, studentId: updated.studentId, previousStatus: attempt.status },
     });
     revalidatePath("/admin/monitoring");
     return { success: true };

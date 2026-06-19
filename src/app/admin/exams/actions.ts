@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { parseWIB } from "@/lib/date";
+import { logAudit } from "@/lib/audit";
 
 export async function getExams() {
   return prisma.exam.findMany({
@@ -68,7 +69,7 @@ export async function createExam(formData: FormData) {
   }
 
   try {
-    await prisma.exam.create({
+    const created = await prisma.exam.create({
       data: {
         title,
         subjectId,
@@ -87,6 +88,12 @@ export async function createExam(formData: FormData) {
           ? { create: classIds.map((cid) => ({ classId: cid })) }
           : undefined,
       },
+    });
+    await logAudit({
+      action: "CREATE_EXAM",
+      entity: "exam",
+      entityId: created.id,
+      details: { title, subjectId, teacherId, status, examType, classCount: classIds.length },
     });
     revalidatePath("/admin/exams");
     return { success: true };
@@ -118,6 +125,10 @@ export async function updateExam(id: string, formData: FormData) {
   if (new Date(startAt) >= new Date(endAt)) return { error: "Waktu mulai harus sebelum waktu selesai" };
 
   try {
+    const previous = await prisma.exam.findUnique({
+      where: { id },
+      select: { title: true, status: true },
+    });
     await prisma.$transaction([
       prisma.exam.update({
         where: { id },
@@ -141,6 +152,19 @@ export async function updateExam(id: string, formData: FormData) {
           })]
         : []),
     ]);
+    await logAudit({
+      action: "UPDATE_EXAM",
+      entity: "exam",
+      entityId: id,
+      details: {
+        previousTitle: previous?.title ?? null,
+        previousStatus: previous?.status ?? null,
+        title,
+        status,
+        examType,
+        classCount: classIds.length,
+      },
+    });
     revalidatePath("/admin/exams");
     return { success: true };
   } catch {
@@ -150,7 +174,14 @@ export async function updateExam(id: string, formData: FormData) {
 
 export async function changeExamStatus(id: string, status: "DRAFT" | "ACTIVE" | "CLOSED") {
   try {
+    const previous = await prisma.exam.findUnique({ where: { id }, select: { status: true, title: true } });
     await prisma.exam.update({ where: { id }, data: { status } });
+    await logAudit({
+      action: "CHANGE_EXAM_STATUS",
+      entity: "exam",
+      entityId: id,
+      details: { title: previous?.title ?? null, previousStatus: previous?.status ?? null, status },
+    });
     revalidatePath("/admin/exams");
     return { success: true };
   } catch {
@@ -160,6 +191,10 @@ export async function changeExamStatus(id: string, status: "DRAFT" | "ACTIVE" | 
 
 export async function deleteExam(id: string, force = false) {
   try {
+    const exam = await prisma.exam.findUnique({
+      where: { id },
+      select: { title: true, status: true },
+    });
     if (force) {
       // Hapus paksa: hapus semua data terkait ujian terlebih dahulu
       await prisma.$transaction([
@@ -180,6 +215,12 @@ export async function deleteExam(id: string, force = false) {
         // Hapus ujian itu sendiri
         prisma.exam.delete({ where: { id } }),
       ]);
+      await logAudit({
+        action: "FORCE_DELETE_EXAM",
+        entity: "exam",
+        entityId: id,
+        details: { title: exam?.title ?? null, status: exam?.status ?? null },
+      });
     } else {
       // Hapus biasa: gagal jika ada data attempt
       const attemptCount = await prisma.studentExamAttempt.count({ where: { examId: id } });
@@ -197,6 +238,12 @@ export async function deleteExam(id: string, force = false) {
         prisma.examClass.deleteMany({ where: { examId: id } }),
         prisma.exam.delete({ where: { id } }),
       ]);
+      await logAudit({
+        action: "DELETE_EXAM",
+        entity: "exam",
+        entityId: id,
+        details: { title: exam?.title ?? null, status: exam?.status ?? null },
+      });
     }
     revalidatePath("/admin/exams");
     return { success: true };

@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { generateExcel, parseExcel } from "@/lib/excel";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function getStudents() {
@@ -44,7 +45,7 @@ export async function createStudent(formData: FormData) {
 
   try {
     const passwordHash = await hashPassword(password);
-    await prisma.user.create({
+    const created = await prisma.user.create({
       data: {
         name,
         username,
@@ -60,6 +61,13 @@ export async function createStudent(formData: FormData) {
           },
         },
       },
+      include: { student: { select: { id: true } } },
+    });
+    await logAudit({
+      action: "CREATE_STUDENT",
+      entity: "student",
+      entityId: created.student?.id ?? created.id,
+      details: { name, username, nis: nis || null, classId: classId || null },
     });
     revalidatePath("/admin/students");
     return { success: true };
@@ -84,7 +92,10 @@ export async function updateStudent(id: string, formData: FormData) {
   if (password && password.length < 6) return { error: "Password minimal 6 karakter" };
 
   try {
-    const student = await prisma.student.findUnique({ where: { id } });
+    const student = await prisma.student.findUnique({
+      where: { id },
+      include: { user: { select: { username: true } } },
+    });
     if (!student) return { error: "Siswa tidak ditemukan" };
 
     await prisma.user.update({
@@ -105,6 +116,18 @@ export async function updateStudent(id: string, formData: FormData) {
         majorId: majorId || null,
       },
     });
+    await logAudit({
+      action: "UPDATE_STUDENT",
+      entity: "student",
+      entityId: id,
+      details: {
+        previousUsername: student.user.username,
+        username,
+        name,
+        nis: nis || null,
+        passwordChanged: Boolean(password),
+      },
+    });
     revalidatePath("/admin/students");
     return { success: true };
   } catch (e) {
@@ -120,9 +143,15 @@ export async function toggleStudentStatus(id: string) {
       where: { id }, include: { user: true },
     });
     if (!student) return { error: "Siswa tidak ditemukan" };
-    await prisma.user.update({
+    const updated = await prisma.user.update({
       where: { id: student.userId },
       data: { isActive: !student.user.isActive },
+    });
+    await logAudit({
+      action: "TOGGLE_STUDENT_STATUS",
+      entity: "student",
+      entityId: id,
+      details: { username: updated.username, isActive: updated.isActive },
     });
     revalidatePath("/admin/students");
     return { success: true };
@@ -133,10 +162,19 @@ export async function toggleStudentStatus(id: string) {
 
 export async function resetStudentPassword(id: string) {
   try {
-    const student = await prisma.student.findUnique({ where: { id } });
+    const student = await prisma.student.findUnique({
+      where: { id },
+      include: { user: { select: { username: true } } },
+    });
     if (!student) return { error: "Siswa tidak ditemukan" };
     const passwordHash = await hashPassword("siswa123");
     await prisma.user.update({ where: { id: student.userId }, data: { passwordHash } });
+    await logAudit({
+      action: "RESET_STUDENT_PASSWORD",
+      entity: "student",
+      entityId: id,
+      details: { username: student.user.username },
+    });
     revalidatePath("/admin/students");
     return { success: true, password: "siswa123" };
   } catch {
@@ -146,9 +184,18 @@ export async function resetStudentPassword(id: string) {
 
 export async function deleteStudent(id: string) {
   try {
-    const student = await prisma.student.findUnique({ where: { id } });
+    const student = await prisma.student.findUnique({
+      where: { id },
+      include: { user: { select: { username: true, name: true } } },
+    });
     if (!student) return { error: "Siswa tidak ditemukan" };
     await prisma.user.delete({ where: { id: student.userId } });
+    await logAudit({
+      action: "DELETE_STUDENT",
+      entity: "student",
+      entityId: id,
+      details: { username: student.user.username, name: student.user.name },
+    });
     revalidatePath("/admin/students");
     return { success: true };
   } catch {
@@ -330,6 +377,11 @@ export async function importStudentsExcel(formData: FormData) {
   }
 
   revalidatePath("/admin/students");
+  await logAudit({
+    action: "IMPORT_STUDENTS",
+    entity: "student",
+    details: { created, failed: errors.length },
+  });
   return {
     success: true,
     created,
@@ -369,6 +421,11 @@ export async function deleteAllStudents() {
   try {
     // Hapus semua user dengan role STUDENT (cascade ke student profile + relasi)
     const result = await prisma.user.deleteMany({ where: { role: "STUDENT" } });
+    await logAudit({
+      action: "DELETE_ALL_STUDENTS",
+      entity: "student",
+      details: { deleted: result.count },
+    });
     revalidatePath("/admin/students");
     return { success: true, count: result.count };
   } catch {

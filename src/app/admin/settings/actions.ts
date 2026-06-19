@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export type Settings = {
@@ -51,17 +52,24 @@ export async function saveSettings(formData: FormData) {
   ];
 
   try {
+    const changed: Record<string, string> = {};
     for (const key of keys) {
       const isCheckbox = checkboxKeys.includes(key);
       const value = isCheckbox
         ? (formData.get(key) === "on" ? "true" : "false")
         : String(formData.get(key) ?? "").trim();
+      changed[key] = value;
       await prisma.systemSetting.upsert({
         where: { key },
         update: { value },
         create: { key, value, category: "exam" },
       });
     }
+    await logAudit({
+      action: "UPDATE_SYSTEM_SETTINGS",
+      entity: "systemSetting",
+      details: changed,
+    });
     revalidatePath("/admin/settings");
     return { success: true };
   } catch {

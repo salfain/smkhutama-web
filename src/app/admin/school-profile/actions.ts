@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { saveUploadedFile } from "@/lib/upload";
+import { logAudit } from "@/lib/audit";
 
 export async function getSchoolProfile() {
   return prisma.schoolProfile.findFirst();
@@ -27,8 +28,9 @@ export async function upsertSchoolProfile(formData: FormData) {
 
     try {
       logoPath = await saveUploadedFile(logoFile, "school", "logo");
-    } catch (err: any) {
-      return { error: `Gagal upload logo: ${err.message}` };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Terjadi kesalahan";
+      return { error: `Gagal upload logo: ${message}` };
     }
   }
 
@@ -45,8 +47,20 @@ export async function upsertSchoolProfile(formData: FormData) {
 
     if (existing) {
       await prisma.schoolProfile.update({ where: { id: existing.id }, data });
+      await logAudit({
+        action: "UPDATE_SCHOOL_PROFILE",
+        entity: "schoolProfile",
+        entityId: existing.id,
+        details: { name, npsn: npsn || null, logoChanged: Boolean(logoPath) },
+      });
     } else {
-      await prisma.schoolProfile.create({ data });
+      const created = await prisma.schoolProfile.create({ data });
+      await logAudit({
+        action: "CREATE_SCHOOL_PROFILE",
+        entity: "schoolProfile",
+        entityId: created.id,
+        details: { name, npsn: npsn || null, logoChanged: Boolean(logoPath) },
+      });
     }
 
     revalidatePath("/admin/school-profile");

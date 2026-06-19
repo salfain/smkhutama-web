@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 
 export async function validateToken(examId: string, tokenInput: string) {
@@ -56,17 +57,29 @@ export async function startAttempt(examId: string) {
         where: { id: existing.id },
         data: { startedAt: new Date(), status: "IN_PROGRESS", loginStatus: true },
       });
+      await logAudit({
+        action: "START_EXAM_ATTEMPT",
+        entity: "studentExamAttempt",
+        entityId: existing.id,
+        details: { examId, studentId },
+      });
     }
     return { success: true };
   }
 
-  await prisma.studentExamAttempt.create({
+  const created = await prisma.studentExamAttempt.create({
     data: {
       examId, studentId,
       startedAt: new Date(),
       status: "IN_PROGRESS",
       loginStatus: true,
     },
+  });
+  await logAudit({
+    action: "START_EXAM_ATTEMPT",
+    entity: "studentExamAttempt",
+    entityId: created.id,
+    details: { examId, studentId },
   });
 
   return { success: true };
@@ -253,6 +266,13 @@ export async function submitExam(examId: string, isAuto = false) {
       },
     }),
   ]);
+
+  await logAudit({
+    action: isAuto ? "AUTO_SUBMIT_EXAM" : "SUBMIT_EXAM",
+    entity: "studentExamAttempt",
+    entityId: attempt.id,
+    details: { examId, studentId: user.student.id, score: finalScore },
+  });
 
   revalidatePath(`/student/exams/${examId}`);
   return { success: true };

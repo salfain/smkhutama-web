@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { parseWIB } from "@/lib/date";
 
@@ -77,7 +78,7 @@ export async function createExamWithQuestions(formData: FormData) {
   if (questionIds.length === 0) return { error: "Pilih minimal 1 soal untuk ujian" };
 
   try {
-    await prisma.exam.create({
+    const created = await prisma.exam.create({
       data: {
         title,
         subjectId,
@@ -101,6 +102,20 @@ export async function createExamWithQuestions(formData: FormData) {
         },
       },
     });
+    await logAudit({
+      action: "CREATE_TEACHER_EXAM",
+      entity: "exam",
+      entityId: created.id,
+      details: {
+        title,
+        teacherId: user.teacher.id,
+        subjectId,
+        status,
+        examType,
+        classCount: classIds.length,
+        questionCount: questionIds.length,
+      },
+    });
     revalidatePath("/teacher/exams");
     return { success: true };
   } catch {
@@ -112,9 +127,19 @@ export async function changeMyExamStatus(id: string, status: "DRAFT" | "ACTIVE" 
   const user = await requireAuth("TEACHER");
   if (!user.teacher) return { error: "Tidak diizinkan" };
   try {
+    const previous = await prisma.exam.findFirst({
+      where: { id, teacherId: user.teacher.id },
+      select: { title: true, status: true },
+    });
     await prisma.exam.update({
       where: { id, teacherId: user.teacher.id },
       data: { status },
+    });
+    await logAudit({
+      action: "CHANGE_TEACHER_EXAM_STATUS",
+      entity: "exam",
+      entityId: id,
+      details: { title: previous?.title ?? null, previousStatus: previous?.status ?? null, status },
     });
     revalidatePath("/teacher/exams");
     return { success: true };
@@ -143,6 +168,12 @@ export async function deleteMyExam(id: string, force = false) {
         prisma.examClass.deleteMany({ where: { examId: id } }),
         prisma.exam.delete({ where: { id } }),
       ]);
+      await logAudit({
+        action: "FORCE_DELETE_TEACHER_EXAM",
+        entity: "exam",
+        entityId: id,
+        details: { title: exam.title, status: exam.status },
+      });
     } else {
       const attemptCount = await prisma.studentExamAttempt.count({ where: { examId: id } });
       if (attemptCount > 0) {
@@ -159,6 +190,12 @@ export async function deleteMyExam(id: string, force = false) {
         prisma.examClass.deleteMany({ where: { examId: id } }),
         prisma.exam.delete({ where: { id } }),
       ]);
+      await logAudit({
+        action: "DELETE_TEACHER_EXAM",
+        entity: "exam",
+        entityId: id,
+        details: { title: exam.title, status: exam.status },
+      });
     }
     revalidatePath("/teacher/exams");
     return { success: true };
@@ -219,6 +256,12 @@ export async function createTokenByTeacher(examId: string, durationMinutes = 60)
   try {
     const created = await prisma.examToken.create({
       data: { examId, token, expiredAt, isActive: true },
+    });
+    await logAudit({
+      action: "CREATE_TEACHER_EXAM_TOKEN",
+      entity: "examToken",
+      entityId: created.id,
+      details: { examId, examType: exam.examType, expiredAt: created.expiredAt },
     });
     revalidatePath("/teacher/exams");
     return { success: true, token: created.token };
