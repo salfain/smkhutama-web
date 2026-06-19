@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireCounselorAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
+import { PrintButtonsRed, SchoolLogo } from "@/components/print/PrintButtons";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Surat Pemanggilan Orang Tua" };
@@ -44,25 +45,12 @@ export default async function SummonPrintPage({ params }: { params: Promise<{ id
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
-      <div className="print:hidden fixed top-4 right-4 z-50 flex gap-2">
-        <button id="back-btn" className="rounded-lg border bg-white px-4 py-2 text-sm font-medium shadow hover:bg-gray-50">
-          ← Kembali
-        </button>
-        <button id="print-btn" className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-700">
-          🖨️ Cetak / PDF
-        </button>
-      </div>
-      <script dangerouslySetInnerHTML={{ __html: `
-        document.getElementById('print-btn').onclick = function() { window.print(); };
-        document.getElementById('back-btn').onclick = function() { window.history.back(); };
-      ` }} />
+      <PrintButtonsRed />
 
       <div className="mx-auto max-w-2xl bg-white p-12 shadow-lg print:max-w-none print:shadow-none print:p-8">
         {/* Kop */}
         <div className="flex items-start gap-4 border-b-2 border-black pb-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/api/school/logo" alt="Logo" className="h-16 w-16 object-contain shrink-0"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          <SchoolLogo />
           <div className="flex-1 text-center">
             <p className="text-lg font-extrabold uppercase tracking-wide">{school?.name ?? "SMK Hutama Pondok Gede"}</p>
             <p className="text-xs text-gray-600 mt-0.5">Sekolah Menengah Kejuruan</p>
