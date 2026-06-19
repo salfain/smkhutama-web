@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, CheckCircle2, FileSpreadsheet, Upload } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, FileSpreadsheet, Upload } from "lucide-react";
 import { importQuestionSet } from "./actions";
 
 type Subject = { id: string; name: string; code: string };
@@ -72,14 +72,22 @@ export function QuestionSetsClient({
 
       <Card className="mb-6 border shadow-sm">
         <CardContent className="p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="rounded-lg bg-emerald-50 p-2">
-              <Upload className="h-5 w-5 text-emerald-600" />
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-emerald-50 p-2">
+                <Upload className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Import Paket Soal</p>
+                <p className="text-xs text-gray-500">Mendukung template Excel lama: JENIS SOAL, KATEGORI, ACAK, SOAL, JAWAB1-5, KUNCI JAWABAN.</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-gray-900">Import Paket Soal</p>
-              <p className="text-xs text-gray-500">Mendukung template Excel lama: JENIS SOAL, KATEGORI, ACAK, SOAL, JAWAB1-5, KUNCI JAWABAN.</p>
-            </div>
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <a href="/templates/template-import-soal-cbt-smk-hutama.xlsx" download>
+                <Download className="h-4 w-4" />
+                Download Template
+              </a>
+            </Button>
           </div>
 
           <form ref={formRef} action={handleImport} className="grid gap-4 lg:grid-cols-5">
