@@ -301,6 +301,7 @@ model QuestionSet {
   subject      Subject    @relation(fields: [subjectId], references: [id])
   ownerTeacher Teacher    @relation(fields: [ownerTeacherId], references: [id])
   questions    Question[]
+  exams        Exam[]
 
   @@map("question_sets")
 }
@@ -359,10 +360,14 @@ model Exam {
   title              String
   subjectId          String     @map("subject_id")
   teacherId          String     @map("teacher_id")
+  questionSetId      String?    @map("question_set_id")
   academicYearId     String?    @map("academic_year_id")
   durationMinutes    Int        @map("duration_minutes")
   startAt            DateTime   @map("start_at")
   endAt              DateTime   @map("end_at")
+  requestedQuestionCount Int?   @map("requested_question_count")
+  multipleChoicePercentage Float @default(100) @map("multiple_choice_percentage")
+  essayPercentage    Float      @default(0) @map("essay_percentage")
   randomizeQuestions Boolean    @default(false) @map("randomize_questions")
   randomizeOptions   Boolean    @default(false) @map("randomize_options")
   showResult         Boolean    @default(false) @map("show_result")
@@ -375,6 +380,7 @@ model Exam {
 
   subject       Subject            @relation(fields: [subjectId], references: [id])
   teacher       Teacher            @relation(fields: [teacherId], references: [id])
+  questionSet   QuestionSet?       @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
   academicYear  AcademicYear?      @relation(fields: [academicYearId], references: [id])
   questions     ExamQuestion[]
   classes       ExamClass[]

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
+import { calculateFinalScoreAfterManual } from "@/lib/exam-scoring";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "TEACHER");
@@ -28,16 +29,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     data: { score, isCorrect: score >= 60 },
   });
 
-  // Recompute total score
-  const allAnswers = await prisma.studentAnswer.findMany({
-    where: { attemptId: answer.attemptId },
-    include: { question: { select: { scoreWeight: true } } },
+  const attempt = await prisma.studentExamAttempt.findUnique({
+    where: { id: answer.attemptId },
+    include: {
+      answers: {
+        include: { question: { include: { options: true } } },
+      },
+      exam: {
+        select: {
+          multipleChoicePercentage: true,
+          essayPercentage: true,
+          questions: {
+            include: { question: { select: { id: true, scoreWeight: true, questionType: true } } },
+          },
+        },
+      },
+    },
   });
-  const allScored = allAnswers.every((a) => a.score !== null);
-  if (allScored) {
-    const totalWeight = allAnswers.reduce((s, a) => s + (a.question.scoreWeight ?? 1), 0);
-    const totalScore = allAnswers.reduce((s, a) => s + ((a.score ?? 0) * (a.question.scoreWeight ?? 1)), 0);
-    const finalScore = totalWeight > 0 ? Math.round(totalScore / totalWeight) : 0;
+
+  if (attempt) {
+    const finalScore = calculateFinalScoreAfterManual({
+      questions: attempt.exam.questions.map((eq) => eq.question),
+      answers: attempt.answers,
+      multipleChoicePercentage: attempt.exam.multipleChoicePercentage,
+      essayPercentage: attempt.exam.essayPercentage,
+    });
     await prisma.studentExamAttempt.update({
       where: { id: answer.attemptId },
       data: { score: finalScore },

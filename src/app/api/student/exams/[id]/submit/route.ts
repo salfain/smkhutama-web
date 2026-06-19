@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { calculateSubmissionScore } from "@/lib/exam-scoring";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "STUDENT");
@@ -17,7 +18,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     where: { examId_studentId: { examId, studentId: student.id } },
     include: {
       answers: { include: { question: { include: { options: true } } } },
-      exam: { select: { questions: { include: { question: { select: { id: true, scoreWeight: true, questionType: true } } } } } },
+      exam: {
+        select: {
+          multipleChoicePercentage: true,
+          essayPercentage: true,
+          questions: {
+            include: { question: { select: { id: true, scoreWeight: true, questionType: true } } },
+          },
+        },
+      },
     },
   });
   if (!attempt) return NextResponse.json({ error: "Attempt tidak ditemukan" }, { status: 404 });
@@ -25,47 +34,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ success: true, score: attempt.score });
   }
 
-  const allExamQuestions = attempt.exam.questions;
-  const answeredMap = new Map(attempt.answers.map((a) => [a.questionId, a]));
-
-  let totalWeight = 0;
-  let earnedWeight = 0;
-  const updates: { id: string; isCorrect: boolean | null; score: number | null }[] = [];
-  let hasUngradedEssay = false;
-
-  for (const eq of allExamQuestions) {
-    const q = eq.question;
-    const weight = q.scoreWeight ?? 1;
-    totalWeight += weight;
-    const ans = answeredMap.get(q.id);
-
-    if (q.questionType === "ESSAY" || q.questionType === "SHORT_ANSWER") {
-      hasUngradedEssay = true;
-      if (ans) updates.push({ id: ans.id, isCorrect: null, score: null });
-      continue;
-    }
-    if (!ans || !ans.selectedOptionId) {
-      if (ans) updates.push({ id: ans.id, isCorrect: false, score: 0 });
-      continue;
-    }
-    if (q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE") {
-      const correctOpt = ans.question.options.find((o) => o.isCorrect);
-      const isCorrect = !!correctOpt && ans.selectedOptionId === correctOpt.id;
-      updates.push({ id: ans.id, isCorrect, score: isCorrect ? 100 : 0 });
-      if (isCorrect) earnedWeight += weight;
-      continue;
-    }
-    if (q.questionType === "MULTIPLE_CHOICE_COMPLEX") {
-      const correctIds = ans.question.options.filter((o) => o.isCorrect).map((o) => o.id);
-      const isCorrect = correctIds.includes(ans.selectedOptionId!);
-      updates.push({ id: ans.id, isCorrect, score: isCorrect ? 100 : 0 });
-      if (isCorrect) earnedWeight += weight;
-      continue;
-    }
-    if (ans) { updates.push({ id: ans.id, isCorrect: null, score: null }); hasUngradedEssay = true; }
-  }
-
-  const finalScore = hasUngradedEssay ? null : (totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0);
+  const { updates, finalScore } = calculateSubmissionScore({
+    questions: attempt.exam.questions.map((eq) => eq.question),
+    answers: attempt.answers,
+    multipleChoicePercentage: attempt.exam.multipleChoicePercentage,
+    essayPercentage: attempt.exam.essayPercentage,
+  });
 
   await prisma.$transaction([
     ...updates.map((u) => prisma.studentAnswer.update({ where: { id: u.id }, data: { isCorrect: u.isCorrect, score: u.score } })),

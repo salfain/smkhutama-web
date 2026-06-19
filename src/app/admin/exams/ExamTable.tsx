@@ -18,7 +18,7 @@ import { Plus, Search, Calendar, Clock, Users, Pencil, Trash2,
 import {
   createExam, updateExam, deleteExam, changeExamStatus,
 } from "./actions";
-import { EXAM_TYPES, getExamTypeInfo } from "@/lib/exam-types";
+import { getExamTypeInfo, type ExamType as ExamTypeValue } from "@/lib/exam-types";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { toDatetimeLocalWIB } from "@/lib/date";
 
@@ -29,16 +29,21 @@ type Exam = {
   startAt: Date;
   endAt: Date;
   status: "DRAFT" | "ACTIVE" | "CLOSED";
-  examType: "UH" | "UTS" | "UAS" | "US" | "TRYOUT" | "LAINNYA";
+  examType: ExamTypeValue;
   randomizeQuestions: boolean;
   randomizeOptions: boolean;
   showResult: boolean;
   passingScore: number | null;
   subjectId: string;
   teacherId: string;
+  questionSetId: string | null;
+  requestedQuestionCount: number | null;
+  multipleChoicePercentage: number;
+  essayPercentage: number;
   academicYearId: string | null;
   subject: { name: string; code: string };
   teacher: { user: { name: string } };
+  questionSet: { id: string; title: string; totalQuestions: number } | null;
   classes: { class: { name: string } }[];
   _count: { questions: number; attempts: number };
 };
@@ -48,7 +53,24 @@ type FormDataOpts = {
   teachers: { id: string; user: { name: string }; subject: { code: string } | null }[];
   classes: { id: string; name: string }[];
   academicYears: { id: string; year: string; semester: string; isActive: boolean }[];
+  questionSets: {
+    id: string;
+    title: string;
+    subjectId: string;
+    ownerTeacherId: string;
+    examType: ExamTypeValue;
+    totalQuestions: number;
+    multipleChoiceCount: number;
+    essayCount: number;
+    status: string;
+  }[];
 };
+
+const ADMIN_EXAM_TYPES = [
+  { value: "UTS", label: "Ujian Tengah Semester", short: "UTS" },
+  { value: "UAS", label: "Ujian Akhir Semester", short: "UAS" },
+  { value: "US", label: "Ujian Sekolah", short: "US" },
+] as const;
 
 const statusStyle: Record<string, string> = {
   ACTIVE: "bg-green-100 text-green-700 border-green-200",
@@ -84,12 +106,18 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
   const [teacherId, setTeacherId] = useState("");
   const [academicYearId, setAcademicYearId] = useState("none");
   const [statusVal, setStatusVal] = useState<"DRAFT" | "ACTIVE" | "CLOSED">("DRAFT");
-  const [examType, setExamType] = useState<"UH" | "UTS" | "UAS" | "US" | "TRYOUT" | "LAINNYA">("UH");
+  const [examType, setExamType] = useState<"UTS" | "UAS" | "US">("UTS");
   const [classIds, setClassIds] = useState<string[]>([]);
+  const [questionSetId, setQuestionSetId] = useState("none");
+  const [requestedQuestionCount, setRequestedQuestionCount] = useState("");
+  const [multipleChoicePercentage, setMultipleChoicePercentage] = useState("100");
+  const [essayPercentage, setEssayPercentage] = useState("0");
 
   function openCreate() {
     setEditing(null);
-    setSubjectId(""); setTeacherId(""); setStatusVal("DRAFT"); setExamType("UH");
+    setSubjectId(""); setTeacherId(""); setStatusVal("DRAFT"); setExamType("UTS");
+    setQuestionSetId("none"); setRequestedQuestionCount("");
+    setMultipleChoicePercentage("100"); setEssayPercentage("0");
     const activeYear = opts.academicYears.find((y) => y.isActive);
     setAcademicYearId(activeYear?.id ?? "none");
     setClassIds([]);
@@ -100,9 +128,13 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
     setEditing(e);
     setSubjectId(e.subjectId);
     setTeacherId(e.teacherId);
+    setQuestionSetId(e.questionSetId ?? "none");
+    setRequestedQuestionCount(e.requestedQuestionCount?.toString() ?? "");
+    setMultipleChoicePercentage(e.multipleChoicePercentage.toString());
+    setEssayPercentage(e.essayPercentage.toString());
     setAcademicYearId(e.academicYearId ?? "none");
     setStatusVal(e.status);
-    setExamType(e.examType);
+    setExamType((["UTS", "UAS", "US"].includes(e.examType) ? e.examType : "UTS") as "UTS" | "UAS" | "US");
     // map class names back to ids
     const ids = e.classes
       .map((ec) => opts.classes.find((c) => c.name === ec.class.name)?.id)
@@ -122,6 +154,10 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
     formData.set("academicYearId", academicYearId === "none" ? "" : academicYearId);
     formData.set("status", statusVal);
     formData.set("examType", examType);
+    formData.set("questionSetId", questionSetId === "none" ? "" : questionSetId);
+    formData.set("requestedQuestionCount", requestedQuestionCount);
+    formData.set("multipleChoicePercentage", multipleChoicePercentage);
+    formData.set("essayPercentage", essayPercentage);
     formData.delete("classIds");
     classIds.forEach((id) => formData.append("classIds", id));
 
@@ -170,6 +206,12 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
   const filteredTeachers = subjectId
     ? opts.teachers.filter((t) => !t.subject || t.subject.code === opts.subjects.find((s) => s.id === subjectId)?.code)
     : opts.teachers;
+  const filteredQuestionSets = opts.questionSets.filter((set) =>
+    (!subjectId || set.subjectId === subjectId) &&
+    (!teacherId || set.ownerTeacherId === teacherId) &&
+    set.examType === examType
+  );
+  const selectedQuestionSet = opts.questionSets.find((set) => set.id === questionSetId);
 
   return (
     <>
@@ -185,7 +227,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Jenis</SelectItem>
-            {EXAM_TYPES.map((t) => (
+            {ADMIN_EXAM_TYPES.map((t) => (
               <SelectItem key={t.value} value={t.value}>{t.short} – {t.label}</SelectItem>
             ))}
           </SelectContent>
@@ -229,6 +271,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                     <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{fmtDateTime(e.startAt)}</span>
                     <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{e.durationMinutes} menit</span>
                     <span className="flex items-center gap-1"><FileText className="h-3.5 w-3.5" />{e._count.questions} soal</span>
+                    {e.questionSet && <span className="flex items-center gap-1">Paket: {e.questionSet.title}</span>}
                     <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{e._count.attempts} peserta</span>
                     {e.classes.length > 0 && (
                       <span className="flex items-center gap-1">
@@ -289,10 +332,14 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Jenis Ujian *</Label>
-                <Select value={examType} onValueChange={(v) => setExamType(v as typeof examType)}>
+                <Select value={examType} onValueChange={(v) => {
+                  setExamType(v as typeof examType);
+                  setQuestionSetId("none");
+                  setRequestedQuestionCount("");
+                }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {EXAM_TYPES.map((t) => (
+                    {ADMIN_EXAM_TYPES.map((t) => (
                       <SelectItem key={t.value} value={t.value}>{t.short} – {t.label}</SelectItem>
                     ))}
                   </SelectContent>
@@ -300,7 +347,11 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               </div>
               <div className="space-y-1.5">
                 <Label>Mata Pelajaran *</Label>
-                <Select value={subjectId} onValueChange={setSubjectId}>
+                <Select value={subjectId} onValueChange={(value) => {
+                  setSubjectId(value);
+                  setQuestionSetId("none");
+                  setRequestedQuestionCount("");
+                }}>
                   <SelectTrigger><SelectValue placeholder="Pilih..." /></SelectTrigger>
                   <SelectContent>
                     {opts.subjects.map((s) => (
@@ -314,7 +365,11 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1.5">
                 <Label>Guru Pengampu *</Label>
-                <Select value={teacherId} onValueChange={setTeacherId}>
+                <Select value={teacherId} onValueChange={(value) => {
+                  setTeacherId(value);
+                  setQuestionSetId("none");
+                  setRequestedQuestionCount("");
+                }}>
                   <SelectTrigger><SelectValue placeholder="Pilih..." /></SelectTrigger>
                   <SelectContent>
                     {filteredTeachers.map((t) => (
@@ -323,6 +378,92 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-3 rounded-lg border bg-blue-50/40 p-3">
+              <div>
+                <Label>Paket Bank Soal</Label>
+                <Select value={questionSetId} onValueChange={(value) => {
+                  setQuestionSetId(value);
+                  const set = opts.questionSets.find((item) => item.id === value);
+                  setRequestedQuestionCount(set ? String(set.totalQuestions) : "");
+                  if (set && set.essayCount > 0) {
+                    setMultipleChoicePercentage("80");
+                    setEssayPercentage("20");
+                  } else {
+                    setMultipleChoicePercentage("100");
+                    setEssayPercentage("0");
+                  }
+                }}>
+                  <SelectTrigger className="mt-1 w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa paket dulu</SelectItem>
+                    {filteredQuestionSets.map((set) => (
+                      <SelectItem key={set.id} value={set.id}>
+                        {set.title} - {set.totalQuestions} soal ({set.multipleChoiceCount} PG, {set.essayCount} esai)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filteredQuestionSets.length === 0 && (
+                  <p className="mt-1 text-xs text-blue-700">
+                    Belum ada paket disetujui untuk jenis ujian, mapel, dan guru ini.
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="requestedQuestionCount">Jumlah Soal</Label>
+                  <Input
+                    id="requestedQuestionCount"
+                    name="requestedQuestionCount"
+                    type="number"
+                    min="0"
+                    max={selectedQuestionSet?.totalQuestions ?? undefined}
+                    value={requestedQuestionCount}
+                    onChange={(e) => setRequestedQuestionCount(e.target.value)}
+                    placeholder={selectedQuestionSet ? String(selectedQuestionSet.totalQuestions) : "Semua"}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="multipleChoicePercentage">Bobot PG (%)</Label>
+                  <Input
+                    id="multipleChoicePercentage"
+                    name="multipleChoicePercentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={multipleChoicePercentage}
+                    onChange={(e) => {
+                      setMultipleChoicePercentage(e.target.value);
+                      const value = Number(e.target.value);
+                      if (!Number.isNaN(value)) setEssayPercentage(String(100 - value));
+                    }}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="essayPercentage">Bobot Esai (%)</Label>
+                  <Input
+                    id="essayPercentage"
+                    name="essayPercentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={essayPercentage}
+                    onChange={(e) => {
+                      setEssayPercentage(e.target.value);
+                      const value = Number(e.target.value);
+                      if (!Number.isNaN(value)) setMultipleChoicePercentage(String(100 - value));
+                    }}
+                  />
+                </div>
+              </div>
+              {selectedQuestionSet && (
+                <p className="text-xs text-gray-500">
+                  Paket berisi {selectedQuestionSet.totalQuestions} soal. Jika jumlah soal dikosongkan, semua soal dalam paket dipakai.
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

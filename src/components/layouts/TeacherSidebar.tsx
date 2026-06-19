@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, FileText, ClipboardList, MonitorCheck,
+  LayoutDashboard, ClipboardList, MonitorCheck,
   CheckSquare, BarChart3, TrendingUp, ChevronRight, Menu, HeartHandshake, KeyRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,6 @@ type UserInfo = { name: string; subjectName: string | null };
 const navItems = [
   { href: "/teacher/dashboard",     icon: LayoutDashboard, label: "Dashboard" },
   { href: "/teacher/question-sets",  icon: ClipboardList,   label: "Paket Bank Soal" },
-  { href: "/teacher/questions",     icon: FileText,        label: "Bank Soal" },
-  { href: "/teacher/exams",         icon: ClipboardList,   label: "Paket Ujian" },
   { href: "/teacher/monitoring",    icon: MonitorCheck,    label: "Monitoring" },
   { href: "/teacher/essay-grading", icon: CheckSquare,     label: "Koreksi Esai" },
   { href: "/teacher/results",       icon: BarChart3,       label: "Hasil Nilai" },

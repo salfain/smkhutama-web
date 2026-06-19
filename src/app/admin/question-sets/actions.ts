@@ -3,48 +3,57 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
-import { revalidatePath } from "next/cache";
 import { parseQuestionSetWorkbook } from "@/lib/question-set-import";
+import { revalidatePath } from "next/cache";
 
-export async function getQuestionSetImportData() {
-  const user = await requireAuth("TEACHER");
-  if (!user.teacher) return { subjects: [], defaultSubjectId: null };
+export async function getAdminQuestionSetData() {
+  await requireAuth("ADMIN");
 
-  const subjects = await prisma.subject.findMany({
-    orderBy: { code: "asc" },
-    select: { id: true, name: true, code: true },
-  });
+  const [questionSets, subjects, teachers] = await Promise.all([
+    prisma.questionSet.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        subject: { select: { id: true, code: true, name: true } },
+        ownerTeacher: { include: { user: { select: { name: true } } } },
+        _count: { select: { questions: true, exams: true } },
+      },
+    }),
+    prisma.subject.findMany({
+      orderBy: { code: "asc" },
+      select: { id: true, code: true, name: true },
+    }),
+    prisma.teacher.findMany({
+      orderBy: { createdAt: "asc" },
+      include: {
+        user: { select: { name: true } },
+        subject: { select: { id: true, code: true, name: true } },
+      },
+    }),
+  ]);
 
-  return { subjects, defaultSubjectId: user.teacher.subjectId };
+  return { questionSets, subjects, teachers };
 }
 
-export async function getMyQuestionSets() {
-  const user = await requireAuth("TEACHER");
-  if (!user.teacher) return [];
-
-  return prisma.questionSet.findMany({
-    where: { ownerTeacherId: user.teacher.id },
-    orderBy: { createdAt: "desc" },
-    include: {
-      subject: { select: { code: true, name: true } },
-      _count: { select: { questions: true } },
-    },
-  });
-}
-
-export async function importQuestionSet(formData: FormData) {
-  const user = await requireAuth("TEACHER");
-  if (!user.teacher) return { error: "Guru tidak terdaftar" };
+export async function importQuestionSetForTeacher(formData: FormData) {
+  const user = await requireAuth("ADMIN");
 
   const title = String(formData.get("title") ?? "").trim();
-  const subjectId = String(formData.get("subjectId") ?? "").trim() || user.teacher.subjectId;
+  const subjectId = String(formData.get("subjectId") ?? "").trim();
+  const teacherId = String(formData.get("teacherId") ?? "").trim();
   const examType = String(formData.get("examType") ?? "UTS").trim() as "UTS" | "UAS" | "US";
   const grade = String(formData.get("grade") ?? "").trim();
   const file = formData.get("file") as File | null;
 
   if (!title) return { error: "Nama paket wajib diisi" };
   if (!subjectId) return { error: "Mata pelajaran wajib dipilih" };
+  if (!teacherId) return { error: "Guru pemilik wajib dipilih" };
   if (!file || file.size === 0) return { error: "File Excel wajib dipilih" };
+
+  const teacher = await prisma.teacher.findUnique({
+    where: { id: teacherId },
+    select: { id: true },
+  });
+  if (!teacher) return { error: "Guru tidak ditemukan" };
 
   const bytes = Buffer.from(await file.arrayBuffer());
   const { questions, errors } = parseQuestionSetWorkbook(bytes);
@@ -60,10 +69,11 @@ export async function importQuestionSet(formData: FormData) {
       data: {
         title,
         subjectId,
-        ownerTeacherId: user.teacher.id,
+        ownerTeacherId: teacherId,
         createdByUserId: user.id,
-        createdByRole: "TEACHER",
-        source: "TEACHER_IMPORT",
+        createdByRole: "ADMIN",
+        source: "ADMIN_IMPORT",
+        status: "APPROVED",
         examType,
         grade: grade || null,
         sourceFileName: file.name,
@@ -74,7 +84,7 @@ export async function importQuestionSet(formData: FormData) {
         questions: {
           create: questions.map((q) => ({
             subjectId,
-            teacherId: user.teacher!.id,
+            teacherId,
             questionType: q.questionType,
             questionText: q.questionText,
             difficulty: q.difficulty,
@@ -102,13 +112,13 @@ export async function importQuestionSet(formData: FormData) {
     });
 
     await logAudit({
-      action: "IMPORT_QUESTION_SET",
+      action: "ADMIN_IMPORT_QUESTION_SET",
       entity: "questionSet",
       entityId: created.id,
       details: {
         title,
         subjectId,
-        teacherId: user.teacher.id,
+        teacherId,
         totalQuestions: questions.length,
         multipleChoiceCount,
         essayCount,
@@ -116,15 +126,43 @@ export async function importQuestionSet(formData: FormData) {
       },
     });
 
+    revalidatePath("/admin/question-sets");
     revalidatePath("/teacher/question-sets");
-    revalidatePath("/teacher/questions");
     return {
       success: true,
-      questionSetId: created.id,
-      message: `${questions.length} soal berhasil diimport ke paket "${title}"`,
+      message: `${questions.length} soal berhasil diimport untuk guru`,
       errors: errors.length > 0 ? errors : undefined,
     };
   } catch {
     return { error: "Gagal menyimpan paket soal" };
+  }
+}
+
+export async function updateQuestionSetStatus(id: string, status: "DRAFT" | "SUBMITTED" | "APPROVED" | "USED") {
+  await requireAuth("ADMIN");
+  try {
+    const previous = await prisma.questionSet.findUnique({
+      where: { id },
+      select: { title: true, status: true },
+    });
+    const updated = await prisma.questionSet.update({
+      where: { id },
+      data: { status },
+    });
+    await logAudit({
+      action: "UPDATE_QUESTION_SET_STATUS",
+      entity: "questionSet",
+      entityId: id,
+      details: {
+        title: previous?.title ?? null,
+        previousStatus: previous?.status ?? null,
+        status: updated.status,
+      },
+    });
+    revalidatePath("/admin/question-sets");
+    revalidatePath("/teacher/question-sets");
+    return { success: true };
+  } catch {
+    return { error: "Gagal mengubah status paket soal" };
   }
 }

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
+import { calculateSubmissionScore } from "@/lib/exam-scoring";
 
 export async function validateToken(examId: string, tokenInput: string) {
   const user = await requireAuth("STUDENT");
@@ -176,6 +177,8 @@ export async function submitExam(examId: string, isAuto = false) {
       exam: {
         select: {
           showResult: true,
+          multipleChoicePercentage: true,
+          essayPercentage: true,
           questions: {
             include: { question: { select: { id: true, scoreWeight: true, questionType: true } } },
           },
@@ -188,66 +191,12 @@ export async function submitExam(examId: string, isAuto = false) {
     return { success: true };
   }
 
-  // Ambil SEMUA soal dalam ujian (termasuk yang tidak dijawab)
-  const allExamQuestions = attempt.exam.questions;
-  const answeredMap = new Map(attempt.answers.map((a) => [a.questionId, a]));
-
-  // Hitung total bobot dari SELURUH soal dalam ujian
-  let totalWeight = 0;
-  let earnedWeight = 0;
-  const answerUpdates: { id: string; isCorrect: boolean | null; score: number | null }[] = [];
-  let hasUngradedEssay = false;
-
-  for (const eq of allExamQuestions) {
-    const q = eq.question;
-    const weight = q.scoreWeight ?? 1;
-    totalWeight += weight;
-
-    const ans = answeredMap.get(q.id);
-
-    // Soal Esai / Isian Singkat: perlu koreksi manual guru
-    if (q.questionType === "ESSAY" || q.questionType === "SHORT_ANSWER") {
-      hasUngradedEssay = true;
-      if (ans) answerUpdates.push({ id: ans.id, isCorrect: null, score: null });
-      continue;
-    }
-
-    // Soal tidak dijawab = salah (0 poin)
-    if (!ans || !ans.selectedOptionId) {
-      if (ans) answerUpdates.push({ id: ans.id, isCorrect: false, score: 0 });
-      continue;
-    }
-
-    // PG Tunggal / Benar-Salah: cocokkan selectedOptionId dengan opsi yang isCorrect
-    if (q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE") {
-      const correctOpt = ans.question.options.find((o) => o.isCorrect);
-      const isCorrect = !!correctOpt && ans.selectedOptionId === correctOpt.id;
-      answerUpdates.push({ id: ans.id, isCorrect, score: isCorrect ? 100 : 0 });
-      if (isCorrect) earnedWeight += weight;
-      continue;
-    }
-
-    // PG Kompleks: cocokkan 1 opsi yang dipilih dengan salah satu yang benar
-    if (q.questionType === "MULTIPLE_CHOICE_COMPLEX") {
-      const correctIds = ans.question.options.filter((o) => o.isCorrect).map((o) => o.id);
-      const isCorrect = correctIds.includes(ans.selectedOptionId!);
-      answerUpdates.push({ id: ans.id, isCorrect, score: isCorrect ? 100 : 0 });
-      if (isCorrect) earnedWeight += weight;
-      continue;
-    }
-
-    // Jenis lainnya: tandai null untuk koreksi manual
-    if (ans) {
-      answerUpdates.push({ id: ans.id, isCorrect: null, score: null });
-      hasUngradedEssay = true;
-    }
-  }
-
-  // Skor final = (bobot_benar / total_bobot_semua_soal) × 100
-  // Jika ada esai yang belum dinilai guru → score = null (ditentukan setelah koreksi)
-  const finalScore = hasUngradedEssay
-    ? null
-    : (totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0);
+  const { updates: answerUpdates, finalScore } = calculateSubmissionScore({
+    questions: attempt.exam.questions.map((eq) => eq.question),
+    answers: attempt.answers,
+    multipleChoicePercentage: attempt.exam.multipleChoicePercentage,
+    essayPercentage: attempt.exam.essayPercentage,
+  });
 
   await prisma.$transaction([
     ...answerUpdates.map((u) =>

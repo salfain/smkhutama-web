@@ -11,6 +11,7 @@ export async function getExams() {
     include: {
       subject: { select: { name: true, code: true } },
       teacher: { include: { user: { select: { name: true } } } },
+      questionSet: { select: { id: true, title: true, totalQuestions: true } },
       classes: { include: { class: { select: { name: true } } } },
       _count: { select: { questions: true, attempts: true } },
     },
@@ -18,7 +19,7 @@ export async function getExams() {
 }
 
 export async function getExamFormData() {
-  const [subjects, teachers, classes, academicYears] = await Promise.all([
+  const [subjects, teachers, classes, academicYears, questionSets] = await Promise.all([
     prisma.subject.findMany({
       orderBy: { code: "asc" },
       select: { id: true, name: true, code: true },
@@ -38,8 +39,47 @@ export async function getExamFormData() {
       orderBy: [{ year: "desc" }, { semester: "asc" }],
       select: { id: true, year: true, semester: true, isActive: true },
     }),
+    prisma.questionSet.findMany({
+      where: { status: { in: ["APPROVED", "USED"] } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        subjectId: true,
+        ownerTeacherId: true,
+        examType: true,
+        totalQuestions: true,
+        multipleChoiceCount: true,
+        essayCount: true,
+        status: true,
+      },
+    }),
   ]);
-  return { subjects, teachers, classes, academicYears };
+  return { subjects, teachers, classes, academicYears, questionSets };
+}
+
+function shuffle<T>(items: T[]) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+async function getQuestionIdsForExam(questionSetId: string, requestedCount: number | null) {
+  const questions = await prisma.question.findMany({
+    where: { questionSetId, isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, isRandomized: true },
+  });
+
+  const target = requestedCount && requestedCount > 0
+    ? Math.min(requestedCount, questions.length)
+    : questions.length;
+  const fixed = questions.filter((q) => !q.isRandomized);
+  const randomized = shuffle(questions.filter((q) => q.isRandomized));
+  return [...fixed, ...randomized].slice(0, target).map((q) => q.id);
 }
 
 export async function createExam(formData: FormData) {
@@ -47,13 +87,16 @@ export async function createExam(formData: FormData) {
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
   const academicYearId = String(formData.get("academicYearId") ?? "").trim();
+  const questionSetId = String(formData.get("questionSetId") ?? "").trim();
+  const requestedQuestionCount = Number(formData.get("requestedQuestionCount") ?? "0");
+  const multipleChoicePercentage = Number(formData.get("multipleChoicePercentage") ?? "100");
+  const essayPercentage = Number(formData.get("essayPercentage") ?? "0");
   const durationMinutes = Number(formData.get("durationMinutes") ?? "0");
   const startAt = String(formData.get("startAt") ?? "").trim();
   const endAt = String(formData.get("endAt") ?? "").trim();
   const passingScoreRaw = String(formData.get("passingScore") ?? "").trim();
   const status = String(formData.get("status") ?? "DRAFT").trim();
-  const examType = String(formData.get("examType") ?? "UH").trim() as
-    "UH" | "UTS" | "UAS" | "US" | "TRYOUT" | "LAINNYA";
+  const examType = String(formData.get("examType") ?? "UTS").trim() as "UTS" | "UAS" | "US";
   const randomizeQuestions = formData.get("randomizeQuestions") === "on";
   const randomizeOptions = formData.get("randomizeOptions") === "on";
   const showResult = formData.get("showResult") === "on";
@@ -67,35 +110,68 @@ export async function createExam(formData: FormData) {
   if (new Date(startAt) >= new Date(endAt)) {
     return { error: "Waktu mulai harus sebelum waktu selesai" };
   }
+  if (!["UTS", "UAS", "US"].includes(examType)) return { error: "Jenis ujian hanya boleh UTS, UAS, atau US" };
+  if (requestedQuestionCount < 0) return { error: "Jumlah soal tidak valid" };
+  if (multipleChoicePercentage < 0 || essayPercentage < 0 || multipleChoicePercentage + essayPercentage !== 100) {
+    return { error: "Persentase PG dan esai harus berjumlah 100%" };
+  }
 
   try {
-    const created = await prisma.exam.create({
-      data: {
-        title,
-        subjectId,
-        teacherId,
-        academicYearId: academicYearId || null,
-        durationMinutes,
-        startAt: parseWIB(startAt),
-        endAt: parseWIB(endAt),
-        passingScore: passingScoreRaw ? Number(passingScoreRaw) : null,
-        randomizeQuestions,
-        randomizeOptions,
-        showResult,
-        status: status as "DRAFT" | "ACTIVE" | "CLOSED",
-        examType,
-        classes: classIds.length > 0
-          ? { create: classIds.map((cid) => ({ classId: cid })) }
-          : undefined,
-      },
+    const questionIds = questionSetId
+      ? await getQuestionIdsForExam(questionSetId, requestedQuestionCount > 0 ? requestedQuestionCount : null)
+      : [];
+    if (questionSetId && questionIds.length === 0) return { error: "Paket soal tidak memiliki soal aktif" };
+
+    const created = await prisma.$transaction(async (tx) => {
+      const exam = await tx.exam.create({
+        data: {
+          title,
+          subjectId,
+          teacherId,
+          questionSetId: questionSetId || null,
+          requestedQuestionCount: questionSetId ? (requestedQuestionCount > 0 ? requestedQuestionCount : questionIds.length) : null,
+          multipleChoicePercentage,
+          essayPercentage,
+          academicYearId: academicYearId || null,
+          durationMinutes,
+          startAt: parseWIB(startAt),
+          endAt: parseWIB(endAt),
+          passingScore: passingScoreRaw ? Number(passingScoreRaw) : null,
+          randomizeQuestions,
+          randomizeOptions,
+          showResult,
+          status: status as "DRAFT" | "ACTIVE" | "CLOSED",
+          examType,
+          classes: classIds.length > 0
+            ? { create: classIds.map((cid) => ({ classId: cid })) }
+            : undefined,
+          questions: questionIds.length > 0
+            ? { create: questionIds.map((qid, index) => ({ questionId: qid, orderNumber: index + 1 })) }
+            : undefined,
+        },
+      });
+      if (questionSetId) {
+        await tx.questionSet.update({ where: { id: questionSetId }, data: { status: "USED" } });
+      }
+      return exam;
     });
     await logAudit({
       action: "CREATE_EXAM",
       entity: "exam",
       entityId: created.id,
-      details: { title, subjectId, teacherId, status, examType, classCount: classIds.length },
+      details: {
+        title,
+        subjectId,
+        teacherId,
+        questionSetId: questionSetId || null,
+        questionCount: questionIds.length,
+        status,
+        examType,
+        classCount: classIds.length,
+      },
     });
     revalidatePath("/admin/exams");
+    revalidatePath("/admin/question-sets");
     return { success: true };
   } catch {
     return { error: "Gagal membuat jadwal ujian" };
@@ -107,13 +183,16 @@ export async function updateExam(id: string, formData: FormData) {
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
   const academicYearId = String(formData.get("academicYearId") ?? "").trim();
+  const questionSetId = String(formData.get("questionSetId") ?? "").trim();
+  const requestedQuestionCount = Number(formData.get("requestedQuestionCount") ?? "0");
+  const multipleChoicePercentage = Number(formData.get("multipleChoicePercentage") ?? "100");
+  const essayPercentage = Number(formData.get("essayPercentage") ?? "0");
   const durationMinutes = Number(formData.get("durationMinutes") ?? "0");
   const startAt = String(formData.get("startAt") ?? "").trim();
   const endAt = String(formData.get("endAt") ?? "").trim();
   const passingScoreRaw = String(formData.get("passingScore") ?? "").trim();
   const status = String(formData.get("status") ?? "DRAFT").trim();
-  const examType = String(formData.get("examType") ?? "UH").trim() as
-    "UH" | "UTS" | "UAS" | "US" | "TRYOUT" | "LAINNYA";
+  const examType = String(formData.get("examType") ?? "UTS").trim() as "UTS" | "UAS" | "US";
   const randomizeQuestions = formData.get("randomizeQuestions") === "on";
   const randomizeOptions = formData.get("randomizeOptions") === "on";
   const showResult = formData.get("showResult") === "on";
@@ -123,17 +202,31 @@ export async function updateExam(id: string, formData: FormData) {
   if (!startAt || !endAt) return { error: "Waktu mulai dan selesai wajib diisi" };
   if (durationMinutes < 1) return { error: "Durasi minimal 1 menit" };
   if (new Date(startAt) >= new Date(endAt)) return { error: "Waktu mulai harus sebelum waktu selesai" };
+  if (!["UTS", "UAS", "US"].includes(examType)) return { error: "Jenis ujian hanya boleh UTS, UAS, atau US" };
+  if (requestedQuestionCount < 0) return { error: "Jumlah soal tidak valid" };
+  if (multipleChoicePercentage < 0 || essayPercentage < 0 || multipleChoicePercentage + essayPercentage !== 100) {
+    return { error: "Persentase PG dan esai harus berjumlah 100%" };
+  }
 
   try {
     const previous = await prisma.exam.findUnique({
       where: { id },
-      select: { title: true, status: true },
+      select: { title: true, status: true, questionSetId: true },
     });
-    await prisma.$transaction([
-      prisma.exam.update({
+    const questionIds = questionSetId && questionSetId !== previous?.questionSetId
+      ? await getQuestionIdsForExam(questionSetId, requestedQuestionCount > 0 ? requestedQuestionCount : null)
+      : null;
+    if (questionSetId && questionIds?.length === 0) return { error: "Paket soal tidak memiliki soal aktif" };
+
+    await prisma.$transaction(async (tx) => {
+      await tx.exam.update({
         where: { id },
         data: {
           title, subjectId, teacherId,
+          questionSetId: questionSetId || null,
+          requestedQuestionCount: questionSetId ? (requestedQuestionCount > 0 ? requestedQuestionCount : questionIds?.length ?? undefined) : null,
+          multipleChoicePercentage,
+          essayPercentage,
           academicYearId: academicYearId || null,
           durationMinutes,
           startAt: parseWIB(startAt),
@@ -143,15 +236,23 @@ export async function updateExam(id: string, formData: FormData) {
           status: status as "DRAFT" | "ACTIVE" | "CLOSED",
           examType,
         },
-      }),
-      // Replace class assignments
-      prisma.examClass.deleteMany({ where: { examId: id } }),
-      ...(classIds.length > 0
-        ? [prisma.examClass.createMany({
-            data: classIds.map((cid) => ({ examId: id, classId: cid })),
-          })]
-        : []),
-    ]);
+      });
+      await tx.examClass.deleteMany({ where: { examId: id } });
+      if (classIds.length > 0) {
+        await tx.examClass.createMany({
+          data: classIds.map((cid) => ({ examId: id, classId: cid })),
+        });
+      }
+      if (questionIds) {
+        await tx.examQuestion.deleteMany({ where: { examId: id } });
+        await tx.examQuestion.createMany({
+          data: questionIds.map((qid, index) => ({ examId: id, questionId: qid, orderNumber: index + 1 })),
+        });
+      }
+      if (questionSetId) {
+        await tx.questionSet.update({ where: { id: questionSetId }, data: { status: "USED" } });
+      }
+    });
     await logAudit({
       action: "UPDATE_EXAM",
       entity: "exam",
@@ -160,12 +261,15 @@ export async function updateExam(id: string, formData: FormData) {
         previousTitle: previous?.title ?? null,
         previousStatus: previous?.status ?? null,
         title,
+        questionSetId: questionSetId || null,
+        questionCount: questionIds?.length ?? null,
         status,
         examType,
         classCount: classIds.length,
       },
     });
     revalidatePath("/admin/exams");
+    revalidatePath("/admin/question-sets");
     return { success: true };
   } catch {
     return { error: "Gagal memperbarui jadwal ujian" };

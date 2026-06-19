@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminExamsPage() {
   const [exams, opts] = await Promise.all([
     getExams().catch(() => []),
-    getExamFormData().catch(() => ({ subjects: [], teachers: [], classes: [], academicYears: [] })),
+    getExamFormData().catch(() => ({ subjects: [], teachers: [], classes: [], academicYears: [], questionSets: [] })),
   ]);
 
   const active = exams.filter((e) => e.status === "ACTIVE").length;
