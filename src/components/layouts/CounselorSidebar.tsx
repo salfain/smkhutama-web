@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, MessagesSquare, ShieldAlert, Award, Inbox, ChevronRight, Menu,
-  CalendarDays, Gavel, Home, BookUser, ClipboardList, BarChart3,
+  CalendarDays, Gavel, Home, BookUser, ClipboardList, BarChart3, KeyRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -65,6 +65,13 @@ function SidebarContent({ user }: { user: UserInfo }) {
             <p className="truncate text-xs text-gray-400">Guru BK</p>
           </div>
         </div>
+        <Link
+          href="/counselor/change-password"
+          className="mb-2 flex items-center gap-2.5 rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <KeyRound className="h-3.5 w-3.5 text-amber-500" />
+          Ganti Password
+        </Link>
         <LogoutButton />
         <ThemeToggle className="w-full justify-start gap-2 h-9" />
       </div>

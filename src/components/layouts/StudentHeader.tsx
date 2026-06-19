@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ClipboardList, Trophy, HeartHandshake } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Trophy, HeartHandshake, KeyRound } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -66,6 +67,11 @@ export function StudentHeader({ user }: { user: UserInfo }) {
           })}
         </nav>
         <div className="flex items-center gap-1">
+          <Link href="/student/change-password">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-700" title="Ganti Password">
+              <KeyRound className="h-4 w-4 text-amber-500" />
+            </Button>
+          </Link>
           <ThemeToggle />
           <div className="text-right hidden sm:block">
             <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{user.name}</p>
