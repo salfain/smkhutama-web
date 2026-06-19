@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Eye, EyeOff, KeyRound, CheckCircle2 } from "lucide-react";
 import { changePasswordAction } from "./actions";
+import { logoutAction } from "@/app/login/actions";
 
 export function ChangePasswordForm() {
   const [showCurrent, setShowCurrent] = useState(false);
@@ -14,7 +15,23 @@ export function ChangePasswordForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [err, setErr] = useState("");
   const [success, setSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!success) return;
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          logoutAction(); // Hapus sesi dan redirect ke login
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [success]);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -47,7 +64,7 @@ export function ChangePasswordForm() {
           <div className="rounded-lg bg-green-50 dark:bg-green-950/20 p-4 border border-green-200 dark:border-green-800/40 text-center space-y-2">
             <CheckCircle2 className="mx-auto h-8 w-8 text-green-500" />
             <p className="text-sm font-semibold text-green-800 dark:text-green-400">Password Berhasil Diubah!</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Gunakan password baru Anda untuk login berikutnya.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Mengalihkan ke halaman login dalam {countdown} detik...</p>
           </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
