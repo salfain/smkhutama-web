@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,6 +62,16 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [redirecting, setRedirecting] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Update title tab browser secara dinamis
+  useEffect(() => {
+    const systemNames: Record<System, string> = {
+      CBT: "Login CBT",
+      SIBIKONS: "Login SIBIKONS",
+      PIKET: "Login Piket",
+    };
+    document.title = `${systemNames[system]} | SMK Hutama`;
+  }, [system]);
 
   const sys = systemConfig[system];
   const cfg = roleConfig[role];
