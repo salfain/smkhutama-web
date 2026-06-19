@@ -1,54 +1,133 @@
-import { getHomeVisitDetail } from "../../../bk-actions";
+import { prisma } from "@/lib/prisma";
+import { requireCounselorAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
-import { PrintButton } from "../../../cases/[id]/print/PrintButton";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Laporan Kunjungan Rumah" };
+
+function fmtDate(d: Date | string | null) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("id-ID", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  });
+}
 
 export default async function HomeVisitPrintPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireCounselorAuth();
   const { id } = await params;
-  const h = await getHomeVisitDetail(id);
-  if (!h) notFound();
 
-  const tgl = new Date(h.visitDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const visit = await prisma.homeVisit.findUnique({
+    where: { id },
+    include: {
+      student: {
+        include: {
+          user: { select: { name: true } },
+          class: { select: { name: true } },
+          major: { select: { name: true } },
+        },
+      },
+      counselor: { include: { user: { select: { name: true } } } },
+    },
+  });
+
+  if (!visit) notFound();
+
+  const school = await prisma.schoolProfile.findFirst();
+  const nomorSurat = `KR-${new Date(visit.visitDate).getFullYear()}-${id.slice(-4).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
-      <PrintButton />
-      <div className="print-doc mx-auto max-w-3xl bg-white p-10 shadow-lg print:max-w-none print:shadow-none print:p-0">
-        <div className="border-b-2 border-black pb-4 text-center">
-          <h1 className="text-lg font-bold uppercase">SMK Hutama Pondok Gede</h1>
-          <p className="text-sm">Bimbingan Konseling (BK)</p>
-          <p className="text-xs text-gray-600">Jl. Raya Hankam No.37, Jatirahayu, Pondok Melati, Kota Bekasi</p>
-        </div>
-        <h2 className="mt-6 text-center text-base font-bold uppercase underline">Laporan Kunjungan Rumah</h2>
-        <table className="mt-6 w-full text-sm">
-          <tbody>
-            <Row label="Nama Siswa" value={h.studentName} />
-            <Row label="NIS" value={h.studentNis || "-"} />
-            <Row label="Kelas" value={h.className} />
-            <Row label="Tanggal Kunjungan" value={tgl} />
-            <Row label="Alamat" value={h.address || "-"} />
-          </tbody>
-        </table>
-        <Section title="Tujuan Kunjungan" content={h.purpose} />
-        {h.findings && <Section title="Temuan / Kondisi" content={h.findings} />}
-        {h.result && <Section title="Hasil / Kesepakatan" content={h.result} />}
-        <div className="mt-12 flex justify-end">
-          <div className="text-center text-sm">
-            <p>Bekasi, {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
-            <p>Guru Bimbingan Konseling</p>
-            <div className="h-20" />
-            <p className="font-semibold underline">{h.counselorName}</p>
+      <div className="print:hidden fixed top-4 right-4 z-50 flex gap-2">
+        <button id="back-btn" className="rounded-lg border bg-white px-4 py-2 text-sm font-medium shadow hover:bg-gray-50">
+          ← Kembali
+        </button>
+        <button id="print-btn" className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-purple-700">
+          🖨️ Cetak / PDF
+        </button>
+      </div>
+      <script dangerouslySetInnerHTML={{ __html: `
+        document.getElementById('print-btn').onclick = function() { window.print(); };
+        document.getElementById('back-btn').onclick = function() { window.history.back(); };
+      ` }} />
+
+      <div className="mx-auto max-w-2xl bg-white p-12 shadow-lg print:max-w-none print:shadow-none print:p-8">
+        {/* Kop */}
+        <div className="flex items-start gap-4 border-b-2 border-black pb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/api/school/logo" alt="Logo" className="h-16 w-16 object-contain shrink-0"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          <div className="flex-1 text-center">
+            <p className="text-lg font-extrabold uppercase tracking-wide">{school?.name ?? "SMK Hutama Pondok Gede"}</p>
+            <p className="text-xs text-gray-600 mt-0.5">Sekolah Menengah Kejuruan</p>
+            {school?.address && <p className="text-xs text-gray-600 mt-0.5">{school.address}</p>}
+            {school?.npsn && <p className="text-xs text-gray-500 mt-0.5">NPSN: {school.npsn}</p>}
           </div>
         </div>
+
+        {/* Judul */}
+        <div className="mt-6 text-center">
+          <h2 className="text-sm font-bold uppercase tracking-widest">Laporan Kunjungan Rumah (Home Visit)</h2>
+          <p className="text-xs text-gray-500 mt-1">No: {nomorSurat}</p>
+        </div>
+
+        <p className="mt-6 text-sm leading-7">
+          Dengan ini melaporkan hasil kunjungan rumah yang telah dilaksanakan oleh Guru Bimbingan Konseling {school?.name ?? "SMK Hutama"} dengan data sebagai berikut:
+        </p>
+
+        {/* Data */}
+        <table className="mt-4 w-full text-sm">
+          <tbody>
+            <tr><td className="w-44 py-1 font-medium">Nama Siswa</td><td className="w-3 py-1">:</td><td className="py-1 font-semibold">{visit.student.user.name}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{visit.student.class?.name ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Jurusan</td><td className="w-3 py-1">:</td><td className="py-1">{visit.student.major?.name ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Tanggal Kunjungan</td><td className="w-3 py-1">:</td><td className="py-1">{fmtDate(visit.visitDate)}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Alamat</td><td className="w-3 py-1">:</td><td className="py-1">{visit.address ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Tujuan Kunjungan</td><td className="w-3 py-1">:</td><td className="py-1">{visit.purpose}</td></tr>
+          </tbody>
+        </table>
+
+        {visit.findings && (
+          <>
+            <p className="mt-5 text-sm font-semibold">Temuan / Kondisi di Lapangan:</p>
+            <p className="mt-1 text-sm leading-7 text-gray-700 border-l-2 border-gray-200 pl-3">{visit.findings}</p>
+          </>
+        )}
+
+        {visit.result && (
+          <>
+            <p className="mt-4 text-sm font-semibold">Hasil & Kesepakatan:</p>
+            <p className="mt-1 text-sm leading-7 text-gray-700 border-l-2 border-gray-200 pl-3">{visit.result}</p>
+          </>
+        )}
+
+        <p className="mt-6 text-sm leading-7">
+          Demikian laporan kunjungan rumah ini dibuat sebagai dokumentasi pelaksanaan layanan bimbingan konseling.
+        </p>
+
+        {/* TTD */}
+        <div className="mt-10 flex justify-between text-sm">
+          <div className="text-center w-52">
+            <p>Orang Tua / Wali,</p>
+            <div className="h-20" />
+            <p className="font-semibold">( ________________________ )</p>
+          </div>
+          <div className="text-center w-52">
+            <p>{school?.address ? school.address.split(",").slice(-1)[0]?.trim() : "Bekasi"}, {fmtDate(visit.visitDate)}</p>
+            <p className="mt-1">Guru Bimbingan Konseling,</p>
+            <div className="h-16" />
+            <p className="font-semibold underline">{visit.counselor.user.name}</p>
+            <p className="text-xs text-gray-500">Guru BK</p>
+          </div>
+        </div>
+
+        <div className="mt-8 border-t border-dashed border-gray-300 pt-3">
+          <p className="text-[10px] text-gray-400 text-center">
+            Dokumen ini dicetak oleh sistem SIBIKONS SMK Hutama · {new Date().toLocaleString("id-ID")}
+          </p>
+        </div>
       </div>
+
+      <style>{`@media print { @page { size: A4; margin: 15mm; } body { -webkit-print-color-adjust: exact; } }`}</style>
     </div>
   );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (<tr><td className="w-40 py-1 align-top font-medium">{label}</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top">{value}</td></tr>);
-}
-function Section({ title, content }: { title: string; content: string }) {
-  return (<div className="mt-5"><p className="text-sm font-bold">{title}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-gray-800">{content}</p></div>);
 }
