@@ -15,6 +15,7 @@ type UserInfo = { name: string; subjectName: string | null };
 
 const navItems = [
   { href: "/teacher/dashboard",     icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/teacher/question-sets",  icon: ClipboardList,   label: "Paket Bank Soal" },
   { href: "/teacher/questions",     icon: FileText,        label: "Bank Soal" },
   { href: "/teacher/exams",         icon: ClipboardList,   label: "Paket Ujian" },
   { href: "/teacher/monitoring",    icon: MonitorCheck,    label: "Monitoring" },
