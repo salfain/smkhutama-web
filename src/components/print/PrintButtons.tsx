@@ -68,3 +68,15 @@ export function SchoolLogo() {
     />
   );
 }
+
+export function SchoolLogoSmall() {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/api/school/logo"
+      alt="Logo"
+      style={{ height: "12mm", width: "12mm", objectFit: "contain", display: "block", margin: "0 auto 1mm" }}
+      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+    />
+  );
+}

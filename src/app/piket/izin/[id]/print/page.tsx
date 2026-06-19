@@ -1,14 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { requirePiketAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
-import { PrintButtons, SchoolLogo } from "@/components/print/PrintButtons";
+import { PrintButtons, SchoolLogoSmall } from "@/components/print/PrintButtons";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Surat Izin Keluar" };
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("id-ID", {
-    weekday: "long", day: "numeric", month: "long", year: "numeric",
+    day: "numeric", month: "long", year: "numeric",
   });
 }
 function formatTime(d: Date | null) {
@@ -36,103 +36,129 @@ export default async function IzinPrintPage({ params }: { params: Promise<{ id: 
   if (!permit) notFound();
 
   const school = await prisma.schoolProfile.findFirst();
-
-  // Ambil nama guru piket yang mencatat
   const piketUser = await prisma.user.findUnique({
     where: { id: permit.recordedBy },
     select: { name: true },
   }).catch(() => null);
 
-  // Nomor surat format: IZIN-YYYYMMDD-XXXX (4 digit dari ID)
   const nomorSurat = `IZIN-${new Date(permit.date).getFullYear()}${String(new Date(permit.date).getMonth() + 1).padStart(2, "0")}${String(new Date(permit.date).getDate()).padStart(2, "0")}-${id.slice(-4).toUpperCase()}`;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
+    <div className="min-h-screen bg-gray-200 py-6 print:bg-white print:py-0">
       <PrintButtons />
 
-      {/* Dokumen surat */}
-      <div className="mx-auto max-w-2xl bg-white p-12 shadow-lg print:max-w-none print:shadow-none print:p-8">
+      {/* Pilihan ukuran — disembunyikan saat print */}
+      <div className="print:hidden mb-4 flex justify-center gap-3 text-xs text-gray-500">
+        <span className="font-medium">Format: Struk Thermal (80mm)</span>
+      </div>
 
-        {/* Kop surat */}
-        <div className="flex items-start gap-4 border-b-2 border-black pb-4">
-          <SchoolLogo />
-          <div className="flex-1 text-center">
-            <p className="text-lg font-extrabold uppercase tracking-wide">
-              {school?.name ?? "SMK Hutama Pondok Gede"}
-            </p>
-            <p className="text-xs text-gray-600 mt-0.5">Sekolah Menengah Kejuruan</p>
-            {school?.address && (
-              <p className="text-xs text-gray-600 mt-0.5">{school.address}</p>
-            )}
-            {school?.npsn && (
-              <p className="text-xs text-gray-500 mt-0.5">NPSN: {school.npsn}</p>
-            )}
+      {/* Struk thermal — lebar 80mm */}
+      <div
+        className="mx-auto bg-white print:mx-0 print:shadow-none"
+        style={{ width: "80mm", padding: "4mm 5mm", fontFamily: "monospace, sans-serif" }}
+      >
+        {/* Header sekolah */}
+        <div style={{ textAlign: "center", marginBottom: "3mm" }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "2mm" }}>
+            <SchoolLogoSmall />
           </div>
+          <p style={{ fontSize: "9pt", fontWeight: "bold", textTransform: "uppercase", margin: 0 }}>
+            {school?.name ?? "SMK Hutama"}
+          </p>
+          {school?.address && (
+            <p style={{ fontSize: "7pt", color: "#555", margin: "0.5mm 0 0" }}>
+              {school.address}
+            </p>
+          )}
+          {school?.npsn && (
+            <p style={{ fontSize: "7pt", color: "#777", margin: "0.5mm 0 0" }}>
+              NPSN: {school.npsn}
+            </p>
+          )}
         </div>
 
-        {/* Judul surat */}
-        <div className="mt-6 text-center">
-          <h2 className="text-sm font-bold uppercase tracking-widest">Surat Izin Keluar Sekolah</h2>
-          <p className="text-xs text-gray-500 mt-1">No: {nomorSurat}</p>
+        {/* Garis pemisah */}
+        <div style={{ borderTop: "1.5px solid black", margin: "2mm 0" }} />
+
+        {/* Judul */}
+        <div style={{ textAlign: "center", margin: "2mm 0" }}>
+          <p style={{ fontSize: "9pt", fontWeight: "bold", textTransform: "uppercase", margin: 0 }}>
+            SURAT IZIN KELUAR
+          </p>
+          <p style={{ fontSize: "7pt", color: "#666", margin: "0.5mm 0 0" }}>
+            No: {nomorSurat}
+          </p>
         </div>
 
-        {/* Isi surat */}
-        <p className="mt-6 text-sm leading-7">
-          Yang bertanda tangan di bawah ini, Guru Piket {school?.name ?? "SMK Hutama Pondok Gede"},
-          memberikan izin kepada siswa berikut untuk meninggalkan sekolah pada jam pelajaran:
-        </p>
+        <div style={{ borderTop: "1px dashed #999", margin: "2mm 0" }} />
 
         {/* Data siswa */}
-        <table className="mt-5 w-full text-sm">
+        <table style={{ width: "100%", fontSize: "8pt", borderCollapse: "collapse" }}>
           <tbody>
-            <tr><td className="w-44 py-1 font-medium align-top">Nama Siswa</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top font-semibold">{permit.student.user.name}</td></tr>
-            <tr><td className="w-44 py-1 font-medium align-top">Kelas</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top">{permit.student.class?.name ?? "—"}</td></tr>
-            <tr><td className="w-44 py-1 font-medium align-top">Jurusan</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top">{permit.student.major?.name ?? "—"}</td></tr>
-            <tr><td className="w-44 py-1 font-medium align-top">Keperluan / Alasan</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top">{permit.reason}</td></tr>
-            <tr><td className="w-44 py-1 font-medium align-top">Tanggal</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top">{formatDate(permit.date)}</td></tr>
-            <tr><td className="w-44 py-1 font-medium align-top">Jam Keluar</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top">{formatTime(permit.exitTime)}</td></tr>
-            <tr><td className="w-44 py-1 font-medium align-top">Jam Kembali (rencana)</td><td className="w-3 py-1 align-top">:</td><td className="py-1 align-top text-gray-500">__________ WIB</td></tr>
+            {[
+              ["Nama", permit.student.user.name],
+              ["Kelas", permit.student.class?.name ?? "—"],
+              ["Jurusan", permit.student.major?.name ?? "—"],
+              ["Keperluan", permit.reason],
+              ["Tanggal", formatDate(permit.date)],
+              ["Jam Keluar", formatTime(permit.exitTime)],
+              ["Jam Kembali", "____________"],
+            ].map(([label, value]) => (
+              <tr key={label}>
+                <td style={{ paddingBottom: "1.5mm", width: "22mm", verticalAlign: "top", color: "#555" }}>
+                  {label}
+                </td>
+                <td style={{ paddingBottom: "1.5mm", width: "3mm", verticalAlign: "top" }}>:</td>
+                <td style={{ paddingBottom: "1.5mm", fontWeight: label === "Nama" ? "bold" : "normal", verticalAlign: "top" }}>
+                  {value}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
-        <p className="mt-6 text-sm leading-7">
-          Demikian surat izin ini dibuat untuk dipergunakan sebagaimana mestinya.
-          Siswa wajib kembali ke sekolah sesuai waktu yang telah disepakati.
-        </p>
+        <div style={{ borderTop: "1px dashed #999", margin: "2mm 0" }} />
 
         {/* Tanda tangan */}
-        <div className="mt-10 flex justify-between text-sm">
-          <div className="text-center w-52">
-            <p>Siswa,</p>
-            <div className="h-20" />
-            <p className="font-semibold">( {permit.student.user.name} )</p>
-          </div>
-          <div className="text-center w-52">
-            <p>
-              {school?.address
-                ? school.address.split(",").slice(-1)[0]?.trim()
-                : "Bekasi"}
-              , {formatDate(permit.date)}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7.5pt", marginTop: "2mm" }}>
+          <div style={{ textAlign: "center", width: "35mm" }}>
+            <p style={{ margin: 0 }}>Siswa,</p>
+            <div style={{ height: "12mm" }} />
+            <p style={{ margin: 0, fontWeight: "bold" }}>
+              ({permit.student.user.name.split(" ").slice(0, 2).join(" ")})
             </p>
-            <p className="mt-1">Guru Piket,</p>
-            <div className="h-16" />
-            <p className="font-semibold underline">{piketUser?.name ?? "Guru Piket"}</p>
-            <p className="text-xs text-gray-500">Guru Piket</p>
+          </div>
+          <div style={{ textAlign: "center", width: "35mm" }}>
+            <p style={{ margin: 0 }}>Guru Piket,</p>
+            <div style={{ height: "12mm" }} />
+            <p style={{ margin: 0, fontWeight: "bold", textDecoration: "underline" }}>
+              ({piketUser?.name ?? "Guru Piket"})
+            </p>
           </div>
         </div>
 
-        {/* Catatan kecil */}
-        <div className="mt-8 border-t border-dashed border-gray-300 pt-4">
-          <p className="text-[10px] text-gray-400 text-center">
-            Dokumen ini dicetak oleh sistem piket digital SMK Hutama · {new Date().toLocaleString("id-ID")}
-          </p>
-        </div>
+        {/* Footer */}
+        <div style={{ borderTop: "1px dashed #999", margin: "3mm 0 1mm" }} />
+        <p style={{ fontSize: "6pt", textAlign: "center", color: "#999", margin: 0 }}>
+          Wajib kembali tepat waktu
+        </p>
+        <p style={{ fontSize: "6pt", textAlign: "center", color: "#bbb", margin: "0.5mm 0 0" }}>
+          {new Date().toLocaleString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+        </p>
       </div>
 
       <style>{`
         @media print {
-          @page { size: A4; margin: 15mm; }
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          @page {
+            /* Format thermal 80mm — tinggi otomatis sesuai konten */
+            size: 80mm auto;
+            margin: 0;
+          }
+          body {
+            margin: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
         }
       `}</style>
     </div>
