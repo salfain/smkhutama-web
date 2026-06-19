@@ -3,12 +3,12 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Calendar } from "lucide-react";
 
-export function PiketDateFilter() {
+export function PiketDateFilter({ currentDate: propDate }: { currentDate?: string } = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentDate = searchParams.get("date") || new Date().toISOString().slice(0, 10);
+  const currentDate = propDate ?? searchParams.get("date") ?? new Date().toISOString().slice(0, 10);
 
   function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const nextDate = e.target.value;
