@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  AlertCircle, CheckCircle2, Download, FileSpreadsheet, Search, Upload,
+  AlertCircle, CheckCircle2, Download, Eye, FileSpreadsheet, Search, Upload,
 } from "lucide-react";
 import { importQuestionSetForTeacher, updateQuestionSetStatus } from "./actions";
 
@@ -249,6 +250,12 @@ export function QuestionSetsAdminClient({
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm" variant="outline" className="gap-1.5">
+                    <Link href={`/admin/question-sets/${set.id}`}>
+                      <Eye className="h-4 w-4" />
+                      Detail
+                    </Link>
+                  </Button>
                   {set.status !== "APPROVED" && (
                     <Button size="sm" variant="outline" disabled={statusPending} onClick={() => changeStatus(set.id, "APPROVED")}>
                       Setujui

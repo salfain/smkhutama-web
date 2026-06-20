@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, CheckCircle2, Download, FileSpreadsheet, Upload } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, Eye, FileSpreadsheet, Upload } from "lucide-react";
 import { importQuestionSet } from "./actions";
 
 type Subject = { id: string; name: string; code: string };
@@ -184,6 +185,15 @@ export function QuestionSetsClient({
                       {set.invalidCount} baris dilewati
                     </Badge>
                   )}
+                </div>
+
+                <div className="mt-3">
+                  <Button asChild size="sm" variant="outline" className="gap-1.5">
+                    <Link href={`/teacher/question-sets/${set.id}`}>
+                      <Eye className="h-4 w-4" />
+                      Detail
+                    </Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
