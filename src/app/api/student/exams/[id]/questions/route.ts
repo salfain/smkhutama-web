@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
+import { buildMobileExamPayload } from "@/lib/mobile-exam";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "STUDENT");
@@ -24,34 +25,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const attempt = await prisma.studentExamAttempt.findUnique({
     where: { examId_studentId: { examId, studentId: student.id } },
-    include: { answers: { select: { questionId: true, selectedOptionId: true, answerText: true, isDoubtful: true } } },
+    include: { answers: { select: { questionId: true, selectedOptionId: true, answerText: true, isDoubtful: true, savedAt: true } } },
   });
   if (!attempt) return NextResponse.json({ error: "Belum mulai ujian" }, { status: 400 });
-
-  const startedAt = attempt.startedAt ?? new Date();
-  const expiresByDuration = new Date(startedAt.getTime() + exam.durationMinutes * 60000);
-  const expiresByExam = new Date(exam.endAt);
-  const expiresAt = expiresByDuration < expiresByExam ? expiresByDuration : expiresByExam;
-
-  let questions = exam.questions.map((eq) => ({
-    id: eq.question.id,
-    questionText: eq.question.questionText,
-    questionType: eq.question.questionType,
-    mediaType: eq.question.mediaType,
-    mediaUrl: eq.question.mediaUrl,
-    options: eq.question.options.map((o) => ({ id: o.id, label: o.optionLabel, text: o.optionText })),
-  }));
-
-  if (exam.randomizeQuestions) questions = questions.sort(() => Math.random() - 0.5);
-
-  const answersMap: Record<string, { selectedOptionId?: string | null; answerText?: string | null; isDoubtful: boolean }> = {};
-  for (const a of attempt.answers) {
-    answersMap[a.questionId] = { selectedOptionId: a.selectedOptionId, answerText: a.answerText, isDoubtful: a.isDoubtful };
-  }
-
-  return NextResponse.json({
-    examId: exam.id, title: exam.title, subject: exam.subject,
-    durationMinutes: exam.durationMinutes, expiresAt: expiresAt.toISOString(),
-    randomizeOptions: exam.randomizeOptions, questions, answers: answersMap,
-  });
+  return NextResponse.json(buildMobileExamPayload(exam, attempt));
 }
