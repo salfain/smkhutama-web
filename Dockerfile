@@ -52,6 +52,7 @@ COPY --from=builder /app/public ./public
 
 # Prisma schema (untuk runtime migrations)
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # package.json (dibutuhkan Prisma runtime)
 COPY --from=builder /app/package.json ./package.json
