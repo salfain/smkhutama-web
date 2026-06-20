@@ -16,7 +16,13 @@ export async function GET(req: NextRequest) {
     prisma.studentPermit.findMany({
       where: { date: { gte: start, lte: end } },
       include: {
-        student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } }
+        student: {
+          include: {
+            user: { select: { name: true } },
+            class: { select: { name: true } },
+            major: { select: { name: true } },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     }),
@@ -31,6 +37,7 @@ export async function GET(req: NextRequest) {
       id: p.id,
       studentName: p.student.user.name,
       className: p.student.class?.name ?? "—",
+      major: p.student.major?.name ?? "-",
       reason: p.reason,
       exitTime: p.exitTime,
       returnTime: p.returnTime,

@@ -44,8 +44,8 @@ const systemConfig: Record<System, {
   },
   PIKET: {
     title: "Guru Piket",
-    subtitle: "Untuk Guru Piket",
-    roles: ["PIKET"],
+    subtitle: "Untuk guru yang sedang terjadwal piket",
+    roles: ["TEACHER"],
     accent: "amber",
     icon: ClipboardList,
     tagline: "Sistem pencatatan ketertiban harian: kehadiran guru, keterlambatan siswa, dan izin keluar/masuk.",
@@ -75,6 +75,8 @@ export default function LoginPage() {
 
   const sys = systemConfig[system];
   const cfg = roleConfig[role];
+  const loginLabel = system === "PIKET" && role === "TEACHER" ? "Guru Piket" : cfg.label;
+  const loginButtonBg = system === "PIKET" ? "bg-amber-500 hover:bg-amber-600" : cfg.bg;
 
   function selectSystem(s: System) {
     setSystem(s);
@@ -86,7 +88,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     startTransition(async () => {
-      const r = await loginAction(username.trim(), password, role);
+      const r = await loginAction(username.trim(), password, role, system);
       if ("error" in r) setError(r.error);
       else {
         // Simpan system aktif untuk student di cookie agar bisa dibaca di server & client
@@ -213,13 +215,13 @@ export default function LoginPage() {
                 </div>
               </div>
               {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600 dark:bg-red-950/20 dark:border-red-900/50 dark:text-red-400">{error}</p>}
-              <Button type="submit" className={`w-full h-11 ${cfg.bg} font-semibold`} disabled={pending}>
+              <Button type="submit" className={`w-full h-11 ${loginButtonBg} font-semibold`} disabled={pending}>
                 {pending ? (
                   <span className="flex items-center gap-2">
                     <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />Memproses...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2"><LogIn className="h-4 w-4" />Masuk sebagai {cfg.label}</span>
+                  <span className="flex items-center gap-2"><LogIn className="h-4 w-4" />Masuk sebagai {loginLabel}</span>
                 )}
               </Button>
             </form>
@@ -239,7 +241,7 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <p>Guru Piket: <span className="font-mono text-slate-900 dark:text-white">piket.hutama</span> / <span className="font-mono text-slate-900 dark:text-white">piket123</span></p>
+                  <p>Gunakan akun guru yang dijadwalkan piket oleh admin.</p>
                 </>
               )}
             </div>

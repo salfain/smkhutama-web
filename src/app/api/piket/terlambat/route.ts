@@ -49,16 +49,19 @@ export async function POST(req: NextRequest) {
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
   const body = await req.json().catch(() => ({}));
-  const { studentId, reason, sanction, arrivalTime } = body;
+  const { studentId, reason, sanction, arrivalTime, date } = body;
 
   if (!studentId) return NextResponse.json({ error: "studentId wajib diisi" }, { status: 400 });
 
   let at: Date;
+  const recordDateStr = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)
+    ? date
+    : new Date().toISOString().slice(0, 10);
+  const recordDate = new Date(`${recordDateStr}T00:00:00`);
   if (arrivalTime) {
     // Bisa berupa "HH:mm" atau ISO string
     if (/^\d{2}:\d{2}$/.test(String(arrivalTime))) {
-      const today = new Date().toISOString().slice(0, 10);
-      at = new Date(`${today}T${arrivalTime}:00`);
+      at = new Date(`${recordDateStr}T${arrivalTime}:00`);
     } else {
       at = new Date(arrivalTime);
     }
@@ -72,6 +75,7 @@ export async function POST(req: NextRequest) {
       studentId,
       recordedBy: r.user.id,
       arrivalTime: at,
+      date: recordDate,
       reason: reason || null,
       sanction: sanction || null,
     },

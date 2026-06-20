@@ -49,11 +49,15 @@ export async function POST(req: NextRequest) {
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
   const body = await req.json().catch(() => ({}));
-  const { teacherId, classId, status, period, substitute, note } = body;
+  const { teacherId, classId, status, period, substitute, note, date } = body;
 
   if (!teacherId || !classId) {
     return NextResponse.json({ error: "teacherId dan classId wajib diisi" }, { status: 400 });
   }
+
+  const recordDate = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)
+    ? new Date(`${date}T00:00:00`)
+    : new Date();
 
   const record = await prisma.teacherAttendance.create({
     data: {
@@ -61,6 +65,7 @@ export async function POST(req: NextRequest) {
       classId,
       recordedBy: r.user.id,
       status: status || "HADIR",
+      date: recordDate,
       period: period || null,
       substitute: substitute || null,
       note: note || null,

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "./prisma";
 import { redirect } from "next/navigation";
+import { isTeacherScheduledForPiket } from "./piket-schedule";
 
 const COOKIE_NAME = "cbt-session";
 
@@ -59,8 +60,12 @@ export async function requireCounselorAuth() {
 export async function requirePiketAuth() {
   const user = await getSession();
   if (!user) redirect("/login");
-  if (user.role !== "PIKET" && user.role !== "ADMIN") redirect("/login");
-  return user;
+  if (user.role === "ADMIN" || user.role === "PIKET") return user;
+  if (user.role === "TEACHER" && user.teacher) {
+    const scheduled = await isTeacherScheduledForPiket(user.teacher.id);
+    if (scheduled) return user;
+  }
+  redirect("/login");
 }
 
 export async function requireCmsAuth() {

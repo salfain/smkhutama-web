@@ -38,6 +38,7 @@ const navItems = [
   { href: "/admin/subjects", icon: BookOpen, label: "Mata Pelajaran" },
   { href: "/admin/academic-years", icon: CalendarDays, label: "Tahun Ajaran" },
   { href: "/admin/exams", icon: UserCog, label: "Jadwal Ujian" },
+  { href: "/admin/piket-schedules", icon: CalendarDays, label: "Jadwal Piket" },
   { href: "/admin/question-sets", icon: ClipboardList, label: "Paket Soal" },
   { href: "/admin/tokens", icon: KeyRound, label: "Token Ujian" },
   { href: "/admin/monitoring", icon: MonitorCheck, label: "Monitoring" },

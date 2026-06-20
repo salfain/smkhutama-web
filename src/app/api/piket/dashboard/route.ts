@@ -6,8 +6,10 @@ export async function GET(req: NextRequest) {
   const r = await requirePiketApiAuth(req);
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
-  const start = new Date(); start.setHours(0, 0, 0, 0);
-  const end   = new Date(); end.setHours(23, 59, 59, 999);
+  const dateStr = req.nextUrl.searchParams.get("date");
+  const date = dateStr ? new Date(dateStr) : new Date();
+  const start = new Date(date); start.setHours(0, 0, 0, 0);
+  const end   = new Date(date); end.setHours(23, 59, 59, 999);
 
   const [tardiness, permits, absences, activePermits] = await Promise.all([
     prisma.studentTardiness.count({ where: { date: { gte: start, lte: end } } }),

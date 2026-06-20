@@ -273,6 +273,7 @@ model Teacher {
   exams           Exam[]
   homeroomClasses Class[]             @relation("Homeroom")
   attendances     TeacherAttendance[]
+  piketSchedules  PiketSchedule[]
 
   @@map("teachers")
 }
@@ -906,6 +907,22 @@ model SurveyAnswer {
 // ============================================
 // GURU PIKET MODELS
 // ============================================
+
+/// Jadwal guru piket mingguan yang ditentukan admin
+model PiketSchedule {
+  id        String   @id @default(uuid())
+  teacherId String   @map("teacher_id")
+  dayOfWeek Int      @map("day_of_week") // 0 Minggu, 1 Senin, ... 6 Sabtu
+  isActive  Boolean  @default(true) @map("is_active")
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, dayOfWeek])
+  @@map("piket_schedules")
+}
 
 /// Kehadiran guru di kelas (dicatat guru piket)
 model TeacherAttendance {
