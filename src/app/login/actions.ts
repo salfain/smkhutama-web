@@ -11,6 +11,14 @@ type LoginResult =
   | { error: string }
   | { success: true; redirectTo: string };
 
+export async function getStudentWebLoginEnabled() {
+  const setting = await prisma.systemSetting.findUnique({
+    where: { key: "allow_student_web_login" },
+    select: { value: true },
+  });
+  return setting?.value === "true";
+}
+
 export async function loginAction(
   username: string,
   password: string,
@@ -28,6 +36,13 @@ export async function loginAction(
     if (!user.isActive) return { error: "Akun Anda nonaktif. Hubungi admin." };
     if (user.role !== expectedRole) {
       return { error: `Akun ini bukan akun ${expectedRole.toLowerCase()}.` };
+    }
+
+    if (expectedRole === "STUDENT") {
+      const allowed = await getStudentWebLoginEnabled();
+      if (!allowed) {
+        return { error: "Login siswa melalui website sedang dinonaktifkan. Silakan gunakan aplikasi mobile." };
+      }
     }
 
     const ok = await verifyPassword(password, user.passwordHash);

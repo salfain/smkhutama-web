@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useMemo, useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, LogIn, ArrowLeft, GraduationCap, HeartHandshake, ClipboardList } from "lucide-react";
-import { loginAction } from "./actions";
+import { getStudentWebLoginEnabled, loginAction } from "./actions";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "PIKET";
@@ -61,6 +61,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [redirecting, setRedirecting] = useState(false);
+  const [allowStudentWebLogin, setAllowStudentWebLogin] = useState(false);
   const [pending, startTransition] = useTransition();
 
   // Update title tab browser secara dinamis
@@ -73,14 +74,34 @@ export default function LoginPage() {
     document.title = `${systemNames[system]} | SMK Hutama`;
   }, [system]);
 
+  useEffect(() => {
+    let active = true;
+    getStudentWebLoginEnabled()
+      .then((enabled) => {
+        if (!active) return;
+        setAllowStudentWebLogin(enabled);
+      })
+      .catch(() => {
+        if (active) setAllowStudentWebLogin(false);
+      });
+    return () => { active = false; };
+  }, []);
+
   const sys = systemConfig[system];
-  const cfg = roleConfig[role];
-  const loginLabel = system === "PIKET" && role === "TEACHER" ? "Guru Piket" : cfg.label;
+  const roles = useMemo(() => (
+    allowStudentWebLogin ? sys.roles : sys.roles.filter((item) => item !== "STUDENT")
+  ), [allowStudentWebLogin, sys.roles]);
+  const activeRole = roles.includes(role) ? role : (roles[0] ?? "TEACHER");
+  const cfg = roleConfig[activeRole];
+  const loginLabel = system === "PIKET" && activeRole === "TEACHER" ? "Guru Piket" : cfg.label;
   const loginButtonBg = system === "PIKET" ? "bg-amber-500 hover:bg-amber-600" : cfg.bg;
 
   function selectSystem(s: System) {
     setSystem(s);
-    setRole(systemConfig[s].roles[0]);
+    const nextRoles = allowStudentWebLogin
+      ? systemConfig[s].roles
+      : systemConfig[s].roles.filter((item) => item !== "STUDENT");
+    setRole(nextRoles[0] ?? "TEACHER");
     setError("");
   }
 
@@ -88,18 +109,18 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     startTransition(async () => {
-      const r = await loginAction(username.trim(), password, role, system);
+      const r = await loginAction(username.trim(), password, activeRole, system);
       if ("error" in r) setError(r.error);
       else {
         // Simpan system aktif untuk student di cookie agar bisa dibaca di server & client
-        if (role === "STUDENT") {
+        if (activeRole === "STUDENT") {
           document.cookie = `student-system=${system}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
         } else {
           document.cookie = "student-system=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         }
 
         // Siswa yang masuk lewat SIBIKONS diarahkan ke portal BK siswa
-        const dest = system === "SIBIKONS" && role === "STUDENT" ? "/student/bk" : r.redirectTo;
+        const dest = system === "SIBIKONS" && activeRole === "STUDENT" ? "/student/bk" : r.redirectTo;
         setRedirecting(true);
         window.location.href = dest;
       }
@@ -186,13 +207,13 @@ export default function LoginPage() {
             </div>
 
             {/* Role tabs — hanya tampil bila lebih dari 1 role */}
-            {sys.roles.length > 1 && (
-              <div className={`mb-6 grid gap-2 rounded-xl bg-gray-100 p-1 dark:bg-slate-950 ${sys.roles.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-                {sys.roles.map((key) => (
+            {roles.length > 1 && (
+              <div className={`mb-6 grid gap-2 rounded-xl bg-gray-100 p-1 dark:bg-slate-950 ${roles.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                {roles.map((key) => (
                   <button key={key} type="button"
                     onClick={() => { setRole(key); setError(""); }}
                     className={`rounded-lg py-2 text-sm font-medium transition-all ${
-                      role === key ? "bg-white shadow-sm text-slate-900 dark:bg-slate-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      activeRole === key ? "bg-white shadow-sm text-slate-900 dark:bg-slate-800 dark:text-white" : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     }`}>
                     {roleConfig[key].label}
                   </button>
@@ -202,7 +223,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="username" className="text-slate-900 dark:text-slate-300">{role === "STUDENT" ? "NIS / NISN / Username" : "Username"}</Label>
+                <Label htmlFor="username" className="text-slate-900 dark:text-slate-300">{activeRole === "STUDENT" ? "NIS / NISN / Username" : "Username"}</Label>
                 <Input id="username" type="text" placeholder={cfg.placeholder} value={username} onChange={(e) => setUsername(e.target.value)} className="h-11 bg-white dark:bg-slate-950 dark:border-slate-800 dark:text-white" autoComplete="username" />
               </div>
               <div className="space-y-1.5">
@@ -227,22 +248,10 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-5 rounded-lg bg-gray-50 border border-dashed border-gray-200 p-3 text-xs text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400">
-              <p className="font-semibold mb-1 text-slate-600 dark:text-slate-400">Akun default:</p>
-              {system === "CBT" ? (
-                <>
-                  <p>Admin: <span className="font-mono text-slate-900 dark:text-white">admin</span> / <span className="font-mono text-slate-900 dark:text-white">admin123</span></p>
-                  <p>Guru: <span className="font-mono text-slate-900 dark:text-white">sari.dewi</span> / <span className="font-mono text-slate-900 dark:text-white">guru123</span></p>
-                  <p>Siswa: <span className="font-mono text-slate-900 dark:text-white">2324001</span> / <span className="font-mono text-slate-900 dark:text-white">siswa123</span></p>
-                </>
-              ) : system === "SIBIKONS" ? (
-                <>
-                  <p>Guru BK: <span className="font-mono text-slate-900 dark:text-white">bk.hutama</span> / <span className="font-mono text-slate-900 dark:text-white">bk123</span></p>
-                  <p>Siswa: <span className="font-mono text-slate-900 dark:text-white">2324001</span> / <span className="font-mono text-slate-900 dark:text-white">siswa123</span></p>
-                </>
-              ) : (
-                <>
-                  <p>Gunakan akun guru yang dijadwalkan piket oleh admin.</p>
-                </>
+              <p className="font-semibold mb-1 text-slate-600 dark:text-slate-400">Butuh bantuan?</p>
+              <p>Jika ada kendala login atau lupa password, silakan hubungi admin sekolah.</p>
+              {!allowStudentWebLogin && (
+                <p className="mt-1">Login siswa melalui website sedang dinonaktifkan. Siswa dapat login melalui aplikasi mobile.</p>
               )}
             </div>
           </div>

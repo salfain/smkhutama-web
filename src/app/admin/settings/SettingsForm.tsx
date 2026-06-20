@@ -13,6 +13,7 @@ const checkboxOptions: { key: keyof Settings; label: string }[] = [
   { key: "allow_free_navigation", label: "Izinkan navigasi soal bebas" },
   { key: "auto_submit_on_timeout", label: "Auto submit saat waktu habis" },
   { key: "show_result_default", label: "Tampilkan nilai langsung setelah ujian (default)" },
+  { key: "allow_student_web_login", label: "Izinkan siswa login melalui website" },
 ];
 
 export function SettingsForm({ settings }: { settings: Settings }) {
