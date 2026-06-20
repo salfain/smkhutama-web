@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  FileText, ClipboardList, CheckSquare, Users, BarChart3, Plus, ArrowRight,
+  FileText, ClipboardList, CheckSquare, Users, BarChart3, ArrowRight, MonitorCheck, Upload,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -45,7 +45,7 @@ export function TeacherDashboardClient({
   };
 
   const stats = [
-    { title: "Bank Soal",       value: d.totalQuestions,    icon: FileText,     color: "text-blue-600",    bg: "bg-blue-50" },
+    { title: "Paket Bank Soal", value: d.totalQuestions,    icon: FileText,     color: "text-blue-600",    bg: "bg-blue-50" },
     { title: "Total Ujian",     value: d.totalExams,        icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-50" },
     { title: "Esai Belum Dikoreksi", value: d.pendingEssays, icon: CheckSquare, color: "text-blue-600",  bg: "bg-blue-50" },
     { title: "Total Peserta",   value: d.totalParticipants, icon: Users,        color: "text-purple-600",  bg: "bg-purple-50" },
@@ -59,11 +59,11 @@ export function TeacherDashboardClient({
           <p className="text-sm text-gray-500">Selamat datang, {teacherName} · Mata Pelajaran: {subjectName}</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/teacher/questions/create">
-            <Button size="sm" variant="outline" className="gap-1.5"><Plus className="h-4 w-4" />Tambah Soal</Button>
+          <Link href="/teacher/question-sets">
+            <Button size="sm" variant="outline" className="gap-1.5"><Upload className="h-4 w-4" />Import Paket Soal</Button>
           </Link>
-          <Link href="/teacher/exams/create">
-            <Button size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"><Plus className="h-4 w-4" />Buat Ujian</Button>
+          <Link href="/teacher/monitoring">
+            <Button size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"><MonitorCheck className="h-4 w-4" />Monitoring</Button>
           </Link>
         </div>
       </div>

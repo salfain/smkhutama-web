@@ -1,12 +1,7 @@
-import { requireAuth } from "@/lib/session";
-import { getSubjectsForQuestion } from "../actions";
-import { QuestionForm } from "../QuestionForm";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function CreateQuestionPage() {
-  const user = await requireAuth("TEACHER");
-  const subjects = await getSubjectsForQuestion().catch(() => []);
-
-  return <QuestionForm subjects={subjects} defaultSubjectId={user.teacher?.subjectId ?? null} />;
+export default function CreateQuestionPage() {
+  redirect("/teacher/question-sets");
 }

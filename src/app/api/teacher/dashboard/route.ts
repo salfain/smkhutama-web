@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (!teacher) return NextResponse.json({ error: "No teacher profile" }, { status: 400 });
 
   const [totalQuestions, totalExams, activeExams, pendingEssays, totalParticipants] = await Promise.all([
-    prisma.question.count({ where: { teacherId: teacher.id, isActive: true } }),
+    prisma.questionSet.count({ where: { ownerTeacherId: teacher.id } }),
     prisma.exam.count({ where: { teacherId: teacher.id } }),
     prisma.exam.count({ where: { teacherId: teacher.id, status: "ACTIVE" } }),
     prisma.studentAnswer.count({

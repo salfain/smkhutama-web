@@ -13,7 +13,7 @@ export async function getTeacherDashboard(teacherId: string) {
     avgScoreData,
     recentExams,
   ] = await Promise.all([
-    prisma.question.count({ where: { teacherId, isActive: true } }),
+    prisma.questionSet.count({ where: { ownerTeacherId: teacherId } }),
     prisma.exam.count({ where: { teacherId } }),
     prisma.exam.count({ where: { teacherId, status: "ACTIVE" } }),
     prisma.exam.count({ where: { teacherId, status: "CLOSED" } }),
