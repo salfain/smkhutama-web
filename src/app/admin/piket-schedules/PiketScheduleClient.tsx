@@ -75,7 +75,7 @@ export function PiketScheduleClient({
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
       const result = await savePiketSchedule(formData);
-      if ("error" in result) setMessage(result.error);
+      if ("error" in result) setMessage(result.error ?? "Gagal menyimpan jadwal piket.");
       else {
         setMessage("Jadwal piket tersimpan.");
         resetForm();
@@ -88,7 +88,7 @@ export function PiketScheduleClient({
     setMessage("");
     startTransition(async () => {
       const result = await deletePiketSchedule(schedule.id);
-      if ("error" in result) setMessage(result.error);
+      if ("error" in result) setMessage(result.error ?? "Gagal menghapus jadwal piket.");
       else setMessage("Jadwal piket dihapus.");
     });
   }
