@@ -57,11 +57,11 @@ enum ExamStatus {
 }
 
 enum ExamType {
-  UH      // Ulangan Harian
-  UTS     // Ujian Tengah Semester
-  UAS     // Ujian Akhir Semester
-  US      // Ujian Sekolah
-  TRYOUT  // Tryout / Latihan
+  UH // Ulangan Harian
+  UTS // Ujian Tengah Semester
+  UAS // Ujian Akhir Semester
+  US // Ujian Sekolah
+  TRYOUT // Tryout / Latihan
   LAINNYA
 }
 
@@ -129,16 +129,16 @@ enum QuestionSetSource {
 
 /// Profil sekolah (hanya 1 record)
 model SchoolProfile {
-  id              String   @id @default(uuid())
-  name            String
-  logo            String?
-  address         String?
-  npsn            String?
-  principalName   String?  @map("principal_name")
-  letterhead      String?
-  digitalSignature String? @map("digital_signature")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(uuid())
+  name             String
+  logo             String?
+  address          String?
+  npsn             String?
+  principalName    String?  @map("principal_name")
+  letterhead       String?
+  digitalSignature String?  @map("digital_signature")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   @@map("school_profiles")
 }
@@ -146,7 +146,7 @@ model SchoolProfile {
 /// Tahun ajaran
 model AcademicYear {
   id        String   @id @default(uuid())
-  year      String   // e.g. "2025/2026"
+  year      String // e.g. "2025/2026"
   semester  Semester
   isActive  Boolean  @default(false) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
@@ -169,8 +169,8 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  student Student?
-  teacher Teacher?
+  student   Student?
+  teacher   Teacher?
   counselor Counselor?
 
   @@map("users")
@@ -193,18 +193,18 @@ model Major {
 
 /// Kelas
 model Class {
-  id        String   @id @default(uuid())
-  name      String   // e.g. "XII TKJ 1"
-  grade     String   // X, XI, XII
-  majorId   String   @map("major_id")
-  homeroomTeacherId String? @map("homeroom_teacher_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(uuid())
+  name              String // e.g. "XII TKJ 1"
+  grade             String // X, XI, XII
+  majorId           String   @map("major_id")
+  homeroomTeacherId String?  @map("homeroom_teacher_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-  major    Major     @relation(fields: [majorId], references: [id])
-  homeroomTeacher Teacher? @relation("Homeroom", fields: [homeroomTeacherId], references: [id])
-  students Student[]
-  examParticipants ExamClass[]
+  major              Major               @relation(fields: [majorId], references: [id])
+  homeroomTeacher    Teacher?            @relation("Homeroom", fields: [homeroomTeacherId], references: [id])
+  students           Student[]
+  examParticipants   ExamClass[]
   teacherAttendances TeacherAttendance[]
 
   @@map("classes")
@@ -219,11 +219,11 @@ model Subject {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  major     Major?    @relation(fields: [majorId], references: [id])
-  teachers  Teacher[]
-  questions Question[]
+  major        Major?        @relation(fields: [majorId], references: [id])
+  teachers     Teacher[]
+  questions    Question[]
   questionSets QuestionSet[]
-  exams     Exam[]
+  exams        Exam[]
 
   @@map("subjects")
 }
@@ -240,10 +240,10 @@ model Student {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  class    Class?  @relation(fields: [classId], references: [id])
-  major    Major?  @relation(fields: [majorId], references: [id])
-  attempts StudentExamAttempt[]
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class              Class?               @relation(fields: [classId], references: [id])
+  major              Major?               @relation(fields: [majorId], references: [id])
+  attempts           StudentExamAttempt[]
   counselingCases    CounselingCase[]
   violationRecords   ViolationRecord[]
   achievementRecords AchievementRecord[]
@@ -266,13 +266,13 @@ model Teacher {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject   Subject? @relation(fields: [subjectId], references: [id])
-  questions Question[]
-  questionSets QuestionSet[]
-  exams     Exam[]
-  homeroomClasses Class[] @relation("Homeroom")
-  attendances TeacherAttendance[]
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject         Subject?            @relation(fields: [subjectId], references: [id])
+  questions       Question[]
+  questionSets    QuestionSet[]
+  exams           Exam[]
+  homeroomClasses Class[]             @relation("Homeroom")
+  attendances     TeacherAttendance[]
 
   @@map("teachers")
 }
@@ -308,32 +308,32 @@ model QuestionSet {
 
 /// Bank soal
 model Question {
-  id             String       @id @default(uuid())
-  subjectId      String       @map("subject_id")
-  teacherId      String       @map("teacher_id")
-  questionSetId  String?      @map("question_set_id")
-  questionType   QuestionType @map("question_type")
-  questionText   String       @map("question_text")
-  mediaType      MediaType    @default(NONE) @map("media_type")
-  mediaUrl       String?      @map("media_url")
-  difficulty     Difficulty   @default(MEDIUM)
-  scoreWeight    Float        @default(1) @map("score_weight")
-  explanation    String?
-  material       String?
-  competency     String?
-  grade          String?
-  isRandomized   Boolean      @default(true) @map("is_randomized")
-  randomizeOptions Boolean    @default(true) @map("randomize_options")
-  isActive       Boolean      @default(true) @map("is_active")
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  id               String       @id @default(uuid())
+  subjectId        String       @map("subject_id")
+  teacherId        String       @map("teacher_id")
+  questionSetId    String?      @map("question_set_id")
+  questionType     QuestionType @map("question_type")
+  questionText     String       @map("question_text")
+  mediaType        MediaType    @default(NONE) @map("media_type")
+  mediaUrl         String?      @map("media_url")
+  difficulty       Difficulty   @default(MEDIUM)
+  scoreWeight      Float        @default(1) @map("score_weight")
+  explanation      String?
+  material         String?
+  competency       String?
+  grade            String?
+  isRandomized     Boolean      @default(true) @map("is_randomized")
+  randomizeOptions Boolean      @default(true) @map("randomize_options")
+  isActive         Boolean      @default(true) @map("is_active")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
 
-  subject  Subject          @relation(fields: [subjectId], references: [id])
-  teacher  Teacher          @relation(fields: [teacherId], references: [id])
-  questionSet QuestionSet?  @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
-  options  QuestionOption[]
+  subject       Subject          @relation(fields: [subjectId], references: [id])
+  teacher       Teacher          @relation(fields: [teacherId], references: [id])
+  questionSet   QuestionSet?     @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
+  options       QuestionOption[]
   examQuestions ExamQuestion[]
-  answers  StudentAnswer[]
+  answers       StudentAnswer[]
 
   @@map("questions")
 }
@@ -356,37 +356,39 @@ model QuestionOption {
 
 /// Ujian / Paket Ujian
 model Exam {
-  id                 String     @id @default(uuid())
-  title              String
-  subjectId          String     @map("subject_id")
-  teacherId          String     @map("teacher_id")
-  questionSetId      String?    @map("question_set_id")
-  academicYearId     String?    @map("academic_year_id")
-  durationMinutes    Int        @map("duration_minutes")
-  startAt            DateTime   @map("start_at")
-  endAt              DateTime   @map("end_at")
-  requestedQuestionCount Int?   @map("requested_question_count")
-  multipleChoicePercentage Float @default(100) @map("multiple_choice_percentage")
-  essayPercentage    Float      @default(0) @map("essay_percentage")
-  randomizeQuestions Boolean    @default(false) @map("randomize_questions")
-  randomizeOptions   Boolean    @default(false) @map("randomize_options")
-  showResult         Boolean    @default(false) @map("show_result")
-  showExplanation    Boolean    @default(false) @map("show_explanation")
-  passingScore       Float?     @map("passing_score") // KKM
-  status             ExamStatus @default(DRAFT)
-  examType           ExamType   @default(UH) @map("exam_type")
-  createdAt          DateTime   @default(now()) @map("created_at")
-  updatedAt          DateTime   @updatedAt @map("updated_at")
+  id                           String     @id @default(uuid())
+  title                        String
+  subjectId                    String     @map("subject_id")
+  teacherId                    String     @map("teacher_id")
+  questionSetId                String?    @map("question_set_id")
+  academicYearId               String?    @map("academic_year_id")
+  durationMinutes              Int        @map("duration_minutes")
+  startAt                      DateTime   @map("start_at")
+  endAt                        DateTime   @map("end_at")
+  requestedQuestionCount       Int?       @map("requested_question_count")
+  requestedMultipleChoiceCount Int?       @map("requested_multiple_choice_count")
+  requestedEssayCount          Int?       @map("requested_essay_count")
+  multipleChoicePercentage     Float      @default(100) @map("multiple_choice_percentage")
+  essayPercentage              Float      @default(0) @map("essay_percentage")
+  randomizeQuestions           Boolean    @default(false) @map("randomize_questions")
+  randomizeOptions             Boolean    @default(false) @map("randomize_options")
+  showResult                   Boolean    @default(false) @map("show_result")
+  showExplanation              Boolean    @default(false) @map("show_explanation")
+  passingScore                 Float?     @map("passing_score") // KKM
+  status                       ExamStatus @default(DRAFT)
+  examType                     ExamType   @default(UH) @map("exam_type")
+  createdAt                    DateTime   @default(now()) @map("created_at")
+  updatedAt                    DateTime   @updatedAt @map("updated_at")
 
-  subject       Subject            @relation(fields: [subjectId], references: [id])
-  teacher       Teacher            @relation(fields: [teacherId], references: [id])
-  questionSet   QuestionSet?       @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
-  academicYear  AcademicYear?      @relation(fields: [academicYearId], references: [id])
-  questions     ExamQuestion[]
-  classes       ExamClass[]
-  sessions      ExamSession[]
-  tokens        ExamToken[]
-  attempts      StudentExamAttempt[]
+  subject      Subject              @relation(fields: [subjectId], references: [id])
+  teacher      Teacher              @relation(fields: [teacherId], references: [id])
+  questionSet  QuestionSet?         @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
+  academicYear AcademicYear?        @relation(fields: [academicYearId], references: [id])
+  questions    ExamQuestion[]
+  classes      ExamClass[]
+  sessions     ExamSession[]
+  tokens       ExamToken[]
+  attempts     StudentExamAttempt[]
 
   @@map("exams")
 }
@@ -449,22 +451,22 @@ model ExamToken {
 
 /// Percobaan ujian siswa
 model StudentExamAttempt {
-  id          String        @id @default(uuid())
-  examId      String        @map("exam_id")
-  studentId   String        @map("student_id")
-  startedAt   DateTime?     @map("started_at")
-  submittedAt DateTime?     @map("submitted_at")
-  status      AttemptStatus @default(NOT_STARTED)
-  score       Float?
-  loginStatus Boolean       @default(false) @map("login_status")
-  ipAddress   String?       @map("ip_address")
+  id             String        @id @default(uuid())
+  examId         String        @map("exam_id")
+  studentId      String        @map("student_id")
+  startedAt      DateTime?     @map("started_at")
+  submittedAt    DateTime?     @map("submitted_at")
+  status         AttemptStatus @default(NOT_STARTED)
+  score          Float?
+  loginStatus    Boolean       @default(false) @map("login_status")
+  ipAddress      String?       @map("ip_address")
   // Anti-cheat (mobile): kunci akses bila siswa berkali-kali keluar app
-  isLocked       Boolean   @default(false) @map("is_locked")
-  lockedAt       DateTime? @map("locked_at")
-  lockReason     String?   @map("lock_reason")
-  violationCount Int       @default(0) @map("violation_count")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  isLocked       Boolean       @default(false) @map("is_locked")
+  lockedAt       DateTime?     @map("locked_at")
+  lockReason     String?       @map("lock_reason")
+  violationCount Int           @default(0) @map("violation_count")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
   exam    Exam            @relation(fields: [examId], references: [id])
   student Student         @relation(fields: [studentId], references: [id])
@@ -533,31 +535,31 @@ enum RegistrationStatus {
 
 /// Profil & konten hero landing page (single record)
 model LandingProfile {
-  id           String   @id @default(uuid())
-  schoolName   String   @default("SMK Hutama Pondok Gede") @map("school_name")
-  shortName    String   @default("SMK Hutama") @map("short_name")
-  tagline      String?
-  logoUrl      String?  @map("logo_url")
-  heroBadge    String?  @map("hero_badge")
-  heroTitle    String?  @map("hero_title")
-  heroSubtitle String?  @map("hero_subtitle")
-  address      String?
-  phone        String?
-  whatsapp     String?
-  email        String?
-  officialUrl  String?  @map("official_url")
-  instagram    String?
-  facebook     String?
-  youtube      String?
-  ppdbOpen     Boolean  @default(true) @map("ppdb_open")
-  vision       String?
-  mission      String?
-  history      String?
-  principalName  String? @map("principal_name")
-  principalPhoto String? @map("principal_photo")
-  principalWord  String? @map("principal_word")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  schoolName     String   @default("SMK Hutama Pondok Gede") @map("school_name")
+  shortName      String   @default("SMK Hutama") @map("short_name")
+  tagline        String?
+  logoUrl        String?  @map("logo_url")
+  heroBadge      String?  @map("hero_badge")
+  heroTitle      String?  @map("hero_title")
+  heroSubtitle   String?  @map("hero_subtitle")
+  address        String?
+  phone          String?
+  whatsapp       String?
+  email          String?
+  officialUrl    String?  @map("official_url")
+  instagram      String?
+  facebook       String?
+  youtube        String?
+  ppdbOpen       Boolean  @default(true) @map("ppdb_open")
+  vision         String?
+  mission        String?
+  history        String?
+  principalName  String?  @map("principal_name")
+  principalPhoto String?  @map("principal_photo")
+  principalWord  String?  @map("principal_word")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at")
 
   @@map("landing_profiles")
 }
@@ -576,22 +578,22 @@ model LandingHeroImage {
 
 /// Statistik sekolah (akreditasi, jumlah siswa, dll)
 model LandingStat {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   label       String
   value       String
-  orderNumber Int      @default(0) @map("order_number")
+  orderNumber Int    @default(0) @map("order_number")
 
   @@map("landing_stats")
 }
 
 /// Program keahlian / jurusan landing
 model LandingMajor {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   code        String
   name        String
   description String
-  orderNumber Int      @default(0) @map("order_number")
-  isActive    Boolean  @default(true) @map("is_active")
+  orderNumber Int     @default(0) @map("order_number")
+  isActive    Boolean @default(true) @map("is_active")
 
   @@map("landing_majors")
 }
@@ -707,10 +709,10 @@ model Counselor {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cases        CounselingCase[]
-  violations   ViolationRecord[]
-  achievements AchievementRecord[]
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cases         CounselingCase[]
+  violations    ViolationRecord[]
+  achievements  AchievementRecord[]
   parentSummons ParentSummon[]
   homeVisits    HomeVisit[]
 
@@ -798,7 +800,7 @@ model CounselingRequest {
   topic         String
   description   String?
   urgency       String        @default("SEDANG")
-  preferredDate DateTime?      @map("preferred_date")
+  preferredDate DateTime?     @map("preferred_date")
   status        RequestStatus @default(PENDING)
   response      String?
   createdAt     DateTime      @default(now()) @map("created_at")
@@ -814,7 +816,7 @@ model ParentSummon {
   id          String       @id @default(uuid())
   studentId   String       @map("student_id")
   counselorId String       @map("counselor_id")
-  level       String       // SP1 / SP2 / SP3 / PANGGILAN
+  level       String // SP1 / SP2 / SP3 / PANGGILAN
   reason      String
   totalPoints Int          @default(0) @map("total_points")
   meetingDate DateTime?    @map("meeting_date")
@@ -907,16 +909,16 @@ model SurveyAnswer {
 
 /// Kehadiran guru di kelas (dicatat guru piket)
 model TeacherAttendance {
-  id          String   @id @default(uuid())
-  teacherId   String   @map("teacher_id")
-  classId     String   @map("class_id")
-  recordedBy  String   @map("recorded_by")
-  status      String   // HADIR / TIDAK_HADIR / DIGANTIKAN / TUGAS_LUAR
-  period      String?
-  substitute  String?
-  note        String?
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  teacherId  String   @map("teacher_id")
+  classId    String   @map("class_id")
+  recordedBy String   @map("recorded_by")
+  status     String // HADIR / TIDAK_HADIR / DIGANTIKAN / TUGAS_LUAR
+  period     String?
+  substitute String?
+  note       String?
+  date       DateTime @default(now())
+  createdAt  DateTime @default(now()) @map("created_at")
 
   teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
@@ -942,16 +944,16 @@ model StudentTardiness {
 
 /// Izin keluar/masuk siswa saat jam pelajaran
 model StudentPermit {
-  id          String    @id @default(uuid())
-  studentId   String    @map("student_id")
-  recordedBy  String    @map("recorded_by")
-  type        String    // KELUAR / MASUK
-  reason      String
-  exitTime    DateTime? @map("exit_time")
-  returnTime  DateTime? @map("return_time")
-  status      String    @default("KELUAR") // KELUAR / SUDAH_KEMBALI / TIDAK_KEMBALI
-  date        DateTime  @default(now())
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id         String    @id @default(uuid())
+  studentId  String    @map("student_id")
+  recordedBy String    @map("recorded_by")
+  type       String // KELUAR / MASUK
+  reason     String
+  exitTime   DateTime? @map("exit_time")
+  returnTime DateTime? @map("return_time")
+  status     String    @default("KELUAR") // KELUAR / SUDAH_KEMBALI / TIDAK_KEMBALI
+  date       DateTime  @default(now())
+  createdAt  DateTime  @default(now()) @map("created_at")
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
