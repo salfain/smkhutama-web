@@ -47,9 +47,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Public assets
-COPY --from=builder /app/public ./public
-
 # Prisma schema (untuk runtime migrations)
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
@@ -57,9 +54,14 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 # package.json (dibutuhkan Prisma runtime)
 COPY --from=builder /app/package.json ./package.json
 
-# Next.js standalone output
+# Next.js standalone output — extract ke root /app/
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# Static files CSS/JS — harus di-copy SETELAH standalone agar tidak ditimpa
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Public assets — di-copy SETELAH standalone agar tidak ditimpa
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # node_modules dari builder (sudah include Prisma generated client)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
