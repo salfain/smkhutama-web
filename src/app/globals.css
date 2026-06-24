@@ -366,6 +366,45 @@
   .print-doc table, .print-doc th, .print-doc td {
     border-color: #000000 !important;
   }
+
+  .question-set-print-root {
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .question-set-print-paper {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  .question-set-print-paper [data-slot="card-header"] {
+    display: none !important;
+  }
+
+  .question-set-print-paper [data-slot="card-content"] {
+    padding: 0 !important;
+  }
+
+  .question-set-screen-card {
+    margin-bottom: 12px !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+  }
+
+  .question-set-question {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    margin-bottom: 10px !important;
+    padding: 12px !important;
+  }
+
+  .question-set-question .bg-emerald-50 {
+    background: #ecfdf5 !important;
+  }
 }
 
 /* ============================================
