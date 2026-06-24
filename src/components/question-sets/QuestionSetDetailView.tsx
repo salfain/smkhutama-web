@@ -222,14 +222,14 @@ export function QuestionSetDetailView({
                   {question.options.map((option) => (
                     <div
                       key={option.id}
-                      className={`rounded-lg border px-3 py-2 text-sm ${
+                      className={`question-set-option-print rounded-lg border px-3 py-2 text-sm ${
                         option.isCorrect ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "bg-white"
                       }`}
                     >
                       <div className="flex gap-2">
                         <span className="font-bold">{option.optionLabel}.</span>
                         <span className="flex-1 whitespace-pre-wrap">{option.optionText || "-"}</span>
-                        {option.isCorrect && <Badge className="bg-emerald-600 hover:bg-emerald-600">Kunci</Badge>}
+                        {option.isCorrect && <Badge className="question-set-answer-key bg-emerald-600 hover:bg-emerald-600">Kunci</Badge>}
                       </div>
                       {option.mediaUrl && (
                         <p className="mt-1 break-all text-xs text-gray-500">Media opsi: {option.mediaUrl}</p>

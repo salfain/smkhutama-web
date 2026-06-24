@@ -402,8 +402,14 @@
     padding: 12px !important;
   }
 
-  .question-set-question .bg-emerald-50 {
-    background: #ecfdf5 !important;
+  .question-set-option-print {
+    border-color: #e5e7eb !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  .question-set-answer-key {
+    display: none !important;
   }
 }
 
