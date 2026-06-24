@@ -29,5 +29,10 @@ export async function GET(req: NextRequest) {
       nip: u.teacher.nip,
       subject: u.teacher.subject,
     } : null,
+    counselor: u.counselor ? {
+      id: u.counselor.id,
+      nip: u.counselor.nip,
+      phone: u.counselor.phone,
+    } : null,
   });
 }
