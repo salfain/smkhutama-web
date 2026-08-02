@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
+import { listTeacherExams } from "@/server/modules/cbt/teacher";
 
 const TEACHER_EXAM_LOCK_MESSAGE =
   "Pembuatan, aktivasi, penghapusan ujian, dan token kini dikelola oleh admin.";
@@ -10,15 +10,7 @@ export async function getMyExams() {
   const user = await requireAuth("TEACHER");
   if (!user.teacher) return [];
 
-  return prisma.exam.findMany({
-    where: { teacherId: user.teacher.id },
-    orderBy: { startAt: "desc" },
-    include: {
-      subject: { select: { code: true, name: true } },
-      classes: { include: { class: { select: { name: true } } } },
-      _count: { select: { questions: true, attempts: true } },
-    },
-  });
+  return listTeacherExams(user.teacher.id);
 }
 
 export async function getExamFormDataForTeacher() {

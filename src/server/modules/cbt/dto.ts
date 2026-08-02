@@ -9,10 +9,20 @@
 
 import type { getAttemptForReview } from "./review";
 import type { listExams, listResults } from "./student";
+import type { getTeacherCounts, listEssayAnswers, listTeacherExams } from "./teacher";
+import type { findTeacherExam, listAttemptsForExam } from "./monitoring";
+import type { getExamForPrint, getSchoolProfile } from "./exam-print";
 
 type ExamListItem = Awaited<ReturnType<typeof listExams>>[number];
 type ResultItem = Awaited<ReturnType<typeof listResults>>[number];
 type AttemptReview = NonNullable<Awaited<ReturnType<typeof getAttemptForReview>>>;
+type TeacherCounts = Awaited<ReturnType<typeof getTeacherCounts>>;
+type TeacherExam = Awaited<ReturnType<typeof listTeacherExams>>[number];
+type EssayAnswer = Awaited<ReturnType<typeof listEssayAnswers>>[number];
+type MonitoredExam = NonNullable<Awaited<ReturnType<typeof findTeacherExam>>>;
+type MonitoredAttempt = Awaited<ReturnType<typeof listAttemptsForExam>>[number];
+type PrintableExam = NonNullable<Awaited<ReturnType<typeof getExamForPrint>>>;
+type SchoolProfile = Awaited<ReturnType<typeof getSchoolProfile>>;
 
 export function toExamListItem(exam: ExamListItem) {
   const attempt = exam.attempts[0];
@@ -133,5 +143,91 @@ export function toAttemptReview(attempt: AttemptReview) {
     status: attempt.status,
     submittedAt: attempt.submittedAt,
     questions,
+  };
+}
+
+// ─── Sisi guru & admin ──────────────────────────────────────────────────────
+
+/** `closedExams` sengaja tidak dikirim: endpoint lama tidak memuatnya. */
+export function toTeacherStats(counts: TeacherCounts) {
+  return {
+    totalQuestions: counts.totalQuestions,
+    totalExams: counts.totalExams,
+    activeExams: counts.activeExams,
+    pendingEssays: counts.pendingEssays,
+    totalParticipants: counts.totalParticipants,
+  };
+}
+
+export function toTeacherExam(exam: TeacherExam) {
+  return {
+    id: exam.id,
+    title: exam.title,
+    examType: exam.examType,
+    status: exam.status,
+    startAt: exam.startAt,
+    endAt: exam.endAt,
+    durationMinutes: exam.durationMinutes,
+    subject: exam.subject,
+    classes: exam.classes.map((c) => c.class.name),
+    questionCount: exam._count.questions,
+    attemptCount: exam._count.attempts,
+  };
+}
+
+export function toMonitoring(exam: MonitoredExam, attempts: MonitoredAttempt[]) {
+  return {
+    exam: { id: exam.id, title: exam.title, totalQuestions: exam._count.questions },
+    participants: attempts.map((attempt) => ({
+      attemptId: attempt.id,
+      studentName: attempt.student.user.name,
+      className: attempt.student.class?.name ?? "—",
+      status: attempt.status,
+      answeredCount: attempt._count.answers,
+      startedAt: attempt.startedAt,
+      submittedAt: attempt.submittedAt,
+      score: attempt.score,
+    })),
+  };
+}
+
+export function toEssayAnswer(answer: EssayAnswer) {
+  return {
+    id: answer.id,
+    answerText: answer.answerText,
+    score: answer.score,
+    questionText: answer.question.questionText,
+    subjectCode: answer.question.subject.code,
+    studentName: answer.attempt.student.user.name,
+    className: answer.attempt.student.class?.name ?? "—",
+    examTitle: answer.attempt.exam.title,
+  };
+}
+
+export function toExamPrint(exam: PrintableExam, school: SchoolProfile) {
+  return {
+    exam: {
+      id: exam.id,
+      title: exam.title,
+      examType: exam.examType,
+      durationMinutes: exam.durationMinutes,
+      startAt: exam.startAt,
+      passingScore: exam.passingScore,
+      subject: exam.subject,
+      teacherName: exam.teacher.user.name,
+      academicYear: exam.academicYear,
+      classNames: exam.classes.map((c) => c.class.name),
+    },
+    questions: exam.questions.map((examQuestion, index) => ({
+      no: index + 1,
+      id: examQuestion.question.id,
+      questionText: examQuestion.question.questionText,
+      questionType: examQuestion.question.questionType,
+      mediaType: examQuestion.question.mediaType,
+      mediaUrl: examQuestion.question.mediaUrl,
+      explanation: examQuestion.question.explanation,
+      options: examQuestion.question.options,
+    })),
+    school: school ? { name: school.name, address: school.address, npsn: school.npsn } : null,
   };
 }

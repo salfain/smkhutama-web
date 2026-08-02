@@ -31,7 +31,7 @@ src/
 │  │  ├─ v1/                     ← API baru, per modul
 │  │  │  ├─ auth/                   login, logout, me (lintas modul)
 │  │  │  ├─ landing/                konten publik sekolah
-│  │  │  ├─ cbt/                    ujian: student ✅ / teacher ⏳ / admin ⏳
+│  │  │  ├─ cbt/                    ujian: student / teacher / admin  ✅
 │  │  │  ├─ bk/                     bimbingan konseling   ✅ sudah jalan
 │  │  │  └─ piket/                  guru piket            ✅ sudah jalan
 │  │  └─ ...                     ← route lama, dibiarkan hidup
@@ -44,8 +44,8 @@ src/
       ├─ auth/service.ts            ✅
       ├─ piket/{service,dto}.ts     ✅
       ├─ bk/                        ✅ service, surveys, follow-up, dto
-      ├─ cbt/                       ◐ exam-session, student, review, dto
-      │                               (inti ujian siswa; guru & admin menyusul)
+      ├─ cbt/                       ✅ exam-session, student, teacher,
+      │                               monitoring, review, exam-print, dto
       └─ landing/                   ⏳
 ```
 
@@ -195,22 +195,47 @@ Dua hal yang perlu dicatat:
   satunya perubahan perilaku pada endpoint lama di seluruh migrasi, dan
   dilakukan karena sifatnya lubang keamanan.
 
-### 5.3b Modul CBT — sisi guru & admin ⏳
+### 5.3b Modul CBT — sisi guru & admin ✅
 
 | v1 | Lama |
 | --- | --- |
-| `GET /api/v1/cbt/teacher/dashboard` | `/api/teacher/dashboard` |
-| `GET /api/v1/cbt/teacher/exams` | `/api/teacher/exams` |
-| `GET /api/v1/cbt/teacher/exams/{id}/token` | `/api/teacher/exams/[id]/token` |
-| `GET /api/v1/cbt/teacher/questions` | `/api/teacher/questions` |
-| `GET /api/v1/cbt/teacher/monitoring/{examId}` | `/api/teacher/monitoring/[examId]` |
-| `GET /api/v1/cbt/teacher/essay-grading` | `/api/teacher/essay-grading` |
-| `PATCH /api/v1/cbt/teacher/essay-grading/{id}` | `/api/teacher/essay-grading/[id]` |
-| `GET /api/v1/cbt/admin/exams/{id}/print-questions` | `/api/admin/exams/[id]/print-questions` |
+| `GET /api/v1/cbt/teacher/dashboard` | `GET /api/teacher/dashboard` |
+| `GET /api/v1/cbt/teacher/exams` | `GET /api/teacher/exams` |
+| `GET /api/v1/cbt/teacher/questions` | `GET /api/teacher/questions` |
+| `GET /api/v1/cbt/teacher/monitoring/{examId}` | `GET /api/teacher/monitoring/[examId]` |
+| `POST /api/v1/cbt/teacher/attempts/{id}/unlock` | — (baru) |
+| `POST /api/v1/cbt/teacher/attempts/{id}/force-submit` | — (baru) |
+| `GET /api/v1/cbt/teacher/essay-grading` | `GET /api/teacher/essay-grading` |
+| `PATCH /api/v1/cbt/teacher/essay-grading/{id}` | `POST /api/teacher/essay-grading/[id]` |
+| `GET /api/v1/cbt/admin/exams/{id}/print-questions` | `GET /api/admin/exams/[id]/print-questions` |
 
-Aturan bisnis yang masih perlu ditata ulang bersama bagian ini:
-`src/lib/exam-permissions.ts` (siapa boleh membuat token) dan
-`src/lib/question-set-import.ts` (impor bank soal).
+Catatan:
+
+- **Buka kunci dan kumpulkan paksa** sebelumnya hanya ada di halaman web,
+  sehingga pengawas yang memantau dari ponsel tidak bisa menolong siswa yang
+  terkunci. Sekarang tersedia lewat API, memakai service yang sama dengan
+  versi web. Guru hanya boleh mengendalikan attempt pada ujian miliknya.
+- **`/api/teacher/exams/[id]/token` tidak punya padanan v1.** Endpoint lama itu
+  hanya menjawab 403 "dikelola admin"; membuat endpoint baru yang selalu
+  gagal tidak ada gunanya. Pembuatan token tetap lewat halaman admin.
+- **Pengetatan kecil pada cetak soal:** endpoint lama meloloskan akun berperan
+  `TEACHER` yang tidak punya record guru untuk mencetak ujian mana pun.
+  Sekarang akun seperti itu ditolak. Akun tanpa record guru adalah akun rusak,
+  jadi ini penutupan celah, bukan pengurangan fitur.
+
+Kendali attempt (buka kunci, kumpulkan paksa, reset login) sebelumnya ditulis
+dua kali — di `admin/monitoring/actions.ts` dan `teacher/monitoring/actions.ts`
+— dengan perbedaan pada nama aksi audit. Sekarang satu implementasi, nama aksi
+audit diserahkan ke pemanggil sehingga jejak audit lama tetap terbaca.
+
+**Yang sengaja belum dipindah ke modul:** CRUD ujian admin
+(`admin/exams/actions.ts`), token (`admin/tokens`), impor paket bank soal
+(`admin/question-sets`, `teacher/question-sets`), rekap & ekspor Excel
+(`admin/reports`), dan daftar hadir cetak (`admin/print`). Semuanya operasi
+admin lewat web tanpa padanan API, jadi tidak ada duplikasi yang perlu
+dihilangkan — memindahkannya sekarang hanya menambah risiko tanpa manfaat.
+Aturan `src/lib/exam-permissions.ts` dan `question-set-import.ts` ikut menunggu
+di sana.
 
 `src/lib/exam-scoring.ts`, `exam-lock.ts`, dan `mobile-exam.ts` **tetap di
 `src/lib/`** dan dipanggil dari modul CBT: ketiganya fungsi murni tanpa
@@ -313,9 +338,11 @@ luar (aplikasi mobile, layar informasi, integrasi pihak ketiga).
    review,dto,http-errors}.ts`, 14 route `/api/v1/cbt`, 14 route lama
    disambungkan, dan server action halaman ujian web ikut memakai service yang
    sama. Diuji lewat simulasi ujian utuh terhadap PostgreSQL sementara.
-4. **Modul CBT — sisi guru & admin** ⏳ — bank soal, penyusunan ujian, token,
-   monitoring, penilaian esai, cetak soal, rekap nilai. Tidak dipakai saat
-   ujian berjalan, jadi risikonya jauh lebih rendah.
+4. **Modul CBT — sisi guru & admin** ✅ — `modules/cbt/{teacher,monitoring,
+   exam-print}.ts`, 9 route `/api/v1/cbt/{teacher,admin}`, 6 route lama
+   disambungkan, dan enam file server action halaman guru/admin ikut memakai
+   service yang sama. CRUD ujian, token, impor bank soal, dan ekspor rekap
+   sengaja dibiarkan di server action — lihat catatan di bagian 5.3b.
 5. **Modul landing** — endpoint baru sepenuhnya, tidak ada klien lama yang
    perlu dijaga.
 6. **Endpoint bersama** (`config`, `media`).

@@ -111,3 +111,12 @@ export async function requireStudent(req: NextRequest) {
   }
   return { actor, student: actor.student };
 }
+
+/** Guru yang login beserta id profil gurunya. */
+export async function requireTeacher(req: NextRequest) {
+  const actor = await requireRole(req, "TEACHER");
+  if (!actor.teacher) {
+    throw forbidden("Akun ini belum terhubung ke data guru", "TEACHER_PROFILE_MISSING");
+  }
+  return { actor, teacher: actor.teacher };
+}
