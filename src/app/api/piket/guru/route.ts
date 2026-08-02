@@ -1,46 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requirePiketApiAuth } from "@/lib/piket-api-auth";
+import { createAttendance, deleteAttendance, listAttendance } from "@/server/modules/piket/service";
+import { toAttendance, toClassOption, toTeacherOption } from "@/server/modules/piket/dto";
 
+// Endpoint versi lama — bentuk response dipertahankan untuk aplikasi mobile
+// yang sudah beredar. Penggantinya: /api/v1/piket/guru.
 export async function GET(req: NextRequest) {
   const r = await requirePiketApiAuth(req);
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
-  const { searchParams } = req.nextUrl;
-  const dateStr = searchParams.get("date");
-  const d = dateStr ? new Date(dateStr) : new Date();
-  const start = new Date(d); start.setHours(0, 0, 0, 0);
-  const end   = new Date(d); end.setHours(23, 59, 59, 999);
-
-  const [records, teachers, classes] = await Promise.all([
-    prisma.teacherAttendance.findMany({
-      where: { date: { gte: start, lte: end } },
-      include: {
-        teacher: { include: { user: { select: { name: true } } } },
-        class: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.teacher.findMany({
-      include: { user: { select: { name: true } } },
-      orderBy: { user: { name: "asc" } },
-    }),
-    prisma.class.findMany({ orderBy: [{ grade: "asc" }, { name: "asc" }] }),
-  ]);
+  const { records, teachers, classes } = await listAttendance(
+    req.nextUrl.searchParams.get("date")
+  );
 
   return NextResponse.json({
-    records: records.map((a) => ({
-      id: a.id,
-      teacherName: a.teacher.user.name,
-      className: a.class.name,
-      status: a.status,
-      period: a.period,
-      substitute: a.substitute,
-      note: a.note,
-      date: a.date,
-    })),
-    teachers: teachers.map((t) => ({ id: t.id, name: t.user.name })),
-    classes: classes.map((c) => ({ id: c.id, name: c.name })),
+    records: records.map(toAttendance),
+    teachers: teachers.map(toTeacherOption),
+    classes: classes.map(toClassOption),
   });
 }
 
@@ -55,21 +31,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "teacherId dan classId wajib diisi" }, { status: 400 });
   }
 
-  const recordDate = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)
-    ? new Date(`${date}T00:00:00`)
-    : new Date();
-
-  const record = await prisma.teacherAttendance.create({
-    data: {
-      teacherId,
-      classId,
-      recordedBy: r.user.id,
-      status: status || "HADIR",
-      date: recordDate,
-      period: period || null,
-      substitute: substitute || null,
-      note: note || null,
-    },
+  const record = await createAttendance({
+    teacherId,
+    classId,
+    recordedBy: r.user.id,
+    status,
+    period,
+    substitute,
+    note,
+    date,
   });
 
   return NextResponse.json({ success: true, id: record.id });
@@ -79,10 +49,9 @@ export async function DELETE(req: NextRequest) {
   const r = await requirePiketApiAuth(req);
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
-  const { searchParams } = req.nextUrl;
-  const id = searchParams.get("id");
+  const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id diperlukan" }, { status: 400 });
 
-  await prisma.teacherAttendance.delete({ where: { id } });
+  await deleteAttendance(id);
   return NextResponse.json({ success: true });
 }

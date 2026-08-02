@@ -1,46 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requirePiketApiAuth } from "@/lib/piket-api-auth";
+import { createTardiness, deleteTardiness, listTardiness } from "@/server/modules/piket/service";
+import { toStudentOption, toTardiness } from "@/server/modules/piket/dto";
 
+// Endpoint versi lama — bentuk response dipertahankan untuk aplikasi mobile
+// yang sudah beredar. Penggantinya: /api/v1/piket/terlambat.
 export async function GET(req: NextRequest) {
   const r = await requirePiketApiAuth(req);
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
-  const { searchParams } = req.nextUrl;
-  const dateStr = searchParams.get("date");
-  const d = dateStr ? new Date(dateStr) : new Date();
-  const start = new Date(d); start.setHours(0, 0, 0, 0);
-  const end   = new Date(d); end.setHours(23, 59, 59, 999);
-
-  const records = await prisma.studentTardiness.findMany({
-    where: { date: { gte: start, lte: end } },
-    include: {
-      student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } }
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const students = await prisma.student.findMany({
-    include: { user: { select: { name: true } }, class: { select: { name: true } } },
-    orderBy: { user: { name: "asc" } },
-  });
+  const { records, students } = await listTardiness(req.nextUrl.searchParams.get("date"));
 
   return NextResponse.json({
-    records: records.map((r) => ({
-      id: r.id,
-      studentName: r.student.user.name,
-      className: r.student.class?.name ?? "—",
-      arrivalTime: r.arrivalTime,
-      reason: r.reason,
-      sanction: r.sanction,
-      date: r.date,
-    })),
-    students: students.map((s) => ({
-      id: s.id,
-      name: s.user.name,
-      className: s.class?.name ?? "—",
-      nis: s.nis,
-    })),
+    records: records.map(toTardiness),
+    students: students.map(toStudentOption),
   });
 }
 
@@ -53,32 +26,13 @@ export async function POST(req: NextRequest) {
 
   if (!studentId) return NextResponse.json({ error: "studentId wajib diisi" }, { status: 400 });
 
-  let at: Date;
-  const recordDateStr = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)
-    ? date
-    : new Date().toISOString().slice(0, 10);
-  const recordDate = new Date(`${recordDateStr}T00:00:00`);
-  if (arrivalTime) {
-    // Bisa berupa "HH:mm" atau ISO string
-    if (/^\d{2}:\d{2}$/.test(String(arrivalTime))) {
-      at = new Date(`${recordDateStr}T${arrivalTime}:00`);
-    } else {
-      at = new Date(arrivalTime);
-    }
-  } else {
-    at = new Date();
-  }
-  if (isNaN(at.getTime())) at = new Date();
-
-  const record = await prisma.studentTardiness.create({
-    data: {
-      studentId,
-      recordedBy: r.user.id,
-      arrivalTime: at,
-      date: recordDate,
-      reason: reason || null,
-      sanction: sanction || null,
-    },
+  const record = await createTardiness({
+    studentId,
+    recordedBy: r.user.id,
+    reason,
+    sanction,
+    arrivalTime,
+    date,
   });
 
   return NextResponse.json({ success: true, id: record.id });
@@ -88,10 +42,9 @@ export async function DELETE(req: NextRequest) {
   const r = await requirePiketApiAuth(req);
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
-  const { searchParams } = req.nextUrl;
-  const id = searchParams.get("id");
+  const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id diperlukan" }, { status: 400 });
 
-  await prisma.studentTardiness.delete({ where: { id } });
+  await deleteTardiness(id);
   return NextResponse.json({ success: true });
 }

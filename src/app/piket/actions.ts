@@ -1,108 +1,62 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { requirePiketAuth } from "@/lib/session";
+/**
+ * Server action halaman piket.
+ *
+ * Query-nya sekarang dipinjam dari `@/server/modules/piket/service` — sumber
+ * yang sama dengan route API — sehingga tidak ada lagi dua salinan query yang
+ * bisa berbeda diam-diam. File ini menyisakan urusan yang memang milik web:
+ * cek sesi cookie, parsing FormData, dan `revalidatePath`.
+ */
+
 import { revalidatePath } from "next/cache";
+import { requirePiketAuth } from "@/lib/session";
+import * as piket from "@/server/modules/piket/service";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+const DASHBOARD_PATH = "/piket/dashboard";
 
-function todayRange() {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
+function text(formData: FormData, field: string) {
+  return String(formData.get(field) ?? "").trim();
 }
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────
 
 export async function getDashboardSummary() {
-  const user = await requirePiketAuth();
-  const { start, end } = todayRange();
-
-  const [tardiness, permits, absences] = await Promise.all([
-    prisma.studentTardiness.count({ where: { date: { gte: start, lte: end } } }),
-    prisma.studentPermit.count({ where: { date: { gte: start, lte: end }, status: "KELUAR" } }),
-    prisma.teacherAttendance.count({ where: { date: { gte: start, lte: end }, status: { not: "HADIR" } } }),
-  ]);
-
-  const activePermits = await prisma.studentPermit.findMany({
-    where: { date: { gte: start, lte: end }, status: "KELUAR" },
-    include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-    orderBy: { exitTime: "asc" },
-    take: 10,
-  });
-
-  void user;
-  return { tardiness, permits, absences, activePermits };
+  await requirePiketAuth();
+  return piket.getDashboard();
 }
 
 // ─── Keterlambatan ──────────────────────────────────────────────────────────
 
 export async function getTardinessData(date?: string) {
   await requirePiketAuth();
-  const d = date ? new Date(date) : new Date();
-  const start = new Date(d); start.setHours(0, 0, 0, 0);
-  const end = new Date(d); end.setHours(23, 59, 59, 999);
-
-  const [records, students] = await Promise.all([
-    prisma.studentTardiness.findMany({
-      where: { date: { gte: start, lte: end } },
-      include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.student.findMany({
-      include: { user: { select: { name: true } }, class: { select: { name: true } } },
-      orderBy: { user: { name: "asc" } },
-    }),
-  ]);
-  return { records, students };
+  return piket.listTardiness(date);
 }
 
 export async function createTardiness(formData: FormData) {
   const user = await requirePiketAuth();
-  const studentId = String(formData.get("studentId") ?? "").trim();
-  const reason = String(formData.get("reason") ?? "").trim();
-  const sanction = String(formData.get("sanction") ?? "").trim();
-  const arrivalStr = String(formData.get("arrivalTime") ?? "").trim();
-
+  const studentId = text(formData, "studentId");
   if (!studentId) return { error: "Siswa wajib dipilih" };
 
-  // arrivalTime dari input[type="time"] hanya berformat "HH:mm"
-  // Gabungkan dengan tanggal hari ini agar menjadi Date yang valid
-  let arrivalTime: Date;
-  if (arrivalStr && /^\d{2}:\d{2}$/.test(arrivalStr)) {
-    const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-    arrivalTime = new Date(`${today}T${arrivalStr}:00`);
-  } else if (arrivalStr) {
-    arrivalTime = new Date(arrivalStr);
-  } else {
-    arrivalTime = new Date();
-  }
-
-  if (isNaN(arrivalTime.getTime())) {
-    arrivalTime = new Date(); // fallback ke sekarang jika masih invalid
-  }
-
-  await prisma.studentTardiness.create({
-    data: {
-      studentId,
-      recordedBy: user.id,
-      arrivalTime,
-      reason: reason || null,
-      sanction: sanction || null,
-    },
+  await piket.createTardiness({
+    studentId,
+    recordedBy: user.id,
+    reason: text(formData, "reason"),
+    sanction: text(formData, "sanction"),
+    // Input[type=time] mengirim "HH:mm"; service yang menggabungkannya dengan tanggal.
+    arrivalTime: text(formData, "arrivalTime"),
   });
+
   revalidatePath("/piket/terlambat");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 export async function deleteTardiness(id: string) {
   await requirePiketAuth();
-  await prisma.studentTardiness.delete({ where: { id } });
+  await piket.deleteTardiness(id);
   revalidatePath("/piket/terlambat");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
@@ -110,62 +64,35 @@ export async function deleteTardiness(id: string) {
 
 export async function getPermitData(date?: string) {
   await requirePiketAuth();
-  const d = date ? new Date(date) : new Date();
-  const start = new Date(d); start.setHours(0, 0, 0, 0);
-  const end = new Date(d); end.setHours(23, 59, 59, 999);
-
-  const [records, students] = await Promise.all([
-    prisma.studentPermit.findMany({
-      where: { date: { gte: start, lte: end } },
-      include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.student.findMany({
-      include: { user: { select: { name: true } }, class: { select: { name: true } } },
-      orderBy: { user: { name: "asc" } },
-    }),
-  ]);
-  return { records, students };
+  return piket.listPermits(date);
 }
 
 export async function createPermit(formData: FormData) {
   const user = await requirePiketAuth();
-  const studentId = String(formData.get("studentId") ?? "").trim();
-  const reason = String(formData.get("reason") ?? "").trim();
-
+  const studentId = text(formData, "studentId");
+  const reason = text(formData, "reason");
   if (!studentId || !reason) return { error: "Siswa dan alasan wajib diisi" };
 
-  await prisma.studentPermit.create({
-    data: {
-      studentId,
-      recordedBy: user.id,
-      type: "KELUAR",
-      reason,
-      exitTime: new Date(),
-      status: "KELUAR",
-    },
-  });
+  await piket.createPermit({ studentId, reason, recordedBy: user.id });
+
   revalidatePath("/piket/izin");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 export async function markPermitReturned(id: string) {
   await requirePiketAuth();
-  await prisma.studentPermit.update({
-    where: { id },
-    data: { status: "SUDAH_KEMBALI", returnTime: new Date() },
-  });
+  await piket.markPermitReturned(id);
   revalidatePath("/piket/izin");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 export async function deletePermit(id: string) {
   await requirePiketAuth();
-  await prisma.studentPermit.delete({ where: { id } });
+  await piket.deletePermit(id);
   revalidatePath("/piket/izin");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
@@ -173,59 +100,34 @@ export async function deletePermit(id: string) {
 
 export async function getAttendanceData(date?: string) {
   await requirePiketAuth();
-  const d = date ? new Date(date) : new Date();
-  const start = new Date(d); start.setHours(0, 0, 0, 0);
-  const end = new Date(d); end.setHours(23, 59, 59, 999);
-
-  const [records, teachers, classes] = await Promise.all([
-    prisma.teacherAttendance.findMany({
-      where: { date: { gte: start, lte: end } },
-      include: {
-        teacher: { include: { user: { select: { name: true } } } },
-        class: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.teacher.findMany({
-      include: { user: { select: { name: true } } },
-      orderBy: { user: { name: "asc" } },
-    }),
-    prisma.class.findMany({ orderBy: [{ grade: "asc" }, { name: "asc" }] }),
-  ]);
-  return { records, teachers, classes };
+  return piket.listAttendance(date);
 }
 
 export async function createAttendance(formData: FormData) {
   const user = await requirePiketAuth();
-  const teacherId = String(formData.get("teacherId") ?? "").trim();
-  const classId   = String(formData.get("classId") ?? "").trim();
-  const status    = String(formData.get("status") ?? "HADIR").trim();
-  const period    = String(formData.get("period") ?? "").trim();
-  const substitute = String(formData.get("substitute") ?? "").trim();
-  const note      = String(formData.get("note") ?? "").trim();
-
+  const teacherId = text(formData, "teacherId");
+  const classId = text(formData, "classId");
   if (!teacherId || !classId) return { error: "Guru dan kelas wajib dipilih" };
 
-  await prisma.teacherAttendance.create({
-    data: {
-      teacherId,
-      classId,
-      recordedBy: user.id,
-      status,
-      period: period || null,
-      substitute: substitute || null,
-      note: note || null,
-    },
+  await piket.createAttendance({
+    teacherId,
+    classId,
+    recordedBy: user.id,
+    status: text(formData, "status") || "HADIR",
+    period: text(formData, "period"),
+    substitute: text(formData, "substitute"),
+    note: text(formData, "note"),
   });
+
   revalidatePath("/piket/guru");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 export async function deleteAttendance(id: string) {
   await requirePiketAuth();
-  await prisma.teacherAttendance.delete({ where: { id } });
+  await piket.deleteAttendance(id);
   revalidatePath("/piket/guru");
-  revalidatePath("/piket/dashboard");
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
