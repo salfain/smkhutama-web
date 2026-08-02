@@ -61,6 +61,34 @@ export async function getDashboard(student: { id: string; classId: string | null
   return { todayExams, upcomingExams, history };
 }
 
+/**
+ * Ringkasan satu attempt untuk halaman selesai ujian: jumlah benar, salah,
+ * dan kosong. "Kosong" dihitung dari total soal dikurangi jawaban yang benar-
+ * benar terisi, bukan dari jumlah baris jawaban — soal yang dibuka lalu
+ * ditinggalkan tetap punya baris jawaban kosong.
+ */
+export async function getFinishSummary(examId: string, studentId: string) {
+  const attempt = await prisma.studentExamAttempt.findUnique({
+    where: { examId_studentId: { examId, studentId } },
+    include: {
+      exam: { include: { subject: { select: { code: true, name: true } } } },
+      answers: { select: { isCorrect: true, selectedOptionId: true, answerText: true } },
+    },
+  });
+  if (!attempt) return null;
+
+  const totalQuestions = await prisma.examQuestion.count({ where: { examId } });
+  const filled = attempt.answers.filter((a) => a.selectedOptionId || a.answerText).length;
+
+  return {
+    attempt,
+    totalQuestions,
+    correct: attempt.answers.filter((a) => a.isCorrect === true).length,
+    wrong: attempt.answers.filter((a) => a.isCorrect === false).length,
+    empty: totalQuestions - filled,
+  };
+}
+
 /** Hasil ujian yang sudah dikirim, terbaru dulu. */
 export async function listResults(studentId: string) {
   return prisma.studentExamAttempt.findMany({

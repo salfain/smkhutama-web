@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma";
+import { getSummon } from "@/server/modules/bk/follow-up";
+import { getSchoolProfile } from "@/server/modules/shared/school";
 import { requireCounselorAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { PrintButtonsRed, SchoolLogo } from "@/components/print/PrintButtons";
@@ -24,23 +25,11 @@ export default async function SummonPrintPage({ params }: { params: Promise<{ id
   await requireCounselorAuth();
   const { id } = await params;
 
-  const summon = await prisma.parentSummon.findUnique({
-    where: { id },
-    include: {
-      student: {
-        include: {
-          user: { select: { name: true } },
-          class: { select: { name: true } },
-          major: { select: { name: true } },
-        },
-      },
-      counselor: { include: { user: { select: { name: true } } } },
-    },
-  });
+  const summon = await getSummon(id);
 
   if (!summon) notFound();
 
-  const school = await prisma.schoolProfile.findFirst();
+  const school = await getSchoolProfile();
   const nomorSurat = `${summon.level}/${new Date(summon.createdAt).getFullYear()}/${id.slice(-4).toUpperCase()}`;
 
   return (

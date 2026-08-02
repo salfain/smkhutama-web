@@ -95,6 +95,29 @@ export async function listTeacherExams(teacherId: string) {
   });
 }
 
+/**
+ * Ujian guru yang sudah berjalan atau selesai, beserta nilai pesertanya —
+ * dipakai halaman rekap nilai. Peserta diurutkan dari nilai tertinggi.
+ */
+export async function listExamResults(teacherId: string) {
+  return prisma.exam.findMany({
+    where: { teacherId, status: { in: ["CLOSED", "ACTIVE"] } },
+    orderBy: { startAt: "desc" },
+    include: {
+      subject: { select: { code: true } },
+      attempts: {
+        where: { status: { in: [...SUBMITTED] } },
+        include: {
+          student: {
+            include: { user: { select: { name: true } }, class: { select: { name: true } } },
+          },
+        },
+        orderBy: { score: "desc" },
+      },
+    },
+  });
+}
+
 export async function listTeacherQuestions(teacherId: string) {
   return prisma.question.findMany({
     where: { teacherId },

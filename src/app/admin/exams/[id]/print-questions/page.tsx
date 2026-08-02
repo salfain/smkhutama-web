@@ -1,39 +1,12 @@
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getExamForPrint, getSchoolProfile } from "@/server/modules/cbt/exam-print";
 import { notFound } from "next/navigation";
 import { PrintQuestionsClient } from "./PrintQuestionsClient";
 
 export const dynamic = "force-dynamic";
 
 async function getExamWithQuestions(examId: string) {
-  const [exam, school] = await Promise.all([
-    prisma.exam.findUnique({
-      where: { id: examId },
-      include: {
-        subject: { select: { name: true, code: true } },
-        teacher: { include: { user: { select: { name: true } } } },
-        academicYear: { select: { year: true, semester: true } },
-        classes: { include: { class: { select: { name: true } } } },
-        questions: {
-          orderBy: { orderNumber: "asc" },
-          include: {
-            question: {
-              include: {
-                options: {
-                  orderBy: { orderNumber: "asc" },
-                  select: {
-                    id: true, optionLabel: true,
-                    optionText: true, isCorrect: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    }),
-    prisma.schoolProfile.findFirst(),
-  ]);
+  const [exam, school] = await Promise.all([getExamForPrint(examId), getSchoolProfile()]);
   return { exam, school };
 }
 

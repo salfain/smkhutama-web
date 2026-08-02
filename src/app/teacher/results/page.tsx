@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { listExamResults } from "@/server/modules/cbt/teacher";
 import { TeacherResultsClient } from "./TeacherResultsClient";
 
 export const dynamic = "force-dynamic";
@@ -8,25 +8,7 @@ export default async function TeacherResultsPage() {
   const user = await requireAuth("TEACHER");
   if (!user.teacher) return null;
 
-  const exams = await prisma.exam.findMany({
-    where: { teacherId: user.teacher.id, status: { in: ["CLOSED", "ACTIVE"] } },
-    orderBy: { startAt: "desc" },
-    include: {
-      subject: { select: { code: true } },
-      attempts: {
-        where: { status: { in: ["SUBMITTED", "AUTO_SUBMITTED"] } },
-        include: {
-          student: {
-            include: {
-              user: { select: { name: true } },
-              class: { select: { name: true } },
-            },
-          },
-        },
-        orderBy: { score: "desc" },
-      },
-    },
-  });
+  const exams = await listExamResults(user.teacher.id);
 
   const data = exams.map((exam) => ({
     id: exam.id,

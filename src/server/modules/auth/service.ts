@@ -27,43 +27,84 @@ export type LoginInput = {
   system?: string | null;
 };
 
-export async function login(input: LoginInput) {
+export type CredentialFailure =
+  | "MISSING_FIELDS"
+  | "INVALID_CREDENTIALS"
+  | "ACCOUNT_INACTIVE"
+  | "ROLE_MISMATCH"
+  | "PIKET_REQUIRES_TEACHER"
+  | "PIKET_NOT_SCHEDULED";
+
+export type CredentialResult =
+  | { ok: true; user: Awaited<ReturnType<typeof findLoginUser>> }
+  | { ok: false; reason: CredentialFailure; today?: string };
+
+function findLoginUser(username: string) {
+  return prisma.user.findUnique({ where: { username }, include: { teacher: true } });
+}
+
+/**
+ * Periksa kredensial beserta syarat tambahannya, tanpa membuat sesi apa pun.
+ *
+ * Kegagalan dikembalikan sebagai **kode**, bukan kalimat: halaman web dan API
+ * memakai susunan kalimat yang berbeda (web mengakhiri pesannya dengan titik),
+ * jadi yang dibagi di sini aturannya, bukan teksnya.
+ */
+export async function checkCredentials(input: LoginInput): Promise<CredentialResult> {
   const username = input.username?.trim();
   const password = input.password;
 
-  if (!username || !password) {
-    throw badRequest("Username dan password wajib diisi", "VALIDATION_ERROR");
-  }
+  if (!username || !password) return { ok: false, reason: "MISSING_FIELDS" };
 
-  const user = await prisma.user.findUnique({
-    where: { username },
-    include: { teacher: true },
-  });
-
-  const credentialsError = unauthorized("Username atau password salah", "INVALID_CREDENTIALS");
-  if (!user) throw credentialsError;
-  if (!user.isActive) throw forbidden("Akun nonaktif. Hubungi admin.", "ACCOUNT_INACTIVE");
-  if (input.role && user.role !== input.role) {
-    throw forbidden(`Akun ini bukan akun ${input.role.toLowerCase()}`, "ROLE_MISMATCH");
-  }
+  const user = await findLoginUser(username);
+  if (!user) return { ok: false, reason: "INVALID_CREDENTIALS" };
+  if (!user.isActive) return { ok: false, reason: "ACCOUNT_INACTIVE" };
+  if (input.role && user.role !== input.role) return { ok: false, reason: "ROLE_MISMATCH" };
 
   const passwordOk = await verifyPassword(password, user.passwordHash);
-  if (!passwordOk) throw credentialsError;
+  if (!passwordOk) return { ok: false, reason: "INVALID_CREDENTIALS" };
 
   if (input.system === "PIKET") {
     if (user.role !== "TEACHER" || !user.teacher) {
-      throw forbidden("Login piket menggunakan akun guru", "PIKET_REQUIRES_TEACHER");
+      return { ok: false, reason: "PIKET_REQUIRES_TEACHER" };
     }
     const scheduled = await isTeacherScheduledForPiket(user.teacher.id);
     if (!scheduled) {
-      const today = getPiketDayName(getJakartaDayOfWeek());
-      throw forbidden(
-        `Anda tidak terjadwal piket hari ${today}. Hubungi admin jika jadwal belum diatur.`,
-        "PIKET_NOT_SCHEDULED"
-      );
+      return {
+        ok: false,
+        reason: "PIKET_NOT_SCHEDULED",
+        today: getPiketDayName(getJakartaDayOfWeek()),
+      };
     }
   }
 
+  return { ok: true, user };
+}
+
+export async function login(input: LoginInput) {
+  const result = await checkCredentials(input);
+
+  if (!result.ok) {
+    switch (result.reason) {
+      case "MISSING_FIELDS":
+        throw badRequest("Username dan password wajib diisi", "VALIDATION_ERROR");
+      case "ACCOUNT_INACTIVE":
+        throw forbidden("Akun nonaktif. Hubungi admin.", "ACCOUNT_INACTIVE");
+      case "ROLE_MISMATCH":
+        throw forbidden(`Akun ini bukan akun ${input.role?.toLowerCase()}`, "ROLE_MISMATCH");
+      case "PIKET_REQUIRES_TEACHER":
+        throw forbidden("Login piket menggunakan akun guru", "PIKET_REQUIRES_TEACHER");
+      case "PIKET_NOT_SCHEDULED":
+        throw forbidden(
+          `Anda tidak terjadwal piket hari ${result.today}. Hubungi admin jika jadwal belum diatur.`,
+          "PIKET_NOT_SCHEDULED"
+        );
+      default:
+        throw unauthorized("Username atau password salah", "INVALID_CREDENTIALS");
+    }
+  }
+
+  const user = result.user!;
   const token = await createToken(user.id, user.role);
 
   await logAudit({

@@ -199,7 +199,8 @@ export async function getCase(id: string) {
   return prisma.counselingCase.findUnique({
     where: { id },
     include: {
-      student: { include: STUDENT_WITH_CLASS },
+      // `major` hanya dipakai halaman cetak; biayanya satu join pada satu record.
+      student: { include: { ...STUDENT_WITH_CLASS, major: { select: { name: true } } } },
       counselor: { include: { user: { select: { name: true } } } },
     },
   });

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { findAttempt, getExamSummary, isSubmitted } from "@/server/modules/cbt/exam-session";
 import { TokenForm } from "./TokenForm";
 
 export const dynamic = "force-dynamic";
@@ -13,18 +13,13 @@ export default async function TokenPage({ params }: { params: Promise<{ id: stri
   if (!user.student) redirect("/login");
   const { id } = await params;
 
-  const exam = await prisma.exam.findUnique({
-    where: { id },
-    include: { subject: { select: { code: true, name: true } } },
-  });
+  const exam = await getExamSummary(id);
   if (!exam) notFound();
 
   // Cek apakah sudah pernah submit
-  const existing = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId: id, studentId: user.student.id } },
-  });
+  const existing = await findAttempt(id, user.student.id);
 
-  if (existing && (existing.status === "SUBMITTED" || existing.status === "AUTO_SUBMITTED")) {
+  if (existing && isSubmitted(existing.status)) {
     redirect(`/student/exams/${id}/finish`);
   }
 

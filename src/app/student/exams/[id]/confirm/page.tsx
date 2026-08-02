@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { findAttempt, getExamSummary, isSubmitted } from "@/server/modules/cbt/exam-session";
 import { ConfirmStart } from "./ConfirmStart";
 
 export const dynamic = "force-dynamic";
@@ -10,19 +10,11 @@ export default async function ConfirmPage({ params }: { params: Promise<{ id: st
   if (!user.student) redirect("/login");
   const { id } = await params;
 
-  const exam = await prisma.exam.findUnique({
-    where: { id },
-    include: {
-      subject: { select: { code: true, name: true } },
-      _count: { select: { questions: true } },
-    },
-  });
+  const exam = await getExamSummary(id);
   if (!exam) notFound();
 
-  const existing = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId: id, studentId: user.student.id } },
-  });
-  if (existing && (existing.status === "SUBMITTED" || existing.status === "AUTO_SUBMITTED")) {
+  const existing = await findAttempt(id, user.student.id);
+  if (existing && isSubmitted(existing.status)) {
     redirect(`/student/exams/${id}/finish`);
   }
 

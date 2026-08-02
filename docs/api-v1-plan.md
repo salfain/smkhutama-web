@@ -45,9 +45,10 @@ src/
       ├─ piket/{service,dto}.ts     ✅
       ├─ bk/                        ✅ service, surveys, follow-up, dto
       ├─ cbt/                       ✅ exam-session, student, teacher,
-      │                               monitoring, review, exam-print, dto
+      │                               monitoring, analysis, review,
+      │                               exam-print, dto
       ├─ landing/                   ✅ content, ppdb, dto
-      └─ shared/                    ✅ config, assets
+      └─ shared/                    ✅ config, assets, school
 ```
 
 Pembagian tanggung jawabnya:
@@ -383,7 +384,48 @@ di-rollback.
 
 ---
 
-## 7. Utang teknis yang ditemukan (bukan bagian dari refactor)
+## 7. Yang sudah selesai dan yang sengaja ditinggalkan
+
+**Tidak ada satu pun route API yang masih menulis query Prisma sendiri.**
+Seluruh `src/app/api/**` kini memanggil modul. Halaman web yang query-nya
+sama dengan modul juga sudah disambungkan: beranda & daftar ujian siswa,
+hasil siswa, konfirmasi/token/selesai ujian, rekap nilai guru, analisis butir
+soal, serta lima halaman cetak (konseling, pemanggilan, kunjungan rumah, izin
+piket, naskah soal).
+
+Login pun sudah satu aturan: `checkCredentials()` di
+`modules/auth/service.ts` dipakai `/api/auth/login`, `/api/v1/auth/login`, dan
+form login web. Kalimat kesalahannya tetap berbeda — versi web diakhiri titik —
+karena yang dibagi aturannya, bukan teksnya.
+
+### Sengaja masih memakai query sendiri
+
+Bagian di bawah ini **tidak** punya padanan API, jadi tidak ada duplikasi yang
+perlu dihilangkan. Memindahkannya sekarang hanya menambah risiko tanpa manfaat.
+
+| Berkas | Alasan |
+| --- | --- |
+| `admin/{classes,students,subjects,teachers,majors,academic-years,settings,school-profile,piket-schedules,dashboard}/actions.ts` | CRUD data induk, hanya lewat panel admin |
+| `admin/{exams,tokens,question-sets}/actions.ts`, `teacher/question-sets/actions.ts` | Penyusunan ujian, token, dan impor bank soal — semuanya operasi admin lewat web |
+| `admin/{reports,print}/actions.ts` | Rekap dan ekspor Excel; keluarannya berkas, bukan JSON |
+| `cms/(panel)/content-actions.ts`, `cms/actions.ts` | Panel CMS harus membaca tabel apa adanya, bukan nilai bawaan — perbedaan yang disengaja |
+| `profile/change-password/actions.ts`, `piket/laporan/actions.ts` | Berdiri sendiri, tidak dipakai modul lain |
+| `admin/audit-logs`, `admin/question-sets/[id]`, `teacher/question-sets/[id]`, `cms/(panel)/dashboard` (halaman) | Mengikuti area admin/CMS di atas |
+
+Kalau nanti admin perlu mengelola ujian atau bank soal dari aplikasi mobile,
+barulah pemindahan itu berbayar — polanya sudah terbukti di empat modul.
+
+### Belum dikerjakan sama sekali
+
+1. **Route lama belum dipensiunkan.** Menunggu aplikasi mobile rilis versi yang
+   memakai `/api/v1`. Sampai itu terjadi keduanya hidup berdampingan.
+2. **Belum ada test otomatis.** Repo belum punya test runner. Verifikasi
+   selama ini dilakukan manual terhadap PostgreSQL sementara di setiap tahap.
+3. **Dokumen migrasi untuk tim mobile** belum ditulis.
+
+---
+
+## 8. Utang teknis yang ditemukan (bukan bagian dari refactor)
 
 Ditemukan saat memindahkan modul piket, sengaja **tidak** diperbaiki di sini
 supaya refactor tidak sekaligus mengubah perilaku:

@@ -165,6 +165,24 @@ export async function createPermit(input: CreatePermitInput) {
   });
 }
 
+/**
+ * Satu catatan izin beserta identitas siswa dan nama petugas piket yang
+ * mencatatnya — untuk surat izin keluar yang dicetak.
+ */
+export async function getPermitForPrint(id: string) {
+  const permit = await prisma.studentPermit.findUnique({
+    where: { id },
+    include: { student: { include: STUDENT_WITH_CLASS } },
+  });
+  if (!permit) return null;
+
+  const recorder = await prisma.user
+    .findUnique({ where: { id: permit.recordedBy }, select: { name: true } })
+    .catch(() => null);
+
+  return { permit, recorderName: recorder?.name ?? null };
+}
+
 /** Tandai siswa sudah kembali. False kalau catatannya tidak ada. */
 export async function markPermitReturned(id: string) {
   const result = await prisma.studentPermit.updateMany({

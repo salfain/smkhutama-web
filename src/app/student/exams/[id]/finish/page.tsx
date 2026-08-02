@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Trophy, XCircle, Minus, ArrowRight, Home, Hourglass } from "lucide-react";
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getFinishSummary } from "@/server/modules/cbt/student";
 
 export const dynamic = "force-dynamic";
 
@@ -13,19 +13,10 @@ export default async function FinishPage({ params }: { params: Promise<{ id: str
   if (!user.student) redirect("/login");
   const { id } = await params;
 
-  const attempt = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId: id, studentId: user.student.id } },
-    include: {
-      exam: { include: { subject: { select: { code: true, name: true } } } },
-      answers: { select: { isCorrect: true, selectedOptionId: true, answerText: true } },
-    },
-  });
-  if (!attempt) notFound();
+  const summary = await getFinishSummary(id, user.student.id);
+  if (!summary) notFound();
 
-  const totalQuestions = await prisma.examQuestion.count({ where: { examId: id } });
-  const correct = attempt.answers.filter((a) => a.isCorrect === true).length;
-  const wrong = attempt.answers.filter((a) => a.isCorrect === false).length;
-  const empty = totalQuestions - attempt.answers.filter((a) => a.selectedOptionId || a.answerText).length;
+  const { attempt, totalQuestions, correct, wrong, empty } = summary;
 
   const isWaiting = attempt.score === null;
   const passed = !isWaiting && attempt.exam.passingScore !== null && (attempt.score ?? 0) >= attempt.exam.passingScore;

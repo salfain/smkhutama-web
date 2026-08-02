@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma";
+import { getPermitForPrint } from "@/server/modules/piket/service";
+import { getSchoolProfile } from "@/server/modules/shared/school";
 import { requirePiketAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { PrintButtons, SchoolLogoSmall } from "@/components/print/PrintButtons";
@@ -20,26 +21,12 @@ export default async function IzinPrintPage({ params }: { params: Promise<{ id: 
   await requirePiketAuth();
   const { id } = await params;
 
-  const permit = await prisma.studentPermit.findUnique({
-    where: { id },
-    include: {
-      student: {
-        include: {
-          user: { select: { name: true } },
-          class: { select: { name: true } },
-          major: { select: { name: true } },
-        },
-      },
-    },
-  });
+  const record = await getPermitForPrint(id);
+  if (!record) notFound();
 
-  if (!permit) notFound();
-
-  const school = await prisma.schoolProfile.findFirst();
-  const piketUser = await prisma.user.findUnique({
-    where: { id: permit.recordedBy },
-    select: { name: true },
-  }).catch(() => null);
+  const { permit, recorderName } = record;
+  const school = await getSchoolProfile();
+  const piketUser = recorderName ? { name: recorderName } : null;
 
   const nomorSurat = `IZIN-${new Date(permit.date).getFullYear()}${String(new Date(permit.date).getMonth() + 1).padStart(2, "0")}${String(new Date(permit.date).getDate()).padStart(2, "0")}-${id.slice(-4).toUpperCase()}`;
 

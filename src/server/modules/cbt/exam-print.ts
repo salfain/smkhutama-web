@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { getSchoolProfile } from "@/server/modules/shared/school";
 
 export async function getExamForPrint(examId: string) {
   return prisma.exam.findUnique({
@@ -32,9 +33,7 @@ export async function getExamForPrint(examId: string) {
   });
 }
 
-export async function getSchoolProfile() {
-  return prisma.schoolProfile.findFirst();
-}
+export { getSchoolProfile };
 
 /** Admin boleh mencetak ujian mana pun; guru hanya ujian miliknya. */
 export function canPrintExam(

@@ -142,6 +142,17 @@ export async function beginAttempt(input: {
   return { status: "OK", attemptId: created.id, resumed: false };
 }
 
+/** Ringkasan ujian tanpa isi soal — untuk halaman konfirmasi & token. */
+export async function getExamSummary(examId: string) {
+  return prisma.exam.findUnique({
+    where: { id: examId },
+    include: {
+      subject: { select: { code: true, name: true } },
+      _count: { select: { questions: true } },
+    },
+  });
+}
+
 /** Ujian beserta soal dan pilihannya, urut nomor. */
 export async function getExamWithQuestions(examId: string) {
   return prisma.exam.findUnique({

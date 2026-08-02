@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getDashboard } from "@/server/modules/cbt/student";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,42 +23,7 @@ export default async function StudentDashboard() {
   if (!user.student) return null;
 
   const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-  const classId = user.student.classId;
-
-  const [todayExams, upcomingExams, history] = await Promise.all([
-    prisma.exam.findMany({
-      where: {
-        status: "ACTIVE",
-        startAt: { lte: todayEnd },
-        endAt: { gte: now },
-        ...(classId ? { classes: { some: { classId } } } : {}),
-      },
-      orderBy: { startAt: "asc" },
-      include: {
-        subject: { select: { code: true, name: true } },
-        _count: { select: { questions: true } },
-      },
-    }),
-    prisma.exam.findMany({
-      where: {
-        status: { in: ["ACTIVE", "DRAFT"] },
-        startAt: { gt: todayEnd },
-        ...(classId ? { classes: { some: { classId } } } : {}),
-      },
-      orderBy: { startAt: "asc" }, take: 5,
-      include: { subject: { select: { code: true, name: true } } },
-    }),
-    prisma.studentExamAttempt.findMany({
-      where: {
-        studentId: user.student.id,
-        status: { in: ["SUBMITTED", "AUTO_SUBMITTED"] },
-      },
-      orderBy: { submittedAt: "desc" }, take: 5,
-      include: { exam: { include: { subject: { select: { code: true } } } } },
-    }),
-  ]);
+  const { todayExams, upcomingExams, history } = await getDashboard(user.student);
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6">

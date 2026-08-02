@@ -30,7 +30,7 @@ export async function getHomeVisit(id: string) {
   return prisma.homeVisit.findUnique({
     where: { id },
     include: {
-      student: { include: STUDENT_WITH_CLASS },
+      student: { include: { ...STUDENT_WITH_CLASS, major: { select: { name: true } } } },
       counselor: { include: { user: { select: { name: true } } } },
     },
   });
@@ -80,7 +80,7 @@ export async function getSummon(id: string) {
   return prisma.parentSummon.findUnique({
     where: { id },
     include: {
-      student: { include: STUDENT_WITH_CLASS },
+      student: { include: { ...STUDENT_WITH_CLASS, major: { select: { name: true } } } },
       counselor: { include: { user: { select: { name: true } } } },
     },
   });

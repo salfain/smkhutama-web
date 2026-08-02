@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { listResults } from "@/server/modules/cbt/student";
 import { StudentResultsClient } from "./StudentResultsClient";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -14,21 +14,7 @@ export default async function StudentResultsPage() {
   const user = await requireAuth("STUDENT");
   if (!user.student) return null;
 
-  const attempts = await prisma.studentExamAttempt.findMany({
-    where: {
-      studentId: user.student.id,
-      status: { in: ["SUBMITTED", "AUTO_SUBMITTED"] },
-    },
-    orderBy: { submittedAt: "desc" },
-    include: {
-      exam: {
-        include: {
-          subject: { select: { code: true, name: true } },
-        },
-      },
-      answers: { select: { isCorrect: true, score: true } },
-    },
-  });
+  const attempts = await listResults(user.student.id);
 
   const data = attempts.map((a) => ({
     id: a.id,
