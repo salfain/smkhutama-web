@@ -31,7 +31,7 @@ src/
 │  │  ├─ v1/                     ← API baru, per modul
 │  │  │  ├─ auth/                   login, logout, me (lintas modul)
 │  │  │  ├─ landing/                konten publik sekolah
-│  │  │  ├─ cbt/                    ujian: student / teacher / admin
+│  │  │  ├─ cbt/                    ujian: student ✅ / teacher ⏳ / admin ⏳
 │  │  │  ├─ bk/                     bimbingan konseling   ✅ sudah jalan
 │  │  │  └─ piket/                  guru piket            ✅ sudah jalan
 │  │  └─ ...                     ← route lama, dibiarkan hidup
@@ -44,7 +44,8 @@ src/
       ├─ auth/service.ts            ✅
       ├─ piket/{service,dto}.ts     ✅
       ├─ bk/                        ✅ service, surveys, follow-up, dto
-      ├─ cbt/                       ⏳
+      ├─ cbt/                       ◐ exam-session, student, review, dto
+      │                               (inti ujian siswa; guru & admin menyusul)
       └─ landing/                   ⏳
 ```
 
@@ -151,24 +152,53 @@ Login menerima `system: "PIKET"` untuk menerapkan syarat jadwal piket.
 Perubahan bentuk di v1: penghapusan memakai path parameter (`/{id}`), bukan
 query string, dan mengembalikan `404` kalau record tidak ada.
 
-### 5.3 Modul CBT ⏳
+### 5.3 Modul CBT — inti ujian siswa ✅
+
+Bagian ini yang dipakai aplikasi mobile **saat ujian berlangsung**, jadi
+dikerjakan terpisah dari sisi guru/admin supaya perubahannya kecil dan mudah
+ditelusuri.
 
 | v1 | Lama |
 | --- | --- |
-| `GET /api/v1/cbt/student/dashboard` | `/api/student/dashboard` |
-| `GET /api/v1/cbt/student/exams` | `/api/student/exams` |
-| `POST /api/v1/cbt/student/exams/validate-token` | `/api/student/exams/validate-token` |
-| `POST /api/v1/cbt/student/exams/start` | `/api/student/exams/start` |
-| `GET /api/v1/cbt/student/exams/{id}/questions` | `/api/student/exams/[id]/questions` |
-| `GET /api/v1/cbt/student/exams/{id}/status` | `/api/student/exams/[id]/status` |
-| `POST /api/v1/cbt/student/exams/{id}/resume` | `/api/student/exams/[id]/resume` |
-| `POST /api/v1/cbt/student/exams/{id}/heartbeat` | `/api/student/exams/[id]/heartbeat` |
-| `POST /api/v1/cbt/student/exams/{id}/violation` | `/api/student/exams/[id]/violation` |
-| `POST /api/v1/cbt/student/exams/{id}/submit` | `/api/student/exams/[id]/submit` |
-| `POST /api/v1/cbt/student/answers` | `/api/student/answers/save` |
-| `POST /api/v1/cbt/student/answers/sync` | `/api/student/answers/sync` |
-| `GET /api/v1/cbt/student/results` | `/api/student/results` |
-| `GET /api/v1/cbt/attempts/{attemptId}/answers` | `/api/answers/[attemptId]` |
+| `GET /api/v1/cbt/student/dashboard` | `GET /api/student/dashboard` |
+| `GET /api/v1/cbt/student/exams` | `GET /api/student/exams` |
+| `POST /api/v1/cbt/student/exams/validate-token` | `POST /api/student/exams/validate-token` |
+| `POST /api/v1/cbt/student/exams/start` | `POST /api/student/exams/start` |
+| `GET /api/v1/cbt/student/exams/{id}/questions` | `GET /api/student/exams/[id]/questions` |
+| `GET /api/v1/cbt/student/exams/{id}/status` | `GET /api/student/exams/[id]/status` |
+| `GET /api/v1/cbt/student/exams/{id}/resume` | `GET /api/student/exams/[id]/resume` |
+| `POST /api/v1/cbt/student/exams/{id}/heartbeat` | `POST /api/student/exams/[id]/heartbeat` |
+| `POST /api/v1/cbt/student/exams/{id}/violation` | `POST /api/student/exams/[id]/violation` |
+| `POST /api/v1/cbt/student/exams/{id}/submit` | `POST /api/student/exams/[id]/submit` |
+| `POST /api/v1/cbt/student/answers` | `POST /api/student/answers/save` |
+| `POST /api/v1/cbt/student/answers/sync` | `POST /api/student/answers/sync` |
+| `GET /api/v1/cbt/student/results` | `GET /api/student/results` |
+| `GET /api/v1/cbt/attempts/{attemptId}/answers` | `GET /api/answers/[attemptId]` |
+
+Aturan yang sekarang jadi satu di `src/server/modules/cbt/exam-session.ts`:
+jendela waktu ujian, keanggotaan kelas, token, siklus attempt, heartbeat,
+penghitungan pelanggaran + penguncian, penyimpanan jawaban, dan penilaian.
+Kegagalan dikembalikan sebagai **kode** (`TOKEN_EXPIRED`, `NOT_PARTICIPANT`,
+…), bukan kalimat — route lama dan halaman web memetakan kode itu ke pesan
+masing-masing, sehingga teks yang sudah dikenal pengguna tidak berubah.
+
+Dua hal yang perlu dicatat:
+
+- **Token hanya diminta saat ujian dimulai.** Attempt yang sudah berjalan bisa
+  dilanjutkan tanpa token baru — perilaku yang sudah berlaku di endpoint lama
+  dan sengaja dipertahankan di v1, supaya siswa yang aplikasinya tertutup di
+  tengah ujian tidak perlu meminta token ulang ke pengawas.
+- **`/api/answers/[attemptId]` sebelumnya tanpa autentikasi sama sekali.**
+  Siapa pun yang tahu `attemptId` bisa membaca lembar jawaban lengkap dengan
+  kunci jawabannya. Sekarang wajib terautentikasi (cookie sesi atau Bearer
+  token) dan siswa hanya boleh membuka attempt miliknya sendiri. Ini satu-
+  satunya perubahan perilaku pada endpoint lama di seluruh migrasi, dan
+  dilakukan karena sifatnya lubang keamanan.
+
+### 5.3b Modul CBT — sisi guru & admin ⏳
+
+| v1 | Lama |
+| --- | --- |
 | `GET /api/v1/cbt/teacher/dashboard` | `/api/teacher/dashboard` |
 | `GET /api/v1/cbt/teacher/exams` | `/api/teacher/exams` |
 | `GET /api/v1/cbt/teacher/exams/{id}/token` | `/api/teacher/exams/[id]/token` |
@@ -178,9 +208,15 @@ query string, dan mengembalikan `404` kalau record tidak ada.
 | `PATCH /api/v1/cbt/teacher/essay-grading/{id}` | `/api/teacher/essay-grading/[id]` |
 | `GET /api/v1/cbt/admin/exams/{id}/print-questions` | `/api/admin/exams/[id]/print-questions` |
 
-Aturan bisnis yang harus pindah ke `src/server/modules/cbt/`:
-`src/lib/exam-scoring.ts`, `exam-permissions.ts`, `exam-lock.ts`,
-`exam-types.ts`, `mobile-exam.ts`, `question-set-import.ts`.
+Aturan bisnis yang masih perlu ditata ulang bersama bagian ini:
+`src/lib/exam-permissions.ts` (siapa boleh membuat token) dan
+`src/lib/question-set-import.ts` (impor bank soal).
+
+`src/lib/exam-scoring.ts`, `exam-lock.ts`, dan `mobile-exam.ts` **tetap di
+`src/lib/`** dan dipanggil dari modul CBT: ketiganya fungsi murni tanpa
+sentuhan Prisma, jadi lebih mudah diuji di tempatnya sekarang.
+`exam-types.ts` juga tetap karena berisi label dan warna yang dipakai
+komponen client.
 
 ### 5.4 Modul BK ✅
 
@@ -273,12 +309,17 @@ luar (aplikasi mobile, layar informasi, integrasi pihak ketiga).
 2. **Modul BK** ✅ — `modules/bk/{service,surveys,follow-up,dto}.ts`, 18 route
    `/api/v1/bk/*`, 18 route lama disambungkan ke service, dan tujuh file
    server action halaman web ikut memakai service yang sama.
-3. **Modul CBT** — paling berisiko (dipakai aplikasi mobile saat ujian
-   berlangsung). Kerjakan setelah pola terbukti di dua modul.
-4. **Modul landing** — endpoint baru sepenuhnya, tidak ada klien lama yang
+3. **Modul CBT — inti ujian siswa** ✅ — `modules/cbt/{exam-session,student,
+   review,dto,http-errors}.ts`, 14 route `/api/v1/cbt`, 14 route lama
+   disambungkan, dan server action halaman ujian web ikut memakai service yang
+   sama. Diuji lewat simulasi ujian utuh terhadap PostgreSQL sementara.
+4. **Modul CBT — sisi guru & admin** ⏳ — bank soal, penyusunan ujian, token,
+   monitoring, penilaian esai, cetak soal, rekap nilai. Tidak dipakai saat
+   ujian berjalan, jadi risikonya jauh lebih rendah.
+5. **Modul landing** — endpoint baru sepenuhnya, tidak ada klien lama yang
    perlu dijaga.
-5. **Endpoint bersama** (`config`, `media`).
-6. **Pensiunkan route lama** setelah aplikasi mobile rilis versi yang memakai
+6. **Endpoint bersama** (`config`, `media`).
+7. **Pensiunkan route lama** setelah aplikasi mobile rilis versi yang memakai
    v1, dengan tenggat yang disepakati.
 
 Setiap langkah dikerjakan dalam PR terpisah supaya mudah direview dan
@@ -308,7 +349,13 @@ supaya refactor tidak sekaligus mengubah perilaku:
    1–4. Akibatnya rata-rata per pertanyaan bisa tertarik ke bawah oleh
    jawaban kosong. Perbaikannya: wajibkan semua pertanyaan terisi di form,
    lalu samakan validasinya di service.
-6. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
+6. **Kunci jawaban ikut terkirim meski `showResult` mati.** Endpoint
+   pembahasan selalu menyertakan `isCorrect` dan `correctOptionLabel`;
+   yang menyembunyikannya hanya tampilan (`showCorrectAnswers` di
+   `AnswerReviewDialog`). Siswa yang membuka tab jaringan peramban tetap bisa
+   melihatnya. Perbaikannya: saring di server berdasarkan `exam.showResult`
+   saat yang meminta adalah siswa.
+7. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
    nilainya terbatas. Sama seperti `ParentSummon.level`. Kandidat enum Prisma.
 
 Satu perbedaan yang justru **diperbaiki** saat migrasi: nomor urut pertanyaan

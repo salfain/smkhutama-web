@@ -1,40 +1,39 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/session";
-import { logAudit } from "@/lib/audit";
+/**
+ * Server action halaman ujian siswa (versi web).
+ *
+ * Aturan akses, siklus attempt, dan penilaiannya dipinjam dari
+ * `@/server/modules/cbt/exam-session` — sumber yang sama dengan route API,
+ * sehingga ujian lewat browser dan lewat aplikasi mobile tidak bisa lagi
+ * berbeda aturan.
+ */
+
 import { revalidatePath } from "next/cache";
-import { calculateSubmissionScore } from "@/lib/exam-scoring";
+import { requireAuth } from "@/lib/session";
+import * as cbt from "@/server/modules/cbt/exam-session";
+import { EXAM_ACCESS_MESSAGES } from "@/server/modules/cbt/http-errors";
+
+/** Halaman web memakai kalimat "sudah kadaluarsa"; API memakai "kadaluarsa". */
+const TOKEN_MESSAGES: Record<cbt.TokenCode, string> = {
+  TOKEN_REQUIRED: "Token wajib diisi",
+  TOKEN_INVALID: "Token tidak valid",
+  TOKEN_EXPIRED: "Token sudah kadaluarsa",
+};
 
 export async function validateToken(examId: string, tokenInput: string) {
   const user = await requireAuth("STUDENT");
   if (!user.student) return { error: "Akun siswa tidak valid" };
 
-  const trimmed = tokenInput.trim().toUpperCase();
-  if (!trimmed) return { error: "Token wajib diisi" };
+  if (!tokenInput.trim()) return { error: TOKEN_MESSAGES.TOKEN_REQUIRED };
 
-  const exam = await prisma.exam.findUnique({
-    where: { id: examId },
-    include: { classes: true },
-  });
-  if (!exam) return { error: "Ujian tidak ditemukan" };
-  if (exam.status !== "ACTIVE") return { error: "Ujian belum aktif" };
   const now = new Date();
-  if (now < exam.startAt) return { error: "Ujian belum dimulai" };
-  if (now > exam.endAt) return { error: "Ujian sudah berakhir" };
+  const exam = await cbt.findExamWithClasses(examId);
+  const accessCode = cbt.checkExamAccess(exam, user.student.classId, now);
+  if (accessCode) return { error: EXAM_ACCESS_MESSAGES[accessCode] };
 
-  // Cek peserta
-  const isParticipant = exam.classes.some((c) => c.classId === user.student!.classId);
-  if (!isParticipant && exam.classes.length > 0) {
-    return { error: "Anda bukan peserta ujian ini" };
-  }
-
-  // Validasi token
-  const token = await prisma.examToken.findFirst({
-    where: { examId, token: trimmed, isActive: true },
-  });
-  if (!token) return { error: "Token tidak valid" };
-  if (token.expiredAt < now) return { error: "Token sudah kadaluarsa" };
+  const tokenCode = await cbt.checkExamToken(examId, tokenInput, now);
+  if (tokenCode) return { error: TOKEN_MESSAGES[tokenCode] };
 
   return { success: true };
 }
@@ -43,46 +42,15 @@ export async function startAttempt(examId: string) {
   const user = await requireAuth("STUDENT");
   if (!user.student) throw new Error("Akun siswa tidak valid");
 
-  const studentId = user.student.id;
-  const existing = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId, studentId } },
+  // Token sudah divalidasi di langkah sebelumnya oleh halaman token.
+  const result = await cbt.beginAttempt({
+    examId,
+    studentId: user.student.id,
+    userId: user.id,
+    auditAction: "START_EXAM_ATTEMPT",
   });
 
-  if (existing) {
-    if (existing.status === "SUBMITTED" || existing.status === "AUTO_SUBMITTED") {
-      return { error: "Ujian sudah dikerjakan" };
-    }
-    // Resume attempt
-    if (!existing.startedAt) {
-      await prisma.studentExamAttempt.update({
-        where: { id: existing.id },
-        data: { startedAt: new Date(), status: "IN_PROGRESS", loginStatus: true },
-      });
-      await logAudit({
-        action: "START_EXAM_ATTEMPT",
-        entity: "studentExamAttempt",
-        entityId: existing.id,
-        details: { examId, studentId },
-      });
-    }
-    return { success: true };
-  }
-
-  const created = await prisma.studentExamAttempt.create({
-    data: {
-      examId, studentId,
-      startedAt: new Date(),
-      status: "IN_PROGRESS",
-      loginStatus: true,
-    },
-  });
-  await logAudit({
-    action: "START_EXAM_ATTEMPT",
-    entity: "studentExamAttempt",
-    entityId: created.id,
-    details: { examId, studentId },
-  });
-
+  if (result.status === "ALREADY_SUBMITTED") return { error: "Ujian sudah dikerjakan" };
   return { success: true };
 }
 
@@ -91,41 +59,12 @@ export async function getExamForTaking(examId: string) {
   if (!user.student) return null;
 
   const [exam, attempt] = await Promise.all([
-    prisma.exam.findUnique({
-      where: { id: examId },
-      include: {
-        subject: { select: { code: true, name: true } },
-        questions: {
-          orderBy: { orderNumber: "asc" },
-          include: {
-            question: {
-              include: {
-                options: { orderBy: { orderNumber: "asc" } },
-              },
-            },
-          },
-        },
-      },
-    }),
-    prisma.studentExamAttempt.findUnique({
-      where: { examId_studentId: { examId, studentId: user.student.id } },
-      include: {
-        answers: {
-          select: {
-            questionId: true, selectedOptionId: true,
-            answerText: true, isDoubtful: true,
-          },
-        },
-      },
-    }),
+    cbt.getExamWithQuestions(examId),
+    cbt.getAttemptWithAnswers(examId, user.student.id),
   ]);
 
   if (!exam || !attempt) return null;
-  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
-    return { ...exam, attempt, finished: true };
-  }
-
-  return { ...exam, attempt, finished: false };
+  return { ...exam, attempt, finished: cbt.isSubmitted(attempt.status) };
 }
 
 export async function saveAnswer(input: {
@@ -138,31 +77,15 @@ export async function saveAnswer(input: {
   const user = await requireAuth("STUDENT");
   if (!user.student) return { error: "Tidak diizinkan" };
 
-  const attempt = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId: input.examId, studentId: user.student.id } },
-  });
-  if (!attempt) return { error: "Attempt tidak ditemukan" };
-  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
-    return { error: "Ujian sudah disubmit" };
-  }
-
-  await prisma.studentAnswer.upsert({
-    where: { attemptId_questionId: { attemptId: attempt.id, questionId: input.questionId } },
-    update: {
-      selectedOptionId: input.selectedOptionId ?? null,
-      answerText: input.answerText ?? null,
-      isDoubtful: input.isDoubtful ?? false,
-      savedAt: new Date(),
-    },
-    create: {
-      attemptId: attempt.id,
-      questionId: input.questionId,
-      selectedOptionId: input.selectedOptionId ?? null,
-      answerText: input.answerText ?? null,
-      isDoubtful: input.isDoubtful ?? false,
-    },
+  const result = await cbt.saveAnswer(input.examId, user.student.id, {
+    questionId: input.questionId,
+    selectedOptionId: input.selectedOptionId,
+    answerText: input.answerText,
+    isDoubtful: input.isDoubtful,
   });
 
+  if (result === "NO_ATTEMPT") return { error: "Attempt tidak ditemukan" };
+  if (result === "ALREADY_SUBMITTED") return { error: "Ujian sudah disubmit" };
   return { success: true };
 }
 
@@ -170,58 +93,15 @@ export async function submitExam(examId: string, isAuto = false) {
   const user = await requireAuth("STUDENT");
   if (!user.student) return { error: "Tidak diizinkan" };
 
-  const attempt = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId, studentId: user.student.id } },
-    include: {
-      answers: { include: { question: { include: { options: true } } } },
-      exam: {
-        select: {
-          showResult: true,
-          multipleChoicePercentage: true,
-          essayPercentage: true,
-          questions: {
-            include: { question: { select: { id: true, scoreWeight: true, questionType: true } } },
-          },
-        },
-      },
-    },
-  });
-  if (!attempt) return { error: "Attempt tidak ditemukan" };
-  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
-    return { success: true };
-  }
-
-  const { updates: answerUpdates, finalScore } = calculateSubmissionScore({
-    questions: attempt.exam.questions.map((eq) => eq.question),
-    answers: attempt.answers,
-    multipleChoicePercentage: attempt.exam.multipleChoicePercentage,
-    essayPercentage: attempt.exam.essayPercentage,
+  const result = await cbt.submitAttempt({
+    examId,
+    studentId: user.student.id,
+    userId: user.id,
+    isAuto,
+    auditAction: isAuto ? "AUTO_SUBMIT_EXAM" : "SUBMIT_EXAM",
   });
 
-  await prisma.$transaction([
-    ...answerUpdates.map((u) =>
-      prisma.studentAnswer.update({
-        where: { id: u.id },
-        data: { isCorrect: u.isCorrect, score: u.score },
-      })
-    ),
-    prisma.studentExamAttempt.update({
-      where: { id: attempt.id },
-      data: {
-        status: isAuto ? "AUTO_SUBMITTED" : "SUBMITTED",
-        submittedAt: new Date(),
-        score: finalScore,
-        loginStatus: false,
-      },
-    }),
-  ]);
-
-  await logAudit({
-    action: isAuto ? "AUTO_SUBMIT_EXAM" : "SUBMIT_EXAM",
-    entity: "studentExamAttempt",
-    entityId: attempt.id,
-    details: { examId, studentId: user.student.id, score: finalScore },
-  });
+  if (result.state === "NO_ATTEMPT") return { error: "Attempt tidak ditemukan" };
 
   revalidatePath(`/student/exams/${examId}`);
   return { success: true };

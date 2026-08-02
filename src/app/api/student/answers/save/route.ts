@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
-import { prisma } from "@/lib/prisma";
+import { saveAnswer } from "@/server/modules/cbt/exam-session";
 
+// Endpoint versi lama. Penggantinya: POST /api/v1/cbt/student/answers.
 export async function POST(req: NextRequest) {
   const r = await requireApiAuth(req, "STUDENT");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
+
   const student = r.user.student;
   if (!student) return NextResponse.json({ error: "No student" }, { status: 400 });
 
@@ -13,29 +15,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "examId dan questionId wajib" }, { status: 400 });
   }
 
-  const attempt = await prisma.studentExamAttempt.findUnique({
-    where: { examId_studentId: { examId, studentId: student.id } },
+  const result = await saveAnswer(examId, student.id, {
+    questionId,
+    selectedOptionId,
+    answerText,
+    isDoubtful,
   });
-  if (!attempt) return NextResponse.json({ error: "Attempt tidak ditemukan" }, { status: 404 });
-  if (attempt.status === "SUBMITTED" || attempt.status === "AUTO_SUBMITTED") {
+
+  if (result === "NO_ATTEMPT") {
+    return NextResponse.json({ error: "Attempt tidak ditemukan" }, { status: 404 });
+  }
+  if (result === "ALREADY_SUBMITTED") {
     return NextResponse.json({ error: "Ujian sudah disubmit" }, { status: 400 });
   }
-
-  await prisma.studentAnswer.upsert({
-    where: { attemptId_questionId: { attemptId: attempt.id, questionId } },
-    update: {
-      selectedOptionId: selectedOptionId ?? null,
-      answerText: answerText ?? null,
-      isDoubtful: isDoubtful ?? false,
-      savedAt: new Date(),
-    },
-    create: {
-      attemptId: attempt.id, questionId,
-      selectedOptionId: selectedOptionId ?? null,
-      answerText: answerText ?? null,
-      isDoubtful: isDoubtful ?? false,
-    },
-  });
 
   return NextResponse.json({ success: true });
 }
