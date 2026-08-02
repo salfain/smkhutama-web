@@ -419,8 +419,12 @@ barulah pemindahan itu berbayar — polanya sudah terbukti di empat modul.
 
 1. **Route lama belum dipensiunkan.** Menunggu aplikasi mobile rilis versi yang
    memakai `/api/v1`. Sampai itu terjadi keduanya hidup berdampingan.
-2. **Belum ada test otomatis.** Repo belum punya test runner. Verifikasi
-   selama ini dilakukan manual terhadap PostgreSQL sementara di setiap tahap.
+2. **Test otomatis baru menutup logika murni.** 69 test dengan `node --test`
+   lewat `tsx` — tanpa dependensi baru, jalankan dengan `npm test`. Yang
+   tertutup: penilaian ujian, aturan akses ujian, batas waktu & pengacakan
+   soal, rekap angket, ambang poin SP, pembaca field request, dan rentang
+   tanggal. Yang **belum** tertutup: apa pun yang menyentuh basis data —
+   itu masih diuji manual terhadap PostgreSQL sementara di tiap tahap.
 3. **Dokumen migrasi untuk tim mobile** belum ditulis.
 
 ---
@@ -459,7 +463,15 @@ supaya refactor tidak sekaligus mengubah perilaku:
    pencari bisa mengindeks halaman kosong. Perilaku ini sudah ada sebelum
    migrasi — alur kodenya tidak berubah — dan berlaku untuk semua halaman yang
    memakai `notFound()`.
-8. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
+8. **Pengacakan soal bergantung pada id berbentuk UUID.** `stableShuffle`
+   mengurutkan berdasarkan hash `attemptId:questionId`. Hash-nya lemah: untuk
+   id yang berawalan sama dan hanya berbeda di karakter akhir (`q1`, `q2`, …)
+   nilainya ikut berurutan, sehingga "pengacakan" berubah jadi urutan asli
+   **tanpa error apa pun**. Saat ini aman karena id soal memakai
+   `@default(uuid())`, tapi kalau suatu saat id diganti jadi berurutan, fitur
+   anti-contek ini mati diam-diam. Ditemukan saat menulis test; dicatat di
+   `src/lib/mobile-exam.test.ts`.
+9. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
    nilainya terbatas. Sama seperti `ParentSummon.level`. Kandidat enum Prisma.
 
 Satu perbedaan yang justru **diperbaiki** saat migrasi: nomor urut pertanyaan
