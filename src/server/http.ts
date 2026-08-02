@@ -97,3 +97,37 @@ export function optionalString(body: Record<string, unknown>, field: string): st
   const text = typeof value === "string" ? value.trim() : "";
   return text || null;
 }
+
+/** Ambil field angka bulat; nilai yang tidak terbaca memakai `fallback`. */
+export function intField(body: Record<string, unknown>, field: string, fallback = 0): number {
+  const value = body[field];
+  const parsed = typeof value === "number" ? value : parseInt(String(value ?? ""), 10);
+  return Number.isFinite(parsed) ? Math.trunc(parsed) : fallback;
+}
+
+/** Ambil field boolean; menerima boolean asli maupun "true"/"on"/"1". */
+export function boolField(body: Record<string, unknown>, field: string, fallback = false): boolean {
+  const value = body[field];
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return ["1", "true", "yes", "on"].includes(value.toLowerCase());
+  return fallback;
+}
+
+/**
+ * Ambil field yang nilainya harus salah satu dari daftar yang diizinkan.
+ * Tanpa `fallback`, nilai di luar daftar ditolak sebagai 400.
+ */
+export function oneOf<T extends string>(
+  body: Record<string, unknown>,
+  field: string,
+  allowed: readonly T[],
+  fallback?: T
+): T {
+  const value = typeof body[field] === "string" ? (body[field] as string).trim() : "";
+  if ((allowed as readonly string[]).includes(value)) return value as T;
+  if (fallback !== undefined && !value) return fallback;
+  throw badRequest(
+    `Field "${field}" harus salah satu dari: ${allowed.join(", ")}`,
+    "VALIDATION_ERROR"
+  );
+}

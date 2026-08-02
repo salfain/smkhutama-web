@@ -1,54 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
-import { prisma } from "@/lib/prisma";
+import {
+  COUNSELING_STATUSES,
+  type CounselingStatus,
+  getCase,
+  updateCaseStatus,
+} from "@/server/modules/bk/service";
+import { toCaseDetail } from "@/server/modules/bk/dto";
 
-const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "REFERRED"] as const;
-
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// Endpoint versi lama. Penggantinya: /api/v1/bk/counselor/cases/{id}.
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "COUNSELOR");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
   const { id } = await params;
-  const c = await prisma.counselingCase.findUnique({
-    where: { id },
-    include: {
-      student: {
-        include: {
-          user: { select: { name: true } },
-          class: { select: { name: true } },
-        },
-      },
-      counselor: { include: { user: { select: { name: true } } } },
-    },
-  });
+  const record = await getCase(id);
+  if (!record) {
+    return NextResponse.json({ error: "Sesi konseling tidak ditemukan" }, { status: 404 });
+  }
 
-  if (!c) return NextResponse.json({ error: "Sesi konseling tidak ditemukan" }, { status: 404 });
-
-  return NextResponse.json({
-    id: c.id,
-    studentId: c.studentId,
-    studentName: c.student.user.name,
-    className: c.student.class?.name ?? "-",
-    counselorName: c.counselor.user.name,
-    type: c.type,
-    status: c.status,
-    title: c.title,
-    description: c.description ?? "",
-    notes: c.notes ?? "",
-    followUp: c.followUp ?? "",
-    isConfidential: c.isConfidential,
-    sessionDate: c.sessionDate,
-    sessions: [],
-  });
+  return NextResponse.json(toCaseDetail(record));
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "COUNSELOR");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
@@ -56,17 +30,14 @@ export async function PATCH(
   const body = await req.json().catch(() => ({}));
   const status = String(body.status ?? "").trim();
 
-  if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
+  if (!COUNSELING_STATUSES.includes(status as CounselingStatus)) {
     return NextResponse.json({ error: "Status tidak valid" }, { status: 400 });
   }
 
-  try {
-    await prisma.counselingCase.update({
-      where: { id },
-      data: { status: status as (typeof VALID_STATUSES)[number] },
-    });
-    return NextResponse.json({ success: true });
-  } catch {
+  const updated = await updateCaseStatus(id, status as CounselingStatus);
+  if (!updated) {
     return NextResponse.json({ error: "Sesi konseling tidak ditemukan" }, { status: 404 });
   }
+
+  return NextResponse.json({ success: true });
 }

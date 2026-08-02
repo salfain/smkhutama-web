@@ -1,34 +1,28 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+/**
+ * Server action rekap BK untuk wali kelas.
+ * Query-nya dipinjam dari `@/server/modules/bk/service`.
+ */
+
 import { requireAuth } from "@/lib/session";
+import { getHomeroomClasses, sumPoints } from "@/server/modules/bk/service";
 
 export async function getHomeroomBk() {
   const user = await requireAuth("TEACHER");
   if (!user.teacher) return null;
 
-  const classes = await prisma.class.findMany({
-    where: { homeroomTeacherId: user.teacher.id },
-    include: {
-      students: {
-        include: {
-          user: { select: { name: true } },
-          violationRecords: { select: { points: true } },
-          achievementRecords: { select: { points: true } },
-          counselingCases: { select: { id: true } },
-        },
-        orderBy: { user: { name: "asc" } },
-      },
-    },
-    orderBy: { name: "asc" },
-  });
+  const classes = await getHomeroomClasses(user.teacher.id);
 
   return classes.map((c) => ({
-    id: c.id, name: c.name,
+    id: c.id,
+    name: c.name,
     students: c.students.map((s) => ({
-      id: s.id, name: s.user.name, nis: s.nis ?? "",
-      violationPoints: s.violationRecords.reduce((a, v) => a + v.points, 0),
-      achievementPoints: s.achievementRecords.reduce((a, v) => a + v.points, 0),
+      id: s.id,
+      name: s.user.name,
+      nis: s.nis ?? "",
+      violationPoints: sumPoints(s.violationRecords),
+      achievementPoints: sumPoints(s.achievementRecords),
       cases: s.counselingCases.length,
     })),
   }));

@@ -32,8 +32,8 @@ src/
 │  │  │  ├─ auth/                   login, logout, me (lintas modul)
 │  │  │  ├─ landing/                konten publik sekolah
 │  │  │  ├─ cbt/                    ujian: student / teacher / admin
-│  │  │  ├─ bk/                     bimbingan konseling
-│  │  │  └─ piket/                  guru piket   ✅ sudah jalan
+│  │  │  ├─ bk/                     bimbingan konseling   ✅ sudah jalan
+│  │  │  └─ piket/                  guru piket            ✅ sudah jalan
 │  │  └─ ...                     ← route lama, dibiarkan hidup
 │  ├─ (landing)/ cms/ admin/ teacher/ student/ counselor/ piket/   ← halaman web
 └─ server/                       ← logika backend, bebas dari HTTP
@@ -43,8 +43,8 @@ src/
    └─ modules/
       ├─ auth/service.ts            ✅
       ├─ piket/{service,dto}.ts     ✅
+      ├─ bk/                        ✅ service, surveys, follow-up, dto
       ├─ cbt/                       ⏳
-      ├─ bk/                        ⏳
       └─ landing/                   ⏳
 ```
 
@@ -182,30 +182,53 @@ Aturan bisnis yang harus pindah ke `src/server/modules/cbt/`:
 `src/lib/exam-scoring.ts`, `exam-permissions.ts`, `exam-lock.ts`,
 `exam-types.ts`, `mobile-exam.ts`, `question-set-import.ts`.
 
-### 5.4 Modul BK ⏳
+### 5.4 Modul BK ✅
 
 | v1 | Lama |
 | --- | --- |
-| `GET /api/v1/bk/counselor/dashboard` | `/api/counselor/dashboard` |
-| `GET\|POST /api/v1/bk/counselor/cases` | `/api/counselor/cases` |
-| `GET\|PATCH /api/v1/bk/counselor/cases/{id}` | `/api/counselor/cases/[id]` |
-| `GET\|POST /api/v1/bk/counselor/violations` | `/api/counselor/violations` |
-| `GET\|POST /api/v1/bk/counselor/achievements` | `/api/counselor/achievements` |
-| `GET /api/v1/bk/counselor/requests` | `/api/counselor/requests` |
-| `PATCH /api/v1/bk/counselor/requests/{id}` | `/api/counselor/requests/[id]` |
-| `GET /api/v1/bk/counselor/students` | `/api/counselor/students` |
-| `GET /api/v1/bk/counselor/students/book` | `/api/counselor/students/book` |
-| `GET /api/v1/bk/counselor/students/book/{id}` | `/api/counselor/students/book/[id]` |
-| `GET\|POST /api/v1/bk/counselor/surveys` | `/api/counselor/surveys` |
-| `GET /api/v1/bk/counselor/surveys/{id}` | `/api/counselor/surveys/[id]` |
-| `GET /api/v1/bk/counselor/surveys/{id}/questions` | `/api/counselor/surveys/[id]/questions` |
-| `GET /api/v1/bk/counselor/surveys/{id}/results` | `/api/counselor/surveys/[id]/results` |
-| `GET /api/v1/bk/student/summary` | `/api/student/bk` |
-| `POST /api/v1/bk/student/requests` | `/api/student/bk/request` |
-| `GET /api/v1/bk/student/surveys` | `/api/student/surveys` |
-| `GET\|POST /api/v1/bk/student/surveys/{id}` | `/api/student/surveys/[id]` |
+| `GET /api/v1/bk/counselor/dashboard` | `GET /api/counselor/dashboard` |
+| `GET /api/v1/bk/counselor/students` | `GET /api/counselor/students` |
+| `GET /api/v1/bk/counselor/students/book` | `GET /api/counselor/students/book` |
+| `GET /api/v1/bk/counselor/students/book/{id}` | `GET /api/counselor/students/book/[id]` |
+| `GET\|POST /api/v1/bk/counselor/cases` | `GET /api/counselor/cases` |
+| `GET\|PATCH /api/v1/bk/counselor/cases/{id}` | `GET\|PATCH /api/counselor/cases/[id]` |
+| `GET\|POST /api/v1/bk/counselor/violations` | `GET\|POST /api/counselor/violations` |
+| `GET\|POST /api/v1/bk/counselor/achievements` | `GET\|POST /api/counselor/achievements` |
+| `GET /api/v1/bk/counselor/requests` | `GET /api/counselor/requests` |
+| `PATCH /api/v1/bk/counselor/requests/{id}` | `POST /api/counselor/requests/[id]` |
+| `GET\|POST /api/v1/bk/counselor/surveys` | `GET\|POST /api/counselor/surveys` |
+| `GET /api/v1/bk/counselor/surveys/{id}` | `GET /api/counselor/surveys/[id]` |
+| `POST /api/v1/bk/counselor/surveys/{id}/questions` | `POST /api/counselor/surveys/[id]/questions` |
+| `GET /api/v1/bk/counselor/surveys/{id}/results` | `GET /api/counselor/surveys/[id]/results` |
+| `GET /api/v1/bk/student/summary` | `GET /api/student/bk` |
+| `POST /api/v1/bk/student/requests` | `POST /api/student/bk/request` |
+| `GET /api/v1/bk/student/surveys` | `GET /api/student/surveys` |
+| `GET\|POST /api/v1/bk/student/surveys/{id}` | `GET\|POST /api/student/surveys/[id]` |
 
-Aturan bisnis yang harus pindah ke `src/server/modules/bk/`: `src/lib/bk-points.ts`.
+Yang berbeda di v1, semuanya bersifat menambah:
+
+- **Dashboard** ikut memuat `topStudents` (lima siswa dengan poin pelanggaran
+  tertinggi), sama seperti yang dilihat halaman web guru BK.
+- **`POST /cases`** membuat sesi konseling — sebelumnya hanya bisa lewat
+  halaman web.
+- **`PATCH /requests/{id}`** menerima `{ convertToCase: true }` untuk sekaligus
+  membuat sesi konseling dari permohonan, jalur yang juga sebelumnya hanya ada
+  di web.
+- **`GET /violations` dan `/achievements`** menerima `?take=`; tanpa parameter
+  tetap 50 seperti endpoint lama, `take=0` berarti seluruh catatan.
+- **Rekap angket** ikut memuat daftar responden.
+- **Hak akses** mengikuti web: guru BK **atau** admin. Endpoint lama tetap
+  hanya untuk peran `COUNSELOR`.
+
+Ambang poin → rekomendasi SP (`src/lib/bk-points.ts`) **tetap di `src/lib/`**,
+bukan dipindah ke `src/server/modules/bk/` seperti rencana awal: aturan itu
+dipakai juga oleh komponen client `FollowUpClient.tsx`, sedangkan `src/server/`
+khusus kode yang hanya berjalan di server.
+
+Server action halaman web yang kini memakai service yang sama:
+`src/app/counselor/{actions,bk-actions,survey-actions,reports-actions}.ts`,
+`src/app/student/bk/{actions,survey-actions}.ts`, dan
+`src/app/teacher/bk/actions.ts`.
 
 ### 5.5 Modul Landing ⏳
 
@@ -247,8 +270,9 @@ luar (aplikasi mobile, layar informasi, integrasi pihak ketiga).
 1. **Fondasi + modul piket** ✅ — `src/server/{http,auth,date-range}.ts`,
    `modules/auth`, `modules/piket`, route `/api/v1/piket/*`, route lama
    disambungkan ke service, server action halaman piket ikut memakai service.
-2. **Modul BK** — paling banyak endpoint tapi paling sedikit aturan bisnis
-   rumit; pola yang sama bisa langsung diterapkan.
+2. **Modul BK** ✅ — `modules/bk/{service,surveys,follow-up,dto}.ts`, 18 route
+   `/api/v1/bk/*`, 18 route lama disambungkan ke service, dan tujuh file
+   server action halaman web ikut memakai service yang sama.
 3. **Modul CBT** — paling berisiko (dipakai aplikasi mobile saat ujian
    berlangsung). Kerjakan setelah pola terbukti di dua modul.
 4. **Modul landing** — endpoint baru sepenuhnya, tidak ada klien lama yang
@@ -279,3 +303,16 @@ supaya refactor tidak sekaligus mengubah perilaku:
 4. **Belum ada test.** Repo belum punya test runner sama sekali; lapisan
    service sekarang berupa fungsi murni terhadap Prisma, jadi jauh lebih
    mudah diuji daripada route handler.
+5. **Nilai jawaban angket 0 masih diterima dari web.** Form web menyimpan
+   pertanyaan yang dilewati sebagai `0`, sementara API menolak nilai di luar
+   1–4. Akibatnya rata-rata per pertanyaan bisa tertarik ke bawah oleh
+   jawaban kosong. Perbaikannya: wajibkan semua pertanyaan terisi di form,
+   lalu samakan validasinya di service.
+6. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
+   nilainya terbatas. Sama seperti `ParentSummon.level`. Kandidat enum Prisma.
+
+Satu perbedaan yang justru **diperbaiki** saat migrasi: nomor urut pertanyaan
+angket. Halaman web memberi nomor dari *jumlah* pertanyaan (`count`, mulai 0)
+sedangkan API dari nomor terbesar + 1. Setelah ada pertanyaan yang dihapus,
+cara pertama menghasilkan nomor urut kembar. Keduanya kini memakai nomor
+terbesar + 1.

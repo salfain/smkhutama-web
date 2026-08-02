@@ -1,24 +1,42 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { requireCounselorAuth } from "@/lib/session";
-import { revalidatePath } from "next/cache";
+/**
+ * Server action halaman guru BK — sesi konseling, pelanggaran, prestasi,
+ * dan permohonan.
+ *
+ * Query-nya dipinjam dari `@/server/modules/bk/service`, sumber yang sama
+ * dengan route API. File ini hanya mengurus hal yang memang milik web:
+ * cek sesi cookie, parsing FormData, dan `revalidatePath`.
+ */
 
-/** Pastikan ada record Counselor untuk user yang login (auto-create bila belum ada). */
+import { revalidatePath } from "next/cache";
+import { requireCounselorAuth } from "@/lib/session";
+import * as bk from "@/server/modules/bk/service";
+import { toAchievement, toCase, toDashboard, toRequest, toViolation } from "@/server/modules/bk/dto";
+
+const CASES_PATH = "/counselor/cases";
+const DASHBOARD_PATH = "/counselor/dashboard";
+const VIOLATIONS_PATH = "/counselor/violations";
+const ACHIEVEMENTS_PATH = "/counselor/achievements";
+const REQUESTS_PATH = "/counselor/requests";
+
+function text(fd: FormData, field: string) {
+  return String(fd.get(field) ?? "").trim();
+}
+
+function intValue(fd: FormData, field: string) {
+  return parseInt(String(fd.get(field) ?? "0"), 10) || 0;
+}
+
+/** Pastikan ada record Counselor untuk user yang sedang login. */
 async function currentCounselorId(): Promise<string> {
   const user = await requireCounselorAuth();
-  const existing = await prisma.counselor.findUnique({ where: { userId: user.id } });
-  if (existing) return existing.id;
-  const created = await prisma.counselor.create({ data: { userId: user.id } });
-  return created.id;
+  return bk.ensureCounselorId(user.id);
 }
 
 export async function listStudents() {
   await requireCounselorAuth();
-  const students = await prisma.student.findMany({
-    include: { user: { select: { name: true } }, class: { select: { name: true } } },
-    orderBy: { user: { name: "asc" } },
-  });
+  const students = await bk.listStudents();
   return students.map((s) => ({
     id: s.id,
     name: s.user.name,
@@ -30,90 +48,42 @@ export async function listStudents() {
 // ---------- DASHBOARD ----------
 export async function getDashboardStats() {
   await requireCounselorAuth();
-  const [openCases, totalCases, totalViolations, totalAchievements, recentCases] = await Promise.all([
-    prisma.counselingCase.count({ where: { status: { in: ["OPEN", "IN_PROGRESS"] } } }),
-    prisma.counselingCase.count(),
-    prisma.violationRecord.count(),
-    prisma.achievementRecord.count(),
-    prisma.counselingCase.findMany({
-      take: 5,
-      orderBy: { sessionDate: "desc" },
-      include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-    }),
+  const [dashboard, topStudents] = await Promise.all([
+    bk.getCounselorDashboard(),
+    bk.getTopViolationStudents(),
   ]);
-
-  const pendingRequests = await prisma.counselingRequest.count({ where: { status: "PENDING" } });
-
-  // Top siswa berdasarkan poin pelanggaran
-  const violationsByStudent = await prisma.violationRecord.groupBy({
-    by: ["studentId"],
-    _sum: { points: true },
-    orderBy: { _sum: { points: "desc" } },
-    take: 5,
-  });
-  const topStudents = await Promise.all(
-    violationsByStudent.map(async (v) => {
-      const s = await prisma.student.findUnique({
-        where: { id: v.studentId },
-        include: { user: { select: { name: true } }, class: { select: { name: true } } },
-      });
-      return { name: s?.user.name ?? "?", className: s?.class?.name ?? "-", points: v._sum.points ?? 0 };
-    })
-  );
-
-  return {
-    openCases, totalCases, totalViolations, totalAchievements, pendingRequests,
-    recentCases: recentCases.map((c) => ({
-      id: c.id, title: c.title, type: c.type, status: c.status,
-      studentName: c.student.user.name, className: c.student.class?.name ?? "-",
-      sessionDate: c.sessionDate,
-    })),
-    topStudents,
-  };
+  return { ...toDashboard(dashboard), topStudents };
 }
 
 // ---------- CASES ----------
 export async function listCases() {
   await requireCounselorAuth();
-  const cases = await prisma.counselingCase.findMany({
-    orderBy: { sessionDate: "desc" },
-    include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-  });
-  return cases.map((c) => ({
-    id: c.id, studentId: c.studentId, studentName: c.student.user.name,
-    className: c.student.class?.name ?? "-", type: c.type, status: c.status,
-    title: c.title, description: c.description ?? "", notes: c.notes ?? "", followUp: c.followUp ?? "",
-    isConfidential: c.isConfidential, sessionDate: c.sessionDate,
-  }));
+  const cases = await bk.listCases();
+  return cases.map((c) => ({ ...toCase(c), studentId: c.studentId }));
 }
 
 export async function saveCase(fd: FormData) {
   const counselorId = await currentCounselorId();
-  const id = String(fd.get("id") ?? "").trim();
-  const studentId = String(fd.get("studentId") ?? "").trim();
-  const type = String(fd.get("type") ?? "PRIBADI") as "PRIBADI" | "SOSIAL" | "BELAJAR" | "KARIR";
-  const status = String(fd.get("status") ?? "OPEN") as "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REFERRED";
-  const title = String(fd.get("title") ?? "").trim();
-  const description = String(fd.get("description") ?? "").trim();
-  const notes = String(fd.get("notes") ?? "").trim();
-  const followUp = String(fd.get("followUp") ?? "").trim();
-  const isConfidential = fd.get("isConfidential") === "on";
-  const sessionDate = String(fd.get("sessionDate") ?? "").trim();
+  const studentId = text(fd, "studentId");
+  const title = text(fd, "title");
   if (!studentId || !title) return { error: "Siswa dan judul wajib diisi" };
 
-  const data = {
-    type, status, title,
-    description: description || null,
-    notes: notes || null,
-    followUp: followUp || null,
-    isConfidential,
-    sessionDate: sessionDate ? new Date(sessionDate) : new Date(),
-  };
   try {
-    if (id) await prisma.counselingCase.update({ where: { id }, data });
-    else await prisma.counselingCase.create({ data: { ...data, studentId, counselorId } });
-    revalidatePath("/counselor/cases");
-    revalidatePath("/counselor/dashboard");
+    await bk.saveCase({
+      id: text(fd, "id"),
+      studentId,
+      counselorId,
+      type: text(fd, "type") as bk.CounselingType || "PRIBADI",
+      status: text(fd, "status") as bk.CounselingStatus || "OPEN",
+      title,
+      description: text(fd, "description"),
+      notes: text(fd, "notes"),
+      followUp: text(fd, "followUp"),
+      isConfidential: fd.get("isConfidential") === "on",
+      sessionDate: text(fd, "sessionDate"),
+    });
+    revalidatePath(CASES_PATH);
+    revalidatePath(DASHBOARD_PATH);
     return { success: true };
   } catch {
     return { error: "Gagal menyimpan kasus konseling" };
@@ -122,77 +92,66 @@ export async function saveCase(fd: FormData) {
 
 export async function deleteCase(id: string) {
   await requireCounselorAuth();
-  await prisma.counselingCase.delete({ where: { id } });
-  revalidatePath("/counselor/cases");
-  revalidatePath("/counselor/dashboard");
+  await bk.deleteCase(id);
+  revalidatePath(CASES_PATH);
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 // ---------- VIOLATION TYPES (master) ----------
 export async function listViolationTypes() {
   await requireCounselorAuth();
-  return prisma.violationType.findMany({ orderBy: [{ category: "asc" }, { points: "desc" }] });
+  return bk.listViolationTypes();
 }
 
 export async function saveViolationType(fd: FormData) {
   await requireCounselorAuth();
-  const id = String(fd.get("id") ?? "").trim();
-  const name = String(fd.get("name") ?? "").trim();
-  const category = String(fd.get("category") ?? "RINGAN") as "RINGAN" | "SEDANG" | "BERAT";
-  const points = parseInt(String(fd.get("points") ?? "0"), 10) || 0;
+  const name = text(fd, "name");
   if (!name) return { error: "Nama pelanggaran wajib diisi" };
-  const data = { name, category, points };
-  if (id) await prisma.violationType.update({ where: { id }, data });
-  else await prisma.violationType.create({ data });
-  revalidatePath("/counselor/violations");
+
+  await bk.saveViolationType({
+    id: text(fd, "id"),
+    name,
+    category: (text(fd, "category") as bk.ViolationCategory) || "RINGAN",
+    points: intValue(fd, "points"),
+  });
+  revalidatePath(VIOLATIONS_PATH);
   return { success: true };
 }
 
 export async function deleteViolationType(id: string) {
   await requireCounselorAuth();
-  await prisma.violationType.delete({ where: { id } });
-  revalidatePath("/counselor/violations");
+  await bk.deleteViolationType(id);
+  revalidatePath(VIOLATIONS_PATH);
   return { success: true };
 }
 
 // ---------- VIOLATION RECORDS ----------
 export async function listViolations() {
   await requireCounselorAuth();
-  const rows = await prisma.violationRecord.findMany({
-    orderBy: { date: "desc" },
-    include: {
-      student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } },
-      violationType: { select: { name: true } },
-    },
-  });
-  return rows.map((r) => ({
-    id: r.id, studentId: r.studentId, studentName: r.student.user.name,
-    className: r.student.class?.name ?? "-",
-    typeName: r.violationType?.name ?? null,
-    description: r.description, points: r.points, sanction: r.sanction ?? "", date: r.date,
-  }));
+  const rows = await bk.listViolations();
+  return rows.map((r) => ({ ...toViolation(r), studentId: r.studentId }));
 }
 
 export async function saveViolation(fd: FormData) {
   const counselorId = await currentCounselorId();
-  const id = String(fd.get("id") ?? "").trim();
-  const studentId = String(fd.get("studentId") ?? "").trim();
-  const violationTypeId = String(fd.get("violationTypeId") ?? "").trim();
-  const description = String(fd.get("description") ?? "").trim();
-  const points = parseInt(String(fd.get("points") ?? "0"), 10) || 0;
-  const sanction = String(fd.get("sanction") ?? "").trim();
-  const date = String(fd.get("date") ?? "").trim();
+  const studentId = text(fd, "studentId");
+  const description = text(fd, "description");
   if (!studentId || !description) return { error: "Siswa dan deskripsi wajib diisi" };
-  const data = {
-    violationTypeId: violationTypeId || null,
-    description, points, sanction: sanction || null,
-    date: date ? new Date(date) : new Date(),
-  };
+
   try {
-    if (id) await prisma.violationRecord.update({ where: { id }, data });
-    else await prisma.violationRecord.create({ data: { ...data, studentId, counselorId } });
-    revalidatePath("/counselor/violations");
-    revalidatePath("/counselor/dashboard");
+    await bk.saveViolation({
+      id: text(fd, "id"),
+      studentId,
+      counselorId,
+      violationTypeId: text(fd, "violationTypeId"),
+      description,
+      points: intValue(fd, "points"),
+      sanction: text(fd, "sanction"),
+      date: text(fd, "date"),
+    });
+    revalidatePath(VIOLATIONS_PATH);
+    revalidatePath(DASHBOARD_PATH);
     return { success: true };
   } catch {
     return { error: "Gagal menyimpan pelanggaran" };
@@ -201,46 +160,38 @@ export async function saveViolation(fd: FormData) {
 
 export async function deleteViolation(id: string) {
   await requireCounselorAuth();
-  await prisma.violationRecord.delete({ where: { id } });
-  revalidatePath("/counselor/violations");
-  revalidatePath("/counselor/dashboard");
+  await bk.deleteViolation(id);
+  revalidatePath(VIOLATIONS_PATH);
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 // ---------- ACHIEVEMENT RECORDS ----------
 export async function listAchievements() {
   await requireCounselorAuth();
-  const rows = await prisma.achievementRecord.findMany({
-    orderBy: { date: "desc" },
-    include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-  });
-  return rows.map((r) => ({
-    id: r.id, studentId: r.studentId, studentName: r.student.user.name,
-    className: r.student.class?.name ?? "-",
-    title: r.title, description: r.description ?? "", points: r.points,
-    level: r.level ?? "", date: r.date,
-  }));
+  const rows = await bk.listAchievements();
+  return rows.map((r) => ({ ...toAchievement(r), studentId: r.studentId }));
 }
 
 export async function saveAchievement(fd: FormData) {
   const counselorId = await currentCounselorId();
-  const id = String(fd.get("id") ?? "").trim();
-  const studentId = String(fd.get("studentId") ?? "").trim();
-  const title = String(fd.get("title") ?? "").trim();
-  const description = String(fd.get("description") ?? "").trim();
-  const points = parseInt(String(fd.get("points") ?? "0"), 10) || 0;
-  const level = String(fd.get("level") ?? "").trim();
-  const date = String(fd.get("date") ?? "").trim();
+  const studentId = text(fd, "studentId");
+  const title = text(fd, "title");
   if (!studentId || !title) return { error: "Siswa dan judul prestasi wajib diisi" };
-  const data = {
-    title, description: description || null, points, level: level || null,
-    date: date ? new Date(date) : new Date(),
-  };
+
   try {
-    if (id) await prisma.achievementRecord.update({ where: { id }, data });
-    else await prisma.achievementRecord.create({ data: { ...data, studentId, counselorId } });
-    revalidatePath("/counselor/achievements");
-    revalidatePath("/counselor/dashboard");
+    await bk.saveAchievement({
+      id: text(fd, "id"),
+      studentId,
+      counselorId,
+      title,
+      description: text(fd, "description"),
+      points: intValue(fd, "points"),
+      level: text(fd, "level"),
+      date: text(fd, "date"),
+    });
+    revalidatePath(ACHIEVEMENTS_PATH);
+    revalidatePath(DASHBOARD_PATH);
     return { success: true };
   } catch {
     return { error: "Gagal menyimpan prestasi" };
@@ -249,76 +200,43 @@ export async function saveAchievement(fd: FormData) {
 
 export async function deleteAchievement(id: string) {
   await requireCounselorAuth();
-  await prisma.achievementRecord.delete({ where: { id } });
-  revalidatePath("/counselor/achievements");
-  revalidatePath("/counselor/dashboard");
+  await bk.deleteAchievement(id);
+  revalidatePath(ACHIEVEMENTS_PATH);
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 // ---------- COUNSELING REQUESTS (dari siswa) ----------
 export async function listRequests() {
   await requireCounselorAuth();
-  const rows = await prisma.counselingRequest.findMany({
-    orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-    include: { student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } } },
-  });
-  return rows.map((r) => ({
-    id: r.id, studentName: r.student.user.name, className: r.student.class?.name ?? "-",
-    topic: r.topic, description: r.description ?? "", urgency: r.urgency,
-    status: r.status, response: r.response ?? "",
-    preferredDate: r.preferredDate, createdAt: r.createdAt,
-  }));
+  const rows = await bk.listRequests();
+  return rows.map(toRequest);
 }
 
 export async function respondRequest(fd: FormData) {
   await requireCounselorAuth();
-  const id = String(fd.get("id") ?? "").trim();
-  const status = String(fd.get("status") ?? "PENDING") as "PENDING" | "APPROVED" | "SCHEDULED" | "DONE" | "REJECTED";
-  const response = String(fd.get("response") ?? "").trim();
+  const id = text(fd, "id");
   if (!id) return { error: "Permohonan tidak ditemukan" };
-  await prisma.counselingRequest.update({
-    where: { id },
-    data: { status, response: response || null },
-  });
-  revalidatePath("/counselor/requests");
-  revalidatePath("/counselor/dashboard");
+
+  await bk.respondRequest(
+    id,
+    (text(fd, "status") as bk.RequestStatus) || "PENDING",
+    text(fd, "response")
+  );
+  revalidatePath(REQUESTS_PATH);
+  revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
 
 /** Terima permohonan & langsung buat sesi konseling dari datanya. */
 export async function convertRequestToCase(id: string) {
   const counselorId = await currentCounselorId();
-  const req = await prisma.counselingRequest.findUnique({
-    where: { id },
-    include: { student: true },
-  });
-  if (!req) return { error: "Permohonan tidak ditemukan" };
+  const createdCase = await bk.convertRequestToCase(id, counselorId);
+  if (!createdCase) return { error: "Permohonan tidak ditemukan" };
 
-  await prisma.$transaction([
-    prisma.counselingCase.create({
-      data: {
-        studentId: req.studentId,
-        counselorId,
-        type: "PRIBADI",
-        status: "IN_PROGRESS",
-        title: req.topic,
-        description: req.description || null,
-        sessionDate: req.preferredDate ?? new Date(),
-        isConfidential: true,
-      },
-    }),
-    prisma.counselingRequest.update({
-      where: { id },
-      data: {
-        status: "SCHEDULED",
-        response: req.response || "Permohonan diterima. Sesi konseling telah dijadwalkan.",
-      },
-    }),
-  ]);
-
-  revalidatePath("/counselor/requests");
-  revalidatePath("/counselor/cases");
-  revalidatePath("/counselor/dashboard");
+  revalidatePath(REQUESTS_PATH);
+  revalidatePath(CASES_PATH);
+  revalidatePath(DASHBOARD_PATH);
   revalidatePath("/student/bk");
   return { success: true };
 }
@@ -326,14 +244,9 @@ export async function convertRequestToCase(id: string) {
 /** Ambil detail sesi konseling untuk cetak/PDF. */
 export async function getCaseDetail(id: string) {
   await requireCounselorAuth();
-  const c = await prisma.counselingCase.findUnique({
-    where: { id },
-    include: {
-      student: { include: { user: { select: { name: true } }, class: { select: { name: true } } } },
-      counselor: { include: { user: { select: { name: true } } } },
-    },
-  });
+  const c = await bk.getCase(id);
   if (!c) return null;
+
   return {
     id: c.id,
     title: c.title,

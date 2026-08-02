@@ -98,3 +98,16 @@ export async function requirePiketAccess(req: NextRequest): Promise<ApiActor> {
 export async function requireCounselorAccess(req: NextRequest): Promise<ApiActor> {
   return requireRole(req, "COUNSELOR", "ADMIN");
 }
+
+/**
+ * Siswa yang login beserta id profil siswanya. Akun berperan STUDENT tanpa
+ * record `Student` tidak bisa berbuat apa-apa, jadi ditolak di sini sekali
+ * saja alih-alih dicek ulang di setiap route.
+ */
+export async function requireStudent(req: NextRequest) {
+  const actor = await requireRole(req, "STUDENT");
+  if (!actor.student) {
+    throw forbidden("Akun ini belum terhubung ke data siswa", "STUDENT_PROFILE_MISSING");
+  }
+  return { actor, student: actor.student };
+}
