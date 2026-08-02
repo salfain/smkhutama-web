@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { listGallery } from "@/server/modules/landing/content";
 import { Images } from "lucide-react";
 import { PageHero } from "@/components/landing/PageHero";
 import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
@@ -8,9 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Galeri – SMK Hutama" };
 
 export default async function GaleriPage() {
-  const photos = await prisma.landingGallery
-    .findMany({ where: { isActive: true }, orderBy: { orderNumber: "asc" } })
-    .catch(() => []);
+  const photos = await listGallery();
 
   return (
     <>

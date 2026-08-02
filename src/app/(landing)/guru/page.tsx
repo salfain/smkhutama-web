@@ -1,6 +1,6 @@
 import { Users } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { TEACHERS, type Teacher } from "@/lib/landing-static";
+import { type Teacher } from "@/lib/landing-static";
+import { listTeachers } from "@/server/modules/landing/content";
 import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
 import { PageHero } from "@/components/landing/PageHero";
 
@@ -9,13 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Data Guru & Tenaga Pendidik – SMK Hutama" };
 
 export default async function GuruPage() {
-  const rows = await prisma.landingTeacher
-    .findMany({ where: { isActive: true }, orderBy: { orderNumber: "asc" } })
-    .catch(() => []);
-
-  const teachers: Teacher[] = rows.length > 0
-    ? rows.map((t) => ({ name: t.name, position: t.position, subject: t.subject ?? "", photo: t.photoUrl }))
-    : TEACHERS;
+  const teachers: Teacher[] = await listTeachers();
 
   return (
     <>

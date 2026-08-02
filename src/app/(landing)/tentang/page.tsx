@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getAbout } from "@/server/modules/landing/content";
 import { Building2, Target, ListChecks, Quote, History } from "lucide-react";
 import { PageHero } from "@/components/landing/PageHero";
 
@@ -7,16 +7,8 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Tentang Kami – SMK Hutama" };
 
 export default async function TentangPage() {
-  const p = await prisma.landingProfile.findFirst().catch(() => null);
-
-  const vision = p?.vision ?? "Menjadi sekolah menengah kejuruan unggulan yang menghasilkan lulusan berkarakter, kompeten, dan berdaya saing global.";
-  const mission = p?.mission ?? "Menyelenggarakan pendidikan vokasi yang religius dan disiplin.\nMembekali siswa dengan keterampilan sesuai kebutuhan industri.\nMembangun kemitraan dengan dunia usaha dan dunia industri (DU/DI).\nMengembangkan karakter, kemandirian, dan jiwa wirausaha siswa.";
-  const history = p?.history ?? "";
-  const principalName = p?.principalName ?? "";
-  const principalPhoto = p?.principalPhoto ?? "";
-  const principalWord = p?.principalWord ?? "";
-
-  const missionItems = mission.split("\n").map((m) => m.trim()).filter(Boolean);
+  const { vision, missionItems, history, principalName, principalPhoto, principalWord } =
+    await getAbout();
 
   return (
     <>

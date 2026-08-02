@@ -1,4 +1,4 @@
-import { getLandingContent } from "@/lib/landing-data";
+import { getLandingContent } from "@/server/modules/landing/content";
 import { Phone, Mail, MapPin, Globe, MessageCircle } from "lucide-react";
 import { RevealContainer, RevealItem, RevealCard } from "@/components/landing/Reveal";
 import { PageHero } from "@/components/landing/PageHero";

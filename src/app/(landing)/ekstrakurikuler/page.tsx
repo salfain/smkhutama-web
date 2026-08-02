@@ -1,8 +1,8 @@
 import {
   Sparkles, Tent, Trophy, Volleyball, Flag, Moon, Languages, Music, HeartPulse, type LucideIcon,
 } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { EXTRACURRICULARS, type Extracurricular } from "@/lib/landing-static";
+import { type Extracurricular } from "@/lib/landing-static";
+import { listExtracurriculars } from "@/server/modules/landing/content";
 import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
 import { PageHero } from "@/components/landing/PageHero";
 
@@ -15,16 +15,7 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 export default async function EkstrakurikulerPage() {
-  const rows = await prisma.landingExtracurricular
-    .findMany({ where: { isActive: true }, orderBy: { orderNumber: "asc" } })
-    .catch(() => []);
-
-  const items: Extracurricular[] = rows.length > 0
-    ? rows.map((e) => ({
-        name: e.name, category: e.category, description: e.description,
-        schedule: e.schedule ?? "", icon: e.icon, color: e.color, image: e.imageUrl,
-      }))
-    : EXTRACURRICULARS;
+  const items: Extracurricular[] = await listExtracurriculars();
 
   return (
     <>

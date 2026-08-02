@@ -1,5 +1,5 @@
 import { GraduationCap, FileText, Clock, CheckCircle2, Phone } from "lucide-react";
-import { getMajorOptions } from "@/lib/landing-data";
+import { getMajorOptions } from "@/server/modules/landing/content";
 import { PpdbForm } from "./PpdbForm";
 
 export const dynamic = "force-dynamic";

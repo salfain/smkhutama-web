@@ -30,7 +30,7 @@ src/
 │  ├─ api/                       ← permukaan HTTP
 │  │  ├─ v1/                     ← API baru, per modul
 │  │  │  ├─ auth/                   login, logout, me (lintas modul)
-│  │  │  ├─ landing/                konten publik sekolah
+│  │  │  ├─ landing/                konten publik sekolah  ✅
 │  │  │  ├─ cbt/                    ujian: student / teacher / admin  ✅
 │  │  │  ├─ bk/                     bimbingan konseling   ✅ sudah jalan
 │  │  │  └─ piket/                  guru piket            ✅ sudah jalan
@@ -46,7 +46,8 @@ src/
       ├─ bk/                        ✅ service, surveys, follow-up, dto
       ├─ cbt/                       ✅ exam-session, student, teacher,
       │                               monitoring, review, exam-print, dto
-      └─ landing/                   ⏳
+      ├─ landing/                   ✅ content, ppdb, dto
+      └─ shared/                    ✅ config, assets
 ```
 
 Pembagian tanggung jawabnya:
@@ -291,38 +292,63 @@ Server action halaman web yang kini memakai service yang sama:
 `src/app/student/bk/{actions,survey-actions}.ts`, dan
 `src/app/teacher/bk/actions.ts`.
 
-### 5.5 Modul Landing ⏳
+### 5.5 Modul Landing ✅
 
-Modul ini **belum punya API sama sekali**. Halaman publik mengambil data
-langsung lewat `src/lib/landing-data.ts` di server component, dan CMS memakai
-server action `src/app/cms/(panel)/content-actions.ts`.
+Satu-satunya modul yang sebelumnya **tidak punya API sama sekali** — halaman
+publik mengambil datanya langsung di server component. Karena itu tidak ada
+bentuk lama yang perlu dipertahankan; semuanya endpoint baru.
 
-| v1 | Sumber sekarang |
+Semua endpoint di bawah **publik**, tanpa autentikasi.
+
+| v1 | Isi |
 | --- | --- |
-| `GET /api/v1/landing/profile` | `getLandingProfile()` |
-| `GET /api/v1/landing/stats` | `LandingStat` |
-| `GET /api/v1/landing/hero-images` | `LandingHeroImage` |
-| `GET /api/v1/landing/majors` | `LandingMajor` |
-| `GET /api/v1/landing/news`, `.../news/{slug}` | `LandingNews` |
-| `GET /api/v1/landing/teachers` | `LandingTeacher` |
-| `GET /api/v1/landing/extracurriculars` | `LandingExtracurricular` |
-| `GET /api/v1/landing/gallery` | `LandingGallery` |
-| `GET /api/v1/landing/faq` | `LandingFaq` |
-| `POST /api/v1/landing/ppdb` | `src/app/(landing)/ppdb/actions.ts` |
-| `GET /api/v1/landing/ppdb/{registrationNumber}` | halaman `/ppdb/status` |
-| `GET /api/v1/landing/logo` | `/api/school/logo` |
+| `GET /api/v1/landing/profile` | identitas, kontak, tautan, status PPDB |
+| `GET /api/v1/landing/about` | visi, misi, sejarah, sambutan kepala sekolah |
+| `GET /api/v1/landing/stats` | angka ringkas sekolah |
+| `GET /api/v1/landing/hero-images` | gambar carousel beranda |
+| `GET /api/v1/landing/majors` | program keahlian aktif |
+| `GET /api/v1/landing/news?take=` | berita terbit, terbaru dulu |
+| `GET /api/v1/landing/news/{slug}` | satu berita + isinya + berita terkait |
+| `GET /api/v1/landing/teachers` | guru & tenaga pendidik |
+| `GET /api/v1/landing/extracurriculars` | kegiatan ekstrakurikuler |
+| `GET /api/v1/landing/gallery` | foto galeri |
+| `GET /api/v1/landing/faq` | pertanyaan yang sering diajukan |
+| `POST /api/v1/landing/ppdb` | kirim pendaftaran, balas nomor pendaftaran |
+| `GET /api/v1/landing/ppdb/{registNumber}` | status pendaftaran |
+| `GET /api/v1/landing/logo` | logo sekolah (gambar, bukan JSON) |
 
-Catatan penting: halaman publik **tetap** memanggil service langsung di server
-component, bukan lewat HTTP ke API sendiri — memanggil API sendiri hanya
-menambah satu round-trip tanpa manfaat. Endpoint landing gunanya untuk klien
-luar (aplikasi mobile, layar informasi, integrasi pihak ketiga).
+Tiga keputusan yang perlu dicatat:
 
-### 5.6 Endpoint bersama ⏳
+- **Halaman publik tetap memanggil service langsung** di server component,
+  bukan lewat HTTP ke API sendiri. Memanggil API sendiri hanya menambah satu
+  perjalanan jaringan tanpa manfaat. Endpoint ini untuk klien luar: aplikasi
+  mobile, layar informasi sekolah, integrasi pihak ketiga.
+- **Nilai bawaan ikut pindah ke service.** Saat tabelnya masih kosong, situs
+  menampilkan konten cadangan (profil, statistik, jurusan, guru, ekskul).
+  Karena API dan situs kini memakai fungsi yang sama, keduanya menampilkan isi
+  yang sama persis — termasuk saat basis data kosong.
+- **Status PPDB hanya mengirim nama, jurusan, dan status.** Nomor pendaftaran
+  bisa ditebak, jadi endpoint ini tidak boleh jadi jalan membocorkan alamat,
+  email, atau nomor telepon pendaftar. Halaman `/ppdb/status` memang tidak
+  menampilkannya, tapi sebelumnya data itu ikut terkirim ke browser.
+
+**Panel CMS sengaja TIDAK memakai service ini.** Fungsi `getX()` di
+`src/app/cms/(panel)/content-actions.ts` membaca tabel apa adanya — pengelola
+konten harus melihat apa yang benar-benar tersimpan, bukan tampilan
+cadangannya. Perbedaan ini disengaja, bukan duplikasi yang terlewat.
+
+### 5.6 Endpoint bersama ✅
 
 | v1 | Lama |
 | --- | --- |
-| `GET /api/v1/config` | `/api/mobile/config` |
-| `GET /api/v1/media/{key}` | `/api/r2-proxy` |
+| `GET /api/v1/config` | `GET /api/mobile/config` |
+| `GET /api/v1/media/{key}` | `GET /api/r2-proxy?key=` |
+
+`/api/v1/config` publik dan tanpa autentikasi — dipanggil sebelum login,
+karena klien justru perlu tahu mode pemeliharaan dan versi minimum saat belum
+bisa masuk. `/api/v1/media/{key}` menerima key bersegmen, mis.
+`/api/v1/media/soal/2026/gambar.png`, dan mengalirkan byte apa adanya
+sehingga tidak memakai amplop v1; hanya kegagalannya yang berbentuk JSON.
 
 ---
 
@@ -343,9 +369,12 @@ luar (aplikasi mobile, layar informasi, integrasi pihak ketiga).
    disambungkan, dan enam file server action halaman guru/admin ikut memakai
    service yang sama. CRUD ujian, token, impor bank soal, dan ekspor rekap
    sengaja dibiarkan di server action — lihat catatan di bagian 5.3b.
-5. **Modul landing** — endpoint baru sepenuhnya, tidak ada klien lama yang
-   perlu dijaga.
-6. **Endpoint bersama** (`config`, `media`).
+5. **Modul landing** ✅ — `modules/landing/{content,ppdb,dto}.ts`, 14 route
+   `/api/v1/landing/*`, dan dua belas halaman publik ikut memakai service yang
+   sama. `src/lib/landing-data.ts` dihapus, isinya pindah ke modul.
+6. **Endpoint bersama** ✅ — `modules/shared/{config,assets}.ts`,
+   `/api/v1/config` dan `/api/v1/media/{key}`, tiga route lama disambungkan
+   (`/api/mobile/config`, `/api/r2-proxy`, `/api/school/logo`).
 7. **Pensiunkan route lama** setelah aplikasi mobile rilis versi yang memakai
    v1, dengan tenggat yang disepakati.
 
@@ -382,7 +411,13 @@ supaya refactor tidak sekaligus mengubah perilaku:
    `AnswerReviewDialog`). Siswa yang membuka tab jaringan peramban tetap bisa
    melihatnya. Perbaikannya: saring di server berdasarkan `exam.showResult`
    saat yang meminta adalah siswa.
-7. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
+7. **`notFound()` mengembalikan status 200, bukan 404.** Terlihat di
+   `/berita/{slug}` untuk slug yang tidak ada maupun berita yang belum terbit:
+   isinya benar-benar tidak bocor, tapi status HTTP-nya 200. Akibatnya mesin
+   pencari bisa mengindeks halaman kosong. Perilaku ini sudah ada sebelum
+   migrasi — alur kodenya tidak berubah — dan berlaku untuk semua halaman yang
+   memakai `notFound()`.
+8. **`CounselingRequest.urgency` bertipe `String`,** bukan enum, padahal
    nilainya terbatas. Sama seperti `ParentSummon.level`. Kandidat enum Prisma.
 
 Satu perbedaan yang justru **diperbaiki** saat migrasi: nomor urut pertanyaan

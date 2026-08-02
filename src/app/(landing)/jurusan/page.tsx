@@ -1,6 +1,6 @@
 import { HomeMajors } from "@/components/landing/HomeSections";
 import { PageHero } from "@/components/landing/PageHero";
-import { getLandingContent } from "@/lib/landing-data";
+import { getLandingContent } from "@/server/modules/landing/content";
 import { GraduationCap } from "lucide-react";
 
 export const dynamic = "force-dynamic";

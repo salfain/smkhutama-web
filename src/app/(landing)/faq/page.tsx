@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { listFaq } from "@/server/modules/landing/content";
 import { HelpCircle } from "lucide-react";
 import { PageHero } from "@/components/landing/PageHero";
 import { FaqAccordion } from "./FaqAccordion";
@@ -8,9 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "FAQ – SMK Hutama" };
 
 export default async function FaqPage() {
-  const faqs = await prisma.landingFaq
-    .findMany({ where: { isActive: true }, orderBy: { orderNumber: "asc" } })
-    .catch(() => []);
+  const faqs = await listFaq();
 
   return (
     <>

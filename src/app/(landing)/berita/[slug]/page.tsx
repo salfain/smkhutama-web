@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getNewsBySlug, listRelatedNews } from "@/server/modules/landing/content";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Newspaper } from "lucide-react";
@@ -7,22 +7,18 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const news = await prisma.landingNews.findUnique({ where: { slug } });
+  const news = await getNewsBySlug(slug);
   if (!news) return { title: "Berita Tidak Ditemukan" };
   return { title: `${news.title} – SMK Hutama` };
 }
 
 export default async function BeritaDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const news = await prisma.landingNews.findUnique({ where: { slug } });
-  if (!news || !news.isPublished) notFound();
+  const news = await getNewsBySlug(slug);
+  if (!news) notFound();
 
   // Ambil berita lain untuk sidebar
-  const related = await prisma.landingNews.findMany({
-    where: { isPublished: true, id: { not: news.id } },
-    orderBy: { publishedAt: "desc" },
-    take: 3,
-  });
+  const related = await listRelatedNews(slug);
 
   return (
     <>
