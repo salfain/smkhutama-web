@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export type Settings = {
@@ -33,6 +34,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 export async function getSettings(): Promise<Settings> {
+  await requireAuth("ADMIN");
   const all = await prisma.systemSetting.findMany();
   const map = new Map(all.map((s) => [s.key, s.value]));
   const result = { ...DEFAULT_SETTINGS };
@@ -44,6 +46,7 @@ export async function getSettings(): Promise<Settings> {
 }
 
 export async function saveSettings(formData: FormData) {
+  await requireAuth("ADMIN");
   const keys = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[];
   const checkboxKeys = [
     "enable_doubtful",
@@ -81,6 +84,7 @@ export async function saveSettings(formData: FormData) {
 }
 
 export async function backupDatabase() {
+  await requireAuth("ADMIN");
   // Stub: hitung statistik untuk simulasi backup
   const [users, exams, attempts] = await Promise.all([
     prisma.user.count(),

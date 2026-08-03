@@ -2,9 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getClasses() {
+  await requireAuth("ADMIN");
   return prisma.class.findMany({
     orderBy: [{ grade: "asc" }, { name: "asc" }],
     include: {
@@ -16,6 +18,7 @@ export async function getClasses() {
 }
 
 export async function getMajorsForSelect() {
+  await requireAuth("ADMIN");
   return prisma.major.findMany({
     orderBy: { code: "asc" },
     select: { id: true, name: true, code: true },
@@ -23,6 +26,7 @@ export async function getMajorsForSelect() {
 }
 
 export async function getTeachersForSelect() {
+  await requireAuth("ADMIN");
   const teachers = await prisma.teacher.findMany({
     include: { user: { select: { name: true } } },
     orderBy: { user: { name: "asc" } },
@@ -31,6 +35,7 @@ export async function getTeachersForSelect() {
 }
 
 export async function createClass(formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const grade = String(formData.get("grade") ?? "").trim();
   const majorId = String(formData.get("majorId") ?? "").trim();
@@ -53,6 +58,7 @@ export async function createClass(formData: FormData) {
 }
 
 export async function updateClass(id: string, formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const grade = String(formData.get("grade") ?? "").trim();
   const majorId = String(formData.get("majorId") ?? "").trim();
@@ -75,6 +81,7 @@ export async function updateClass(id: string, formData: FormData) {
 }
 
 export async function deleteClass(id: string) {
+  await requireAuth("ADMIN");
   try {
     const deleted = await prisma.class.delete({ where: { id } });
     await logAudit({

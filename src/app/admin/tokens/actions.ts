@@ -2,9 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getTokens() {
+  await requireAuth("ADMIN");
   return prisma.examToken.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -20,6 +22,7 @@ export async function getTokens() {
 }
 
 export async function getExamsForToken() {
+  await requireAuth("ADMIN");
   return prisma.exam.findMany({
     where: { status: { in: ["DRAFT", "ACTIVE"] } },
     orderBy: { startAt: "desc" },
@@ -36,6 +39,7 @@ function generateRandomToken(prefix = ""): string {
 }
 
 export async function createToken(formData: FormData) {
+  await requireAuth("ADMIN");
   const examId = String(formData.get("examId") ?? "").trim();
   const durationMinutes = Number(formData.get("durationMinutes") ?? "60");
 
@@ -78,6 +82,7 @@ export async function createToken(formData: FormData) {
 }
 
 export async function regenerateToken(id: string) {
+  await requireAuth("ADMIN");
   try {
     const t = await prisma.examToken.findUnique({
       where: { id },
@@ -112,6 +117,7 @@ export async function regenerateToken(id: string) {
 }
 
 export async function toggleTokenStatus(id: string) {
+  await requireAuth("ADMIN");
   try {
     const t = await prisma.examToken.findUnique({ where: { id } });
     if (!t) return { error: "Token tidak ditemukan" };
@@ -133,6 +139,7 @@ export async function toggleTokenStatus(id: string) {
 }
 
 export async function deleteToken(id: string) {
+  await requireAuth("ADMIN");
   try {
     const deleted = await prisma.examToken.delete({ where: { id } });
     await logAudit({
