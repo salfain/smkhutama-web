@@ -284,6 +284,7 @@ export async function listViolations(options: { take?: number } = {}) {
     take: options.take,
     include: {
       student: { include: STUDENT_WITH_CLASS },
+      recordedBy: { select: { name: true } },
       violationType: { select: { name: true } },
     },
   });
@@ -292,7 +293,7 @@ export async function listViolations(options: { take?: number } = {}) {
 export type SaveViolationInput = {
   id?: string | null;
   studentId: string;
-  counselorId: string;
+  recordedById: string;
   violationTypeId?: string | null;
   description: string;
   points: number;
@@ -311,7 +312,7 @@ export async function saveViolation(input: SaveViolationInput) {
 
   if (input.id) return prisma.violationRecord.update({ where: { id: input.id }, data });
   return prisma.violationRecord.create({
-    data: { ...data, studentId: input.studentId, counselorId: input.counselorId },
+    data: { ...data, studentId: input.studentId, recordedById: input.recordedById },
   });
 }
 
@@ -326,14 +327,17 @@ export async function listAchievements(options: { take?: number } = {}) {
   return prisma.achievementRecord.findMany({
     orderBy: { date: "desc" },
     take: options.take,
-    include: { student: { include: STUDENT_WITH_CLASS } },
+    include: {
+      student: { include: STUDENT_WITH_CLASS },
+      recordedBy: { select: { name: true } },
+    },
   });
 }
 
 export type SaveAchievementInput = {
   id?: string | null;
   studentId: string;
-  counselorId: string;
+  recordedById: string;
   title: string;
   description?: string | null;
   points: number;
@@ -352,7 +356,7 @@ export async function saveAchievement(input: SaveAchievementInput) {
 
   if (input.id) return prisma.achievementRecord.update({ where: { id: input.id }, data });
   return prisma.achievementRecord.create({
-    data: { ...data, studentId: input.studentId, counselorId: input.counselorId },
+    data: { ...data, studentId: input.studentId, recordedById: input.recordedById },
   });
 }
 

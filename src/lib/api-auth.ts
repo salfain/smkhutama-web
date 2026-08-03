@@ -39,7 +39,10 @@ export async function getApiUser(req: NextRequest) {
 /**
  * Helper: require authenticated user with specific role
  */
-export async function requireApiAuth(req: NextRequest, role?: "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR") {
+export async function requireApiAuth(
+  req: NextRequest,
+  role?: "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "KURIKULUM" | "KESISWAAN" | "ADMIN_CBT"
+) {
   const user = await getApiUser(req);
   if (!user) return { error: "Unauthorized", status: 401 };
   if (role && user.role !== role) return { error: "Forbidden", status: 403 };

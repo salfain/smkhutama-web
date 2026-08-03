@@ -16,6 +16,9 @@ import {
   MonitorCheck,
   BarChart3,
   Printer,
+  Award,
+  Clock3,
+  ShieldAlert,
   Settings,
   ScrollText,
   Menu,
@@ -51,6 +54,10 @@ const navItems = [
   { href: "/admin/monitoring", icon: MonitorCheck, label: "Monitoring", roles: ["ADMIN_CBT"] },
   { href: "/admin/reports", icon: BarChart3, label: "Laporan", roles: ["ADMIN_CBT"] },
   { href: "/admin/print", icon: Printer, label: "Cetak Dokumen", roles: ["ADMIN_CBT"] },
+  { href: "/admin/violations", icon: ShieldAlert, label: "Pelanggaran", roles: ["KESISWAAN"] },
+  { href: "/admin/achievements", icon: Award, label: "Prestasi", roles: ["KESISWAAN"] },
+  { href: "/admin/tardiness", icon: Clock3, label: "Rekap Terlambat", roles: ["KESISWAAN"] },
+  { href: "/admin/permits", icon: ClipboardList, label: "Rekap Izin", roles: ["KESISWAAN"] },
 ];
 
 function SidebarContent({ user }: { user: UserInfo }) {

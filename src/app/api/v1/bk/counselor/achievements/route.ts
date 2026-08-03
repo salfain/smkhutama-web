@@ -8,8 +8,8 @@ import {
   readJson,
   requiredString,
 } from "@/server/http";
-import { requireCounselorAccess } from "@/server/auth";
-import { ensureCounselorId, listAchievements, saveAchievement } from "@/server/modules/bk/service";
+import { requireCounselorAccess, requireRole } from "@/server/auth";
+import { listAchievements, saveAchievement } from "@/server/modules/bk/service";
 import { toAchievement } from "@/server/modules/bk/dto";
 
 const DEFAULT_TAKE = 50;
@@ -31,12 +31,12 @@ export async function GET(req: NextRequest) {
 /** POST /api/v1/bk/counselor/achievements */
 export async function POST(req: NextRequest) {
   return handle(async () => {
-    const actor = await requireCounselorAccess(req);
+    const actor = await requireRole(req, "KESISWAAN");
     const body = await readJson(req);
 
     const record = await saveAchievement({
       studentId: requiredString(body, "studentId"),
-      counselorId: await ensureCounselorId(actor.id),
+      recordedById: actor.id,
       title: requiredString(body, "title"),
       description: optionalString(body, "description"),
       points: intField(body, "points"),
