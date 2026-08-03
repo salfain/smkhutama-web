@@ -1,10 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/session";
+import { requireAdminArea } from "@/lib/session";
 
 export async function getDashboardStats() {
-  await requireAuth("ADMIN");
+  await requireAdminArea();
   const [
     totalStudents,
     totalTeachers,
@@ -55,7 +55,7 @@ export async function getDashboardStats() {
 }
 
 export async function getChartData() {
-  await requireAuth("ADMIN");
+  await requireAdminArea();
   // Ujian per status per 7 hari terakhir
   const exams = await prisma.exam.findMany({
     where: { startAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },

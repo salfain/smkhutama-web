@@ -17,7 +17,7 @@ export default async function PrintQuestionsPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ showKey?: string }>;
 }) {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   const { id: examId } = await params;
   const sp = await searchParams;
   const showKey = sp.showKey === "1";

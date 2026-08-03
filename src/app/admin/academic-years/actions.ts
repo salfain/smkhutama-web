@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getAcademicYears() {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   return prisma.academicYear.findMany({
     orderBy: [{ year: "desc" }, { semester: "asc" }],
     include: { _count: { select: { exams: true } } },
@@ -14,7 +14,7 @@ export async function getAcademicYears() {
 }
 
 export async function createAcademicYear(formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   const year = String(formData.get("year") ?? "").trim();
   const semester = String(formData.get("semester") ?? "").trim() as "GANJIL" | "GENAP";
   const isActive = formData.get("isActive") === "on";
@@ -40,7 +40,7 @@ export async function createAcademicYear(formData: FormData) {
 }
 
 export async function updateAcademicYear(id: string, formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   const year = String(formData.get("year") ?? "").trim();
   const semester = String(formData.get("semester") ?? "").trim() as "GANJIL" | "GENAP";
   const isActive = formData.get("isActive") === "on";
@@ -72,7 +72,7 @@ export async function updateAcademicYear(id: string, formData: FormData) {
 }
 
 export async function setActiveAcademicYear(id: string) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   try {
     await prisma.academicYear.updateMany({ data: { isActive: false } });
     const updated = await prisma.academicYear.update({ where: { id }, data: { isActive: true } });
@@ -90,7 +90,7 @@ export async function setActiveAcademicYear(id: string) {
 }
 
 export async function deleteAcademicYear(id: string) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   try {
     const deleted = await prisma.academicYear.delete({ where: { id } });
     await logAudit({

@@ -14,13 +14,22 @@ import { useConfirm } from "@/components/ConfirmDialog";
 type Student = { id: string; name: string; nis: string; className: string };
 type Achievement = {
   id: string; studentId: string; studentName: string; className: string;
-  title: string; description: string; points: number; level: string; date: string | Date;
+  recordedByName: string; title: string; description: string;
+  points: number; level: string; date: string | Date;
 };
 
 const LEVELS = ["Sekolah", "Kecamatan", "Kota/Kabupaten", "Provinsi", "Nasional", "Internasional"];
 const toDateInput = (d: string | Date) => new Date(d).toISOString().slice(0, 10);
 
-export function AchievementsClient({ achievements, students }: { achievements: Achievement[]; students: Student[] }) {
+export function AchievementsClient({
+  achievements,
+  students,
+  readOnly,
+}: {
+  achievements: Achievement[];
+  students: Student[];
+  readOnly: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Achievement | null>(null);
   const [studentId, setStudentId] = useState("");
@@ -51,11 +60,11 @@ export function AchievementsClient({ achievements, students }: { achievements: A
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      {!readOnly && <div className="mb-4 flex justify-end">
         <Button size="sm" className="gap-1.5 bg-purple-600 hover:bg-purple-700" onClick={openCreate}>
           <Plus className="h-4 w-4" />Catat Prestasi
         </Button>
-      </div>
+      </div>}
 
       {achievements.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
@@ -74,25 +83,26 @@ export function AchievementsClient({ achievements, students }: { achievements: A
               </div>
               <p className="mt-3 font-semibold text-gray-900 leading-snug">{a.title}</p>
               <p className="text-xs text-gray-500">{a.studentName} · {a.className}</p>
+              <p className="text-[11px] text-gray-400">Dicatat oleh {a.recordedByName}</p>
               {a.level && <p className="mt-1 text-[11px] font-medium text-emerald-600">Tingkat {a.level}</p>}
               {a.description && <p className="mt-2 line-clamp-2 text-xs text-gray-600">{a.description}</p>}
               <div className="mt-3 flex items-center justify-between">
                 <span className="text-[11px] text-gray-400">{new Date(a.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</span>
-                <div className="flex gap-1">
+                {!readOnly && <div className="flex gap-1">
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-purple-600 hover:bg-purple-50" onClick={() => openEdit(a)}>
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(a.id)}>
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
-                </div>
+                </div>}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      {!readOnly && <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editing ? "Edit" : "Catat"} Prestasi</DialogTitle></DialogHeader>
           <form action={submit} className="space-y-4 pt-2">
@@ -125,7 +135,7 @@ export function AchievementsClient({ achievements, students }: { achievements: A
             </div>
           </form>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
     </div>
   );
 }

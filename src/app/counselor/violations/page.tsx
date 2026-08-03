@@ -13,9 +13,15 @@ export default async function ViolationsPage() {
     <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold text-gray-900">Pelanggaran Siswa</h1>
-        <p className="text-sm text-gray-500">Catat pelanggaran & kelola poin pelanggaran siswa.</p>
+        <p className="text-sm text-gray-500">Tinjau catatan siswa dan kelola master jenis pelanggaran.</p>
       </div>
-      <ViolationsClient violations={violations} types={types} students={students} />
+      <ViolationsClient
+        violations={violations}
+        types={types}
+        students={students}
+        canManageRecords={false}
+        canManageTypes
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
-import { ensureCounselorId, listAchievements, saveAchievement } from "@/server/modules/bk/service";
+import { listAchievements, saveAchievement } from "@/server/modules/bk/service";
 import { toAchievement } from "@/server/modules/bk/dto";
 
 // Endpoint versi lama. Penggantinya: /api/v1/bk/counselor/achievements.
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const r = await requireApiAuth(req, "COUNSELOR");
+  const r = await requireApiAuth(req, "KESISWAAN");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
   const body = await req.json().catch(() => ({}));
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   await saveAchievement({
     studentId,
-    counselorId: await ensureCounselorId(r.user.id),
+    recordedById: r.user.id,
     title,
     description,
     points,

@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getExams, getExamFormData } from "./actions";
 import { ExamTable } from "./ExamTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminExamsPage() {
+  await requireAuth("ADMIN_CBT");
   const [exams, opts] = await Promise.all([
     getExams().catch(() => []),
     getExamFormData().catch(() => ({ subjects: [], teachers: [], classes: [], academicYears: [], questionSets: [] })),

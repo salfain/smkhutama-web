@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
-import { ensureCounselorId, listViolations, saveViolation } from "@/server/modules/bk/service";
+import { listViolations, saveViolation } from "@/server/modules/bk/service";
 import { toViolation } from "@/server/modules/bk/dto";
 
 // Endpoint versi lama. Penggantinya: /api/v1/bk/counselor/violations.
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const r = await requireApiAuth(req, "COUNSELOR");
+  const r = await requireApiAuth(req, "KESISWAAN");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
   const body = await req.json().catch(() => ({}));
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   await saveViolation({
     studentId,
-    counselorId: await ensureCounselorId(r.user.id),
+    recordedById: r.user.id,
     description,
     points,
     sanction,

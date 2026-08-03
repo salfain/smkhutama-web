@@ -7,7 +7,7 @@ import { parseQuestionSetWorkbook } from "@/lib/question-set-import";
 import { revalidatePath } from "next/cache";
 
 export async function getAdminQuestionSetData() {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
 
   const [questionSets, subjects, teachers] = await Promise.all([
     prisma.questionSet.findMany({
@@ -35,7 +35,7 @@ export async function getAdminQuestionSetData() {
 }
 
 export async function importQuestionSetForTeacher(formData: FormData) {
-  const user = await requireAuth("ADMIN");
+  const user = await requireAuth("ADMIN_CBT");
 
   const title = String(formData.get("title") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
@@ -139,7 +139,7 @@ export async function importQuestionSetForTeacher(formData: FormData) {
 }
 
 export async function updateQuestionSetStatus(id: string, status: "DRAFT" | "SUBMITTED" | "APPROVED" | "USED") {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   try {
     const previous = await prisma.questionSet.findUnique({
       where: { id },

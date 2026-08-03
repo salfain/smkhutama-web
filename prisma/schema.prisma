@@ -21,6 +21,9 @@ enum Role {
   LANDING_ADMIN
   COUNSELOR
   PIKET
+  KURIKULUM
+  KESISWAAN
+  ADMIN_CBT
 }
 
 enum Gender {
@@ -172,6 +175,9 @@ model User {
   student   Student?
   teacher   Teacher?
   counselor Counselor?
+
+  violationsRecorded   ViolationRecord[]   @relation("ViolationRecorder")
+  achievementsRecorded AchievementRecord[] @relation("AchievementRecorder")
 
   @@map("users")
 }
@@ -710,10 +716,8 @@ model Counselor {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   cases         CounselingCase[]
-  violations    ViolationRecord[]
-  achievements  AchievementRecord[]
   parentSummons ParentSummon[]
   homeVisits    HomeVisit[]
 
@@ -761,7 +765,7 @@ model CounselingCase {
 model ViolationRecord {
   id              String   @id @default(uuid())
   studentId       String   @map("student_id")
-  counselorId     String   @map("counselor_id")
+  recordedById    String   @map("recorded_by_id")
   violationTypeId String?  @map("violation_type_id")
   description     String
   points          Int      @default(0)
@@ -770,7 +774,7 @@ model ViolationRecord {
   createdAt       DateTime @default(now()) @map("created_at")
 
   student       Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  counselor     Counselor      @relation(fields: [counselorId], references: [id])
+  recordedBy    User           @relation("ViolationRecorder", fields: [recordedById], references: [id])
   violationType ViolationType? @relation(fields: [violationTypeId], references: [id])
 
   @@map("violation_records")
@@ -778,18 +782,18 @@ model ViolationRecord {
 
 /// Catatan prestasi siswa (poin positif)
 model AchievementRecord {
-  id          String   @id @default(uuid())
-  studentId   String   @map("student_id")
-  counselorId String   @map("counselor_id")
-  title       String
-  description String?
-  points      Int      @default(0)
-  level       String?
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  studentId    String   @map("student_id")
+  recordedById String   @map("recorded_by_id")
+  title        String
+  description  String?
+  points       Int      @default(0)
+  level        String?
+  date         DateTime @default(now())
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  counselor Counselor @relation(fields: [counselorId], references: [id])
+  student    Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  recordedBy User    @relation("AchievementRecorder", fields: [recordedById], references: [id])
 
   @@map("achievement_records")
 }

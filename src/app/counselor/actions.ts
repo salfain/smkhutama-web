@@ -10,7 +10,7 @@
  */
 
 import { revalidatePath } from "next/cache";
-import { requireCounselorAuth } from "@/lib/session";
+import { requireAuth, requireCounselorAuth } from "@/lib/session";
 import * as bk from "@/server/modules/bk/service";
 import { toAchievement, toCase, toDashboard, toRequest, toViolation } from "@/server/modules/bk/dto";
 
@@ -18,6 +18,8 @@ const CASES_PATH = "/counselor/cases";
 const DASHBOARD_PATH = "/counselor/dashboard";
 const VIOLATIONS_PATH = "/counselor/violations";
 const ACHIEVEMENTS_PATH = "/counselor/achievements";
+const ADMIN_VIOLATIONS_PATH = "/admin/violations";
+const ADMIN_ACHIEVEMENTS_PATH = "/admin/achievements";
 const REQUESTS_PATH = "/counselor/requests";
 
 function text(fd: FormData, field: string) {
@@ -134,7 +136,7 @@ export async function listViolations() {
 }
 
 export async function saveViolation(fd: FormData) {
-  const counselorId = await currentCounselorId();
+  const user = await requireAuth("KESISWAAN");
   const studentId = text(fd, "studentId");
   const description = text(fd, "description");
   if (!studentId || !description) return { error: "Siswa dan deskripsi wajib diisi" };
@@ -143,7 +145,7 @@ export async function saveViolation(fd: FormData) {
     await bk.saveViolation({
       id: text(fd, "id"),
       studentId,
-      counselorId,
+      recordedById: user.id,
       violationTypeId: text(fd, "violationTypeId"),
       description,
       points: intValue(fd, "points"),
@@ -151,6 +153,7 @@ export async function saveViolation(fd: FormData) {
       date: text(fd, "date"),
     });
     revalidatePath(VIOLATIONS_PATH);
+    revalidatePath(ADMIN_VIOLATIONS_PATH);
     revalidatePath(DASHBOARD_PATH);
     return { success: true };
   } catch {
@@ -159,9 +162,10 @@ export async function saveViolation(fd: FormData) {
 }
 
 export async function deleteViolation(id: string) {
-  await requireCounselorAuth();
+  await requireAuth("KESISWAAN");
   await bk.deleteViolation(id);
   revalidatePath(VIOLATIONS_PATH);
+  revalidatePath(ADMIN_VIOLATIONS_PATH);
   revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }
@@ -174,7 +178,7 @@ export async function listAchievements() {
 }
 
 export async function saveAchievement(fd: FormData) {
-  const counselorId = await currentCounselorId();
+  const user = await requireAuth("KESISWAAN");
   const studentId = text(fd, "studentId");
   const title = text(fd, "title");
   if (!studentId || !title) return { error: "Siswa dan judul prestasi wajib diisi" };
@@ -183,7 +187,7 @@ export async function saveAchievement(fd: FormData) {
     await bk.saveAchievement({
       id: text(fd, "id"),
       studentId,
-      counselorId,
+      recordedById: user.id,
       title,
       description: text(fd, "description"),
       points: intValue(fd, "points"),
@@ -191,6 +195,7 @@ export async function saveAchievement(fd: FormData) {
       date: text(fd, "date"),
     });
     revalidatePath(ACHIEVEMENTS_PATH);
+    revalidatePath(ADMIN_ACHIEVEMENTS_PATH);
     revalidatePath(DASHBOARD_PATH);
     return { success: true };
   } catch {
@@ -199,9 +204,10 @@ export async function saveAchievement(fd: FormData) {
 }
 
 export async function deleteAchievement(id: string) {
-  await requireCounselorAuth();
+  await requireAuth("KESISWAAN");
   await bk.deleteAchievement(id);
   revalidatePath(ACHIEVEMENTS_PATH);
+  revalidatePath(ADMIN_ACHIEVEMENTS_PATH);
   revalidatePath(DASHBOARD_PATH);
   return { success: true };
 }

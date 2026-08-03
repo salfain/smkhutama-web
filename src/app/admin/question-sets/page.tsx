@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getAdminQuestionSetData } from "./actions";
 import { QuestionSetsAdminClient } from "./QuestionSetsAdminClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminQuestionSetsPage() {
+  await requireAuth("ADMIN_CBT");
   const data = await getAdminQuestionSetData().catch(() => ({
     questionSets: [],
     subjects: [],

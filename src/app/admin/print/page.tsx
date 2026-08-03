@@ -1,10 +1,12 @@
 import { Printer } from "lucide-react";
+import { requireAuth } from "@/lib/session";
 import { getExamsForPrint } from "./actions";
 import { PrintClient } from "./PrintClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function PrintPage() {
+  await requireAuth("ADMIN_CBT");
   const exams = await getExamsForPrint().catch(() => []);
 
   return (

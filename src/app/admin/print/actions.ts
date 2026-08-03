@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
 
 export async function getExamsForPrint() {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   return prisma.exam.findMany({
     orderBy: { startAt: "desc" },
     select: {
@@ -16,7 +16,7 @@ export async function getExamsForPrint() {
 }
 
 export async function getExamPrintData(examId: string) {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   const [exam, school] = await Promise.all([
     prisma.exam.findUnique({
       where: { id: examId },

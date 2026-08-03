@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getTeachers, getSubjectsForSelect } from "./actions";
 import { TeacherTable } from "./TeacherTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function TeachersPage() {
+  await requireAuth("ADMIN");
   const [teachers, subjects] = await Promise.all([
     getTeachers().catch(() => []),
     getSubjectsForSelect().catch(() => []),

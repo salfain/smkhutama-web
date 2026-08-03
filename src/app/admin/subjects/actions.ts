@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getSubjects() {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   return prisma.subject.findMany({
     orderBy: { code: "asc" },
     include: {
@@ -17,7 +17,7 @@ export async function getSubjects() {
 }
 
 export async function getMajorsForSelect() {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   return prisma.major.findMany({
     orderBy: { code: "asc" },
     select: { id: true, name: true, code: true },
@@ -25,7 +25,7 @@ export async function getMajorsForSelect() {
 }
 
 export async function createSubject(formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   const name = String(formData.get("name") ?? "").trim();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const majorId = String(formData.get("majorId") ?? "").trim();
@@ -49,7 +49,7 @@ export async function createSubject(formData: FormData) {
 }
 
 export async function updateSubject(id: string, formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   const name = String(formData.get("name") ?? "").trim();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const majorId = String(formData.get("majorId") ?? "").trim();
@@ -74,7 +74,7 @@ export async function updateSubject(id: string, formData: FormData) {
 }
 
 export async function deleteSubject(id: string) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   try {
     const deleted = await prisma.subject.delete({ where: { id } });
     await logAudit({

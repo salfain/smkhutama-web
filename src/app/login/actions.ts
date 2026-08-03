@@ -15,7 +15,15 @@ import { clearSession, setSession } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
 import { checkCredentials, type CredentialFailure } from "@/server/modules/auth/service";
 
-type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "PIKET";
+type Role =
+  | "ADMIN"
+  | "TEACHER"
+  | "STUDENT"
+  | "COUNSELOR"
+  | "PIKET"
+  | "KURIKULUM"
+  | "KESISWAAN"
+  | "ADMIN_CBT";
 type System = "CBT" | "SIBIKONS" | "PIKET";
 
 type LoginResult = { error: string } | { success: true; redirectTo: string };
@@ -41,6 +49,9 @@ function messageFor(reason: CredentialFailure, role: Role, today?: string) {
 function destinationFor(role: string, system?: System) {
   if (system === "PIKET") return "/piket/dashboard";
   if (role === "ADMIN") return "/admin/dashboard";
+  if (role === "KURIKULUM") return "/admin/dashboard";
+  if (role === "KESISWAAN") return "/admin/dashboard";
+  if (role === "ADMIN_CBT") return "/admin/dashboard";
   if (role === "TEACHER") return "/teacher/dashboard";
   if (role === "COUNSELOR") return "/counselor/dashboard";
   if (role === "PIKET") return "/piket/dashboard";

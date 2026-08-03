@@ -15,7 +15,8 @@ type Student = { id: string; name: string; nis: string; className: string };
 type VType = { id: string; name: string; category: string; points: number };
 type Violation = {
   id: string; studentId: string; studentName: string; className: string;
-  typeName: string | null; description: string; points: number; sanction: string; date: string | Date;
+  recordedByName: string; typeName: string | null; description: string;
+  points: number; sanction: string; date: string | Date;
 };
 
 const CATS = [["RINGAN", "Ringan"], ["SEDANG", "Sedang"], ["BERAT", "Berat"]];
@@ -24,7 +25,19 @@ const catCls: Record<string, string> = {
 };
 const toDateInput = (d: string | Date) => new Date(d).toISOString().slice(0, 10);
 
-export function ViolationsClient({ violations, types, students }: { violations: Violation[]; types: VType[]; students: Student[] }) {
+export function ViolationsClient({
+  violations,
+  types,
+  students,
+  canManageRecords,
+  canManageTypes,
+}: {
+  violations: Violation[];
+  types: VType[];
+  students: Student[];
+  canManageRecords: boolean;
+  canManageTypes: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [typesOpen, setTypesOpen] = useState(false);
   const [editing, setEditing] = useState<Violation | null>(null);
@@ -64,14 +77,20 @@ export function ViolationsClient({ violations, types, students }: { violations: 
 
   return (
     <div>
-      <div className="mb-4 flex justify-end gap-2">
-        <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setTypesOpen(true)}>
-          <Settings2 className="h-4 w-4" />Jenis Pelanggaran
-        </Button>
-        <Button size="sm" className="gap-1.5 bg-purple-600 hover:bg-purple-700" onClick={openCreate}>
-          <Plus className="h-4 w-4" />Catat Pelanggaran
-        </Button>
-      </div>
+      {(canManageRecords || canManageTypes) && (
+        <div className="mb-4 flex justify-end gap-2">
+          {canManageTypes && (
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setTypesOpen(true)}>
+              <Settings2 className="h-4 w-4" />Jenis Pelanggaran
+            </Button>
+          )}
+          {canManageRecords && (
+            <Button size="sm" className="gap-1.5 bg-purple-600 hover:bg-purple-700" onClick={openCreate}>
+              <Plus className="h-4 w-4" />Catat Pelanggaran
+            </Button>
+          )}
+        </div>
+      )}
 
       {violations.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
@@ -87,7 +106,7 @@ export function ViolationsClient({ violations, types, students }: { violations: 
                 <th className="px-4 py-3">Pelanggaran</th>
                 <th className="px-4 py-3 text-center">Poin</th>
                 <th className="px-4 py-3">Tanggal</th>
-                <th className="px-4 py-3"></th>
+                {canManageRecords && <th className="px-4 py-3"></th>}
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -101,6 +120,7 @@ export function ViolationsClient({ violations, types, students }: { violations: 
                     {v.typeName && <p className="text-xs font-medium text-gray-700">{v.typeName}</p>}
                     <p className="text-xs text-gray-500">{v.description}</p>
                     {v.sanction && <p className="text-[11px] text-sky-600">Sanksi: {v.sanction}</p>}
+                    <p className="text-[11px] text-gray-400">Dicatat oleh {v.recordedByName}</p>
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">{v.points}</span>
@@ -108,16 +128,18 @@ export function ViolationsClient({ violations, types, students }: { violations: 
                   <td className="px-4 py-3 text-xs text-gray-500">
                     {new Date(v.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-purple-600 hover:bg-purple-50" onClick={() => openEdit(v)}>
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(v.id)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </td>
+                  {canManageRecords && (
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-purple-600 hover:bg-purple-50" onClick={() => openEdit(v)}>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(v.id)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -126,7 +148,7 @@ export function ViolationsClient({ violations, types, students }: { violations: 
       )}
 
       {/* Dialog catat pelanggaran */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      {canManageRecords && <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editing ? "Edit" : "Catat"} Pelanggaran</DialogTitle></DialogHeader>
           <form action={submit} className="space-y-4 pt-2">
@@ -165,10 +187,10 @@ export function ViolationsClient({ violations, types, students }: { violations: 
             </div>
           </form>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
       {/* Dialog kelola jenis pelanggaran */}
-      <ViolationTypesDialog open={typesOpen} onOpenChange={setTypesOpen} types={types} />
+      {canManageTypes && <ViolationTypesDialog open={typesOpen} onOpenChange={setTypesOpen} types={types} />}
     </div>
   );
 }
