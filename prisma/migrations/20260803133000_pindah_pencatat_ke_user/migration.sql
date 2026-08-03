@@ -19,7 +19,8 @@ ALTER TABLE "violation_records" DROP CONSTRAINT IF EXISTS "violation_records_cou
 ALTER TABLE "violation_records" DROP COLUMN "counselor_id";
 ALTER TABLE "violation_records"
   ADD CONSTRAINT "violation_records_recorded_by_id_fkey"
-  FOREIGN KEY ("recorded_by_id") REFERENCES "users"("id");
+  FOREIGN KEY ("recorded_by_id") REFERENCES "users"("id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AchievementRecord: lakukan urutan aman yang sama.
 ALTER TABLE "achievement_records" ADD COLUMN "recorded_by_id" TEXT;
@@ -35,4 +36,5 @@ ALTER TABLE "achievement_records" DROP CONSTRAINT IF EXISTS "achievement_records
 ALTER TABLE "achievement_records" DROP COLUMN "counselor_id";
 ALTER TABLE "achievement_records"
   ADD CONSTRAINT "achievement_records_recorded_by_id_fkey"
-  FOREIGN KEY ("recorded_by_id") REFERENCES "users"("id");
+  FOREIGN KEY ("recorded_by_id") REFERENCES "users"("id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
