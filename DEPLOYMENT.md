@@ -78,7 +78,13 @@ Tips: salin file backup ke penyimpanan lain (Google Drive / rclone / S3) secara 
 cd /var/www/cbt-smkhutama
 git pull
 npx prisma generate
-npx prisma db push      # hanya jika ada perubahan skema database
+npx prisma migrate deploy
 npm run build
 pm2 restart cbt-smkhutama
+```
+
+Data demo bersifat opsional dan akan memperbarui password akun demo. Jalankan hanya bila diperlukan:
+
+```bash
+ALLOW_DEMO_SEED=true npm run db:seed
 ```
