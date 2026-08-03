@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requirePiketApiAuth } from "@/lib/piket-api-auth";
+import { markPermitReturned } from "@/server/modules/piket/service";
+
+// Endpoint versi lama — bentuk response dipertahankan untuk aplikasi mobile
+// yang sudah beredar. Penggantinya: PATCH /api/v1/piket/izin/{id}/kembali.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,14 +22,8 @@ async function markReturned(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   if (!id) return json({ error: "id diperlukan" }, 400);
 
-  const result = await prisma.studentPermit.updateMany({
-    where: { id },
-    data: { status: "SUDAH_KEMBALI", returnTime: new Date() },
-  });
-
-  if (result.count === 0) {
-    return json({ error: "Catatan izin tidak ditemukan" }, 404);
-  }
+  const updated = await markPermitReturned(id);
+  if (!updated) return json({ error: "Catatan izin tidak ditemukan" }, 404);
 
   return json({ success: true });
 }

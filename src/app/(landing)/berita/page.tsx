@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { listNews } from "@/server/modules/landing/content";
 import { Newspaper } from "lucide-react";
 import { NewsGrid } from "@/components/landing/NewsGrid";
 import { PageHero } from "@/components/landing/PageHero";
@@ -8,10 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Berita & Kegiatan – SMK Hutama" };
 
 export default async function BeritaPage() {
-  const news = await prisma.landingNews.findMany({
-    where: { isPublished: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  const news = await listNews();
 
   return (
     <>

@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma";
+import { getCase } from "@/server/modules/bk/service";
+import { getSchoolProfile } from "@/server/modules/shared/school";
 import { requireCounselorAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { PrintButtonsPurple, SchoolLogo } from "@/components/print/PrintButtons";
@@ -24,23 +25,11 @@ export default async function CasePrintPage({ params }: { params: Promise<{ id: 
   await requireCounselorAuth();
   const { id } = await params;
 
-  const c = await prisma.counselingCase.findUnique({
-    where: { id },
-    include: {
-      student: {
-        include: {
-          user: { select: { name: true } },
-          class: { select: { name: true } },
-          major: { select: { name: true } },
-        },
-      },
-      counselor: { include: { user: { select: { name: true } } } },
-    },
-  });
+  const c = await getCase(id);
 
   if (!c) notFound();
 
-  const school = await prisma.schoolProfile.findFirst();
+  const school = await getSchoolProfile();
   const nomorSurat = `KONS-${new Date(c.sessionDate).getFullYear()}-${id.slice(-4).toUpperCase()}`;
 
   return (

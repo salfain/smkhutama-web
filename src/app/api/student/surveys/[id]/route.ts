@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
-import { prisma } from "@/lib/prisma";
+import {
+  getSurveyForStudent,
+  hasResponded,
+  submitSurveyResponse,
+} from "@/server/modules/bk/surveys";
+import { toStudentSurveyDetail } from "@/server/modules/bk/dto";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// Endpoint versi lama. Penggantinya: /api/v1/bk/student/surveys/{id}.
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "STUDENT");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
@@ -15,37 +18,13 @@ export async function GET(
   }
 
   const { id } = await params;
+  const survey = await getSurveyForStudent(id, studentId);
+  if (!survey) return NextResponse.json({ error: "Survey not found" }, { status: 404 });
 
-  const survey = await prisma.survey.findUnique({
-    where: { id },
-    include: {
-      questions: { orderBy: { orderNumber: "asc" } },
-      responses: { where: { studentId }, select: { id: true } },
-    },
-  });
-
-  if (!survey || !survey.isActive) {
-    return NextResponse.json({ error: "Survey not found" }, { status: 404 });
-  }
-
-  return NextResponse.json({
-    id: survey.id,
-    title: survey.title,
-    description: survey.description,
-    answered: survey.responses.length > 0,
-    questions: survey.questions.map((q) => ({
-      id: q.id,
-      text: q.text,
-      category: q.category,
-      orderNumber: q.orderNumber,
-    })),
-  });
+  return NextResponse.json(toStudentSurveyDetail(survey));
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "STUDENT");
   if ("error" in r) return NextResponse.json({ error: r.error }, { status: r.status });
 
@@ -55,56 +34,41 @@ export async function POST(
   }
 
   const { id } = await params;
+  const survey = await getSurveyForStudent(id, studentId);
+  if (!survey) return NextResponse.json({ error: "Survey not found" }, { status: 404 });
 
-  const survey = await prisma.survey.findUnique({
-    where: { id },
-    include: { questions: true },
-  });
-
-  if (!survey || !survey.isActive) {
-    return NextResponse.json({ error: "Survey not found" }, { status: 404 });
-  }
-
-  // Check if already answered
-  const existing = await prisma.surveyResponse.findUnique({
-    where: { surveyId_studentId: { surveyId: id, studentId } },
-  });
-  if (existing) {
+  if (await hasResponded(id, studentId)) {
     return NextResponse.json({ error: "Already answered this survey" }, { status: 409 });
   }
 
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
   const { answers } = body;
 
   if (!Array.isArray(answers) || answers.length === 0) {
     return NextResponse.json({ error: "Answers are required" }, { status: 400 });
   }
 
-  // Validate each answer
   const questionIds = new Set(survey.questions.map((q) => q.id));
-  for (const ans of answers) {
-    if (!ans.questionId || !questionIds.has(ans.questionId)) {
+  for (const answer of answers) {
+    if (!answer?.questionId || !questionIds.has(answer.questionId)) {
       return NextResponse.json({ error: "Invalid question ID" }, { status: 400 });
     }
-    if (typeof ans.value !== "number" || ans.value < 1 || ans.value > 4) {
+    if (typeof answer.value !== "number" || answer.value < 1 || answer.value > 4) {
       return NextResponse.json({ error: "Value must be between 1 and 4" }, { status: 400 });
     }
   }
 
-  // Create response with answers
-  const response = await prisma.surveyResponse.create({
-    data: {
-      surveyId: id,
-      studentId,
-      answers: {
-        create: answers.map((a: { questionId: string; value: number }) => ({
-          questionId: a.questionId,
-          value: a.value,
-        })),
-      },
-    },
-    include: { answers: true },
-  });
+  const response = await submitSurveyResponse(
+    id,
+    studentId,
+    answers.map((a: { questionId: string; value: number }) => ({
+      questionId: a.questionId,
+      value: a.value,
+    }))
+  );
 
-  return NextResponse.json({ id: response.id, message: "Survey submitted successfully" }, { status: 201 });
+  return NextResponse.json(
+    { id: response.id, message: "Survey submitted successfully" },
+    { status: 201 }
+  );
 }

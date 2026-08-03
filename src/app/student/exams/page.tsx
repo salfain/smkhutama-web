@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { listExams } from "@/server/modules/cbt/student";
 import { StudentExamsList } from "./StudentExamsList";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -14,17 +14,7 @@ export default async function StudentExamsPage() {
   const user = await requireAuth("STUDENT");
   if (!user.student) return null;
 
-  const classId = user.student.classId;
-
-  const examsRaw = await prisma.exam.findMany({
-    where: classId ? { classes: { some: { classId } } } : {},
-    orderBy: { startAt: "desc" },
-    include: {
-      subject: { select: { code: true, name: true } },
-      _count: { select: { questions: true } },
-      attempts: { where: { studentId: user.student.id }, take: 1 },
-    },
-  });
+  const examsRaw = await listExams(user.student);
 
   const exams = examsRaw.map((e) => ({
     id: e.id,

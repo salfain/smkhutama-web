@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { listTeacherActiveExams } from "@/server/modules/cbt/monitoring";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { MonitorCheck, Clock, Lock } from "lucide-react";
@@ -12,25 +12,7 @@ export default async function TeacherMonitoringPage() {
   const user = await requireAuth("TEACHER");
   if (!user.teacher) return null;
 
-  const exams = await prisma.exam.findMany({
-    where: { teacherId: user.teacher.id, status: "ACTIVE" },
-    orderBy: { startAt: "desc" },
-    include: {
-      subject: { select: { code: true } },
-      _count: { select: { questions: true, attempts: true } },
-      attempts: {
-        include: {
-          student: {
-            include: {
-              user: { select: { name: true } },
-              class: { select: { name: true } },
-            },
-          },
-          _count: { select: { answers: true } },
-        },
-      },
-    },
-  });
+  const exams = await listTeacherActiveExams(user.teacher.id);
 
   return (
     <div className="p-4 md:p-6 lg:p-8">

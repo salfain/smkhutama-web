@@ -1,15 +1,51 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { verifyPassword } from "@/lib/auth";
-import { setSession, clearSession } from "@/lib/session";
-import { logAudit } from "@/lib/audit";
-import { getPiketDayName, isTeacherScheduledForPiket, getJakartaDayOfWeek } from "@/lib/piket-schedule";
-import { redirect } from "next/navigation";
+/**
+ * Server action halaman login web.
+ *
+ * Aturan kredensialnya dipinjam dari `@/server/modules/auth/service` — sumber
+ * yang sama dengan `/api/v1/auth/login` — supaya login lewat browser dan lewat
+ * aplikasi mobile tidak bisa berbeda syarat. Yang khas web tinggal di sini:
+ * saklar login siswa, cookie sesi, dan tujuan pengalihan setelah masuk.
+ */
 
-type LoginResult =
-  | { error: string }
-  | { success: true; redirectTo: string };
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { clearSession, setSession } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
+import { checkCredentials, type CredentialFailure } from "@/server/modules/auth/service";
+
+type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "PIKET";
+type System = "CBT" | "SIBIKONS" | "PIKET";
+
+type LoginResult = { error: string } | { success: true; redirectTo: string };
+
+/** Kalimat versi web — diakhiri titik, berbeda dari kalimat API. */
+function messageFor(reason: CredentialFailure, role: Role, today?: string) {
+  switch (reason) {
+    case "MISSING_FIELDS":
+      return "Username dan password wajib diisi.";
+    case "ACCOUNT_INACTIVE":
+      return "Akun Anda nonaktif. Hubungi admin.";
+    case "ROLE_MISMATCH":
+      return `Akun ini bukan akun ${role.toLowerCase()}.`;
+    case "PIKET_REQUIRES_TEACHER":
+      return "Login piket menggunakan akun guru.";
+    case "PIKET_NOT_SCHEDULED":
+      return `Anda tidak terjadwal piket hari ${today}. Hubungi admin jika jadwal belum diatur.`;
+    default:
+      return "Username atau password salah.";
+  }
+}
+
+function destinationFor(role: string, system?: System) {
+  if (system === "PIKET") return "/piket/dashboard";
+  if (role === "ADMIN") return "/admin/dashboard";
+  if (role === "TEACHER") return "/teacher/dashboard";
+  if (role === "COUNSELOR") return "/counselor/dashboard";
+  if (role === "PIKET") return "/piket/dashboard";
+  return "/student/dashboard";
+}
 
 export async function getStudentWebLoginEnabled() {
   const setting = await prisma.systemSetting.findUnique({
@@ -22,42 +58,23 @@ export async function getStudentWebLoginEnabled() {
 export async function loginAction(
   username: string,
   password: string,
-  expectedRole: "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "PIKET",
-  system?: "CBT" | "SIBIKONS" | "PIKET"
+  expectedRole: Role,
+  system?: System
 ): Promise<LoginResult> {
-  if (!username || !password) return { error: "Username dan password wajib diisi." };
-
   try {
-    const user = await prisma.user.findUnique({
-      where: { username },
-      include: { teacher: true },
-    });
-    if (!user) return { error: "Username atau password salah." };
-    if (!user.isActive) return { error: "Akun Anda nonaktif. Hubungi admin." };
-    if (user.role !== expectedRole) {
-      return { error: `Akun ini bukan akun ${expectedRole.toLowerCase()}.` };
+    const result = await checkCredentials({ username, password, role: expectedRole, system });
+    if (!result.ok) {
+      return { error: messageFor(result.reason, expectedRole, result.today) };
     }
 
-    if (expectedRole === "STUDENT") {
-      const allowed = await getStudentWebLoginEnabled();
-      if (!allowed) {
-        return { error: "Login siswa melalui website sedang dinonaktifkan. Silakan gunakan aplikasi mobile." };
-      }
-    }
+    const user = result.user!;
 
-    const ok = await verifyPassword(password, user.passwordHash);
-    if (!ok) return { error: "Username atau password salah." };
-
-    if (system === "PIKET") {
-      if (user.role !== "TEACHER" || !user.teacher) {
-        return { error: "Login piket menggunakan akun guru." };
-      }
-
-      const scheduled = await isTeacherScheduledForPiket(user.teacher.id);
-      if (!scheduled) {
-        const today = getPiketDayName(getJakartaDayOfWeek());
-        return { error: `Anda tidak terjadwal piket hari ${today}. Hubungi admin jika jadwal belum diatur.` };
-      }
+    // Aturan khusus web: siswa bisa dilarang masuk lewat browser.
+    if (user.role === "STUDENT" && !(await getStudentWebLoginEnabled())) {
+      return {
+        error:
+          "Login siswa melalui website sedang dinonaktifkan. Silakan gunakan aplikasi mobile.",
+      };
     }
 
     await setSession(user.id);
@@ -69,20 +86,7 @@ export async function loginAction(
       details: { username: user.username, role: user.role },
     });
 
-    const redirectTo =
-      system === "PIKET"
-        ? "/piket/dashboard"
-        : user.role === "ADMIN"
-        ? "/admin/dashboard"
-        : user.role === "TEACHER"
-        ? "/teacher/dashboard"
-        : user.role === "COUNSELOR"
-        ? "/counselor/dashboard"
-        : user.role === "PIKET"
-        ? "/piket/dashboard"
-        : "/student/dashboard";
-
-    return { success: true, redirectTo };
+    return { success: true, redirectTo: destinationFor(user.role, system) };
   } catch {
     return { error: "Terjadi kesalahan. Periksa koneksi database." };
   }

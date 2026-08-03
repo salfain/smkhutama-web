@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getQuestionAnalysis, listClosedExams } from "@/server/modules/cbt/analysis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, BarChart3, Users, CheckCircle2, XCircle } from "lucide-react";
@@ -23,14 +23,7 @@ export default async function AnalysisPage({
   if (!user.teacher) return null;
 
   // Ambil semua ujian CLOSED milik guru ini
-  const allExams = await prisma.exam.findMany({
-    where: { teacherId: user.teacher.id, status: "CLOSED" },
-    orderBy: { endAt: "desc" },
-    include: {
-      subject: { select: { code: true, name: true } },
-      _count: { select: { attempts: true } },
-    },
-  });
+  const allExams = await listClosedExams(user.teacher.id);
 
   const { examId } = await searchParams;
   // Pilih ujian: dari URL param, atau ujian terbaru
@@ -63,51 +56,11 @@ export default async function AnalysisPage({
   }
 
   // ── Hitung statistik per soal ────────────────────────────────────────────
-  const examFull = await prisma.exam.findUnique({
-    where: { id: exam.id },
-    include: {
-      subject: { select: { code: true, name: true } },
-      questions: {
-        orderBy: { orderNumber: "asc" },
-        include: { question: { select: { id: true, questionText: true, questionType: true } } },
-      },
-      _count: { select: { attempts: true } },
-    },
-  });
+  const analysis = await getQuestionAnalysis(exam.id);
+  if (!analysis) return null;
 
-  if (!examFull) return null;
-
-  const questionIds = examFull.questions.map((q) => q.questionId);
-  const answers = await prisma.studentAnswer.findMany({
-    where: {
-      questionId: { in: questionIds },
-      attempt: { examId: exam.id, status: { in: ["SUBMITTED", "AUTO_SUBMITTED"] } },
-    },
-    select: { questionId: true, isCorrect: true },
-  });
-
-  const totalParticipants = examFull._count.attempts;
-
-  const stats = examFull.questions.map((eq, idx) => {
-    const all = answers.filter((a) => a.questionId === eq.questionId);
-    const correct = all.filter((a) => a.isCorrect === true).length;
-    const wrong   = all.filter((a) => a.isCorrect === false).length;
-    const total   = totalParticipants || 1; // pakai total peserta bukan jawaban masuk
-    const difficulty = correct / total;
-    return {
-      no: idx + 1,
-      questionText: eq.question.questionText,
-      questionType: eq.question.questionType,
-      correct, wrong, total: totalParticipants, difficulty,
-    };
-  });
-
-  const sorted = [...stats].sort((a, b) => a.difficulty - b.difficulty);
-  const hardest  = sorted[0];
-  const easiest  = sorted[sorted.length - 1];
-  const avgDiff  = stats.length > 0
-    ? stats.reduce((s, q) => s + q.difficulty, 0) / stats.length
-    : 0;
+  const { exam: examFull, totalParticipants, stats, hardest, easiest } = analysis;
+  const avgDiff = analysis.averageDifficulty;
 
   // Distribusi tingkat kesulitan
   const easy   = stats.filter((q) => q.difficulty >= 0.7).length;

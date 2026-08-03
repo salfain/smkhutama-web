@@ -1,6 +1,6 @@
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { getLandingContent } from "@/lib/landing-data";
+import { getLandingContent } from "@/server/modules/landing/content";
 
 export default async function LandingLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await getLandingContent().catch(() => ({ profile: null }));

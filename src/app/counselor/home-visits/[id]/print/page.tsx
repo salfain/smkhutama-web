@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma";
+import { getHomeVisit } from "@/server/modules/bk/follow-up";
+import { getSchoolProfile } from "@/server/modules/shared/school";
 import { requireCounselorAuth } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { PrintButtonsPurple, SchoolLogo } from "@/components/print/PrintButtons";
@@ -17,23 +18,11 @@ export default async function HomeVisitPrintPage({ params }: { params: Promise<{
   await requireCounselorAuth();
   const { id } = await params;
 
-  const visit = await prisma.homeVisit.findUnique({
-    where: { id },
-    include: {
-      student: {
-        include: {
-          user: { select: { name: true } },
-          class: { select: { name: true } },
-          major: { select: { name: true } },
-        },
-      },
-      counselor: { include: { user: { select: { name: true } } } },
-    },
-  });
+  const visit = await getHomeVisit(id);
 
   if (!visit) notFound();
 
-  const school = await prisma.schoolProfile.findFirst();
+  const school = await getSchoolProfile();
   const nomorSurat = `KR-${new Date(visit.visitDate).getFullYear()}-${id.slice(-4).toUpperCase()}`;
 
   return (

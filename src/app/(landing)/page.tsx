@@ -1,6 +1,6 @@
 import { HomeHero } from "@/components/landing/HomeHero";
 import { LandingCTA } from "@/components/landing/LandingFooter";
-import { getLandingContent } from "@/lib/landing-data";
+import { getLandingContent } from "@/server/modules/landing/content";
 
 export const dynamic = "force-dynamic";
 
