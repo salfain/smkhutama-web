@@ -2,9 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getMajors() {
+  await requireAuth("ADMIN");
   return prisma.major.findMany({
     orderBy: { code: "asc" },
     include: { _count: { select: { classes: true, students: true } } },
@@ -12,6 +14,7 @@ export async function getMajors() {
 }
 
 export async function createMajor(formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   if (!name || !code) return { error: "Nama dan kode wajib diisi" };
@@ -33,6 +36,7 @@ export async function createMajor(formData: FormData) {
 }
 
 export async function updateMajor(id: string, formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   if (!name || !code) return { error: "Nama dan kode wajib diisi" };
@@ -53,6 +57,7 @@ export async function updateMajor(id: string, formData: FormData) {
 }
 
 export async function deleteMajor(id: string) {
+  await requireAuth("ADMIN");
   try {
     const deleted = await prisma.major.delete({ where: { id } });
     await logAudit({

@@ -4,12 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { saveUploadedFile } from "@/lib/upload";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 
 export async function getSchoolProfile() {
+  await requireAuth("ADMIN");
   return prisma.schoolProfile.findFirst();
 }
 
 export async function upsertSchoolProfile(formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
   const npsn = String(formData.get("npsn") ?? "").trim();

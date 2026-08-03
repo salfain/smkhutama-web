@@ -2,9 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getSubjects() {
+  await requireAuth("ADMIN");
   return prisma.subject.findMany({
     orderBy: { code: "asc" },
     include: {
@@ -15,6 +17,7 @@ export async function getSubjects() {
 }
 
 export async function getMajorsForSelect() {
+  await requireAuth("ADMIN");
   return prisma.major.findMany({
     orderBy: { code: "asc" },
     select: { id: true, name: true, code: true },
@@ -22,6 +25,7 @@ export async function getMajorsForSelect() {
 }
 
 export async function createSubject(formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const majorId = String(formData.get("majorId") ?? "").trim();
@@ -45,6 +49,7 @@ export async function createSubject(formData: FormData) {
 }
 
 export async function updateSubject(id: string, formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const majorId = String(formData.get("majorId") ?? "").trim();
@@ -69,6 +74,7 @@ export async function updateSubject(id: string, formData: FormData) {
 }
 
 export async function deleteSubject(id: string) {
+  await requireAuth("ADMIN");
   try {
     const deleted = await prisma.subject.delete({ where: { id } });
     await logAudit({

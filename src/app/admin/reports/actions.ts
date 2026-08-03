@@ -2,8 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { generateExcel } from "@/lib/excel";
+import { requireAuth } from "@/lib/session";
 
 export async function getReportSummary() {
+  await requireAuth("ADMIN");
   const [
     totalExams, activeExams, closedExams,
     totalStudents, totalTeachers, totalClasses, totalSubjects, totalQuestions,
@@ -39,6 +41,7 @@ export async function getReportSummary() {
 
 // ---- Export rekap nilai per ujian ----
 export async function exportExamScores(examId: string) {
+  await requireAuth("ADMIN");
   const exam = await prisma.exam.findUnique({
     where: { id: examId },
     include: {
@@ -92,6 +95,7 @@ export async function exportExamScores(examId: string) {
 
 // ---- Export daftar hadir ujian ----
 export async function exportAttendance(examId: string) {
+  await requireAuth("ADMIN");
   const exam = await prisma.exam.findUnique({
     where: { id: examId },
     include: {
@@ -139,6 +143,7 @@ export async function exportAttendance(examId: string) {
 
 // ---- Export rekap per kelas (semua mapel) ----
 export async function exportClassRecap() {
+  await requireAuth("ADMIN");
   const classes = await prisma.class.findMany({
     orderBy: [{ grade: "asc" }, { name: "asc" }],
     include: {

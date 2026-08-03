@@ -4,8 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { parseWIB } from "@/lib/date";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 
 export async function getExams() {
+  await requireAuth("ADMIN");
   return prisma.exam.findMany({
     orderBy: { startAt: "desc" },
     include: {
@@ -19,6 +21,7 @@ export async function getExams() {
 }
 
 export async function getExamFormData() {
+  await requireAuth("ADMIN");
   const [subjects, teachers, classes, academicYears, questionSets] = await Promise.all([
     prisma.subject.findMany({
       orderBy: { code: "asc" },
@@ -152,6 +155,7 @@ async function getQuestionIdsForExam(questionSetId: string, request: QuestionSel
 }
 
 export async function createExam(formData: FormData) {
+  await requireAuth("ADMIN");
   const title = String(formData.get("title") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
@@ -265,6 +269,7 @@ export async function createExam(formData: FormData) {
 }
 
 export async function updateExam(id: string, formData: FormData) {
+  await requireAuth("ADMIN");
   const title = String(formData.get("title") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
@@ -395,6 +400,7 @@ export async function updateExam(id: string, formData: FormData) {
 }
 
 export async function changeExamStatus(id: string, status: "DRAFT" | "ACTIVE" | "CLOSED") {
+  await requireAuth("ADMIN");
   try {
     const previous = await prisma.exam.findUnique({
       where: { id },
@@ -423,6 +429,7 @@ export async function changeExamStatus(id: string, status: "DRAFT" | "ACTIVE" | 
 }
 
 export async function deleteExam(id: string, force = false) {
+  await requireAuth("ADMIN");
   try {
     const exam = await prisma.exam.findUnique({
       where: { id },

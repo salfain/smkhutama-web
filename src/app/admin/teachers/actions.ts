@@ -3,9 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getTeachers() {
+  await requireAuth("ADMIN");
   return prisma.teacher.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -17,6 +19,7 @@ export async function getTeachers() {
 }
 
 export async function getSubjectsForSelect() {
+  await requireAuth("ADMIN");
   return prisma.subject.findMany({
     orderBy: { code: "asc" },
     select: { id: true, name: true, code: true },
@@ -24,6 +27,7 @@ export async function getSubjectsForSelect() {
 }
 
 export async function createTeacher(formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const username = String(formData.get("username") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
@@ -72,6 +76,7 @@ export async function createTeacher(formData: FormData) {
 }
 
 export async function updateTeacher(id: string, formData: FormData) {
+  await requireAuth("ADMIN");
   const name = String(formData.get("name") ?? "").trim();
   const username = String(formData.get("username") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
@@ -127,6 +132,7 @@ export async function updateTeacher(id: string, formData: FormData) {
 }
 
 export async function toggleTeacherStatus(id: string) {
+  await requireAuth("ADMIN");
   try {
     const teacher = await prisma.teacher.findUnique({
       where: { id },
@@ -151,6 +157,7 @@ export async function toggleTeacherStatus(id: string) {
 }
 
 export async function resetTeacherPassword(id: string, newPassword: string = "guru123") {
+  await requireAuth("ADMIN");
   try {
     const teacher = await prisma.teacher.findUnique({
       where: { id },
@@ -176,6 +183,7 @@ export async function resetTeacherPassword(id: string, newPassword: string = "gu
 }
 
 export async function deleteTeacher(id: string) {
+  await requireAuth("ADMIN");
   try {
     const teacher = await prisma.teacher.findUnique({
       where: { id },
@@ -197,6 +205,7 @@ export async function deleteTeacher(id: string) {
 }
 
 export async function exportTeachersExcel() {
+  await requireAuth("ADMIN");
   const { generateExcel } = await import("@/lib/excel");
   const teachers = await prisma.teacher.findMany({
     orderBy: { createdAt: "asc" },
@@ -231,6 +240,7 @@ export async function exportTeachersExcel() {
 
 // ---- TEMPLATE IMPORT GURU ----
 export async function getTeacherImportTemplate() {
+  await requireAuth("ADMIN");
   const { generateExcel } = await import("@/lib/excel");
   const buf = await generateExcel("Template Guru", [
     { header: "Nama Lengkap", key: "nama", width: 30 },
@@ -254,6 +264,7 @@ export async function getTeacherImportTemplate() {
 
 // ---- IMPORT GURU DARI EXCEL ----
 export async function importTeachersExcel(formData: FormData) {
+  await requireAuth("ADMIN");
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) return { error: "File wajib dipilih" };
 
