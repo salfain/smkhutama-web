@@ -48,7 +48,7 @@ export function canReviewAttempt(
   actor: { role: string; student?: { id: string } | null },
   attempt: { studentId: string }
 ) {
-  if (actor.role === "TEACHER" || actor.role === "ADMIN" || actor.role === "COUNSELOR") return true;
+  if (actor.role === "TEACHER" || actor.role === "ADMIN_CBT" || actor.role === "COUNSELOR") return true;
   if (actor.role === "STUDENT") return actor.student?.id === attempt.studentId;
   return false;
 }

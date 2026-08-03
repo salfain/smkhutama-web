@@ -1,4 +1,5 @@
 import { MonitorCheck } from "lucide-react";
+import { requireAuth } from "@/lib/session";
 import { getActiveExams, getExamMonitoring } from "./actions";
 import { MonitoringClient } from "./MonitoringClient";
 
@@ -7,6 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function MonitoringPage({
   searchParams,
 }: { searchParams: Promise<{ examId?: string }> }) {
+  await requireAuth("ADMIN_CBT");
   const params = await searchParams;
   const examId = params.examId ?? null;
 

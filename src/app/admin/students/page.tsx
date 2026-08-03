@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getStudents, getClassesAndMajors } from "./actions";
 import { StudentTable } from "./StudentTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentsPage() {
+  await requireAuth("ADMIN");
   const [students, { classes, majors }] = await Promise.all([
     getStudents().catch(() => []),
     getClassesAndMajors().catch(() => ({ classes: [], majors: [] })),

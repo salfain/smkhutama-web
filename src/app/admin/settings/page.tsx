@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getSettings } from "./actions";
 import { SettingsForm } from "./SettingsForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
+  await requireAuth("ADMIN");
   const settings = await getSettings().catch(() => null);
 
   if (!settings) {

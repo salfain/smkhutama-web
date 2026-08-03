@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getMajors } from "./actions";
 import { MajorTable } from "./MajorTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function MajorsPage() {
+  await requireAuth("ADMIN");
   const majors = await getMajors().catch(() => []);
 
   return (

@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getTokens, getExamsForToken } from "./actions";
 import { TokenManager } from "./TokenManager";
 
 export const dynamic = "force-dynamic";
 
 export default async function TokenPage() {
+  await requireAuth("ADMIN_CBT");
   const [tokens, exams] = await Promise.all([
     getTokens().catch(() => []),
     getExamsForToken().catch(() => []),

@@ -7,7 +7,7 @@ import { logAudit } from "@/lib/audit";
 import { requireAuth } from "@/lib/session";
 
 export async function getExams() {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   return prisma.exam.findMany({
     orderBy: { startAt: "desc" },
     include: {
@@ -21,7 +21,7 @@ export async function getExams() {
 }
 
 export async function getExamFormData() {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   const [subjects, teachers, classes, academicYears, questionSets] = await Promise.all([
     prisma.subject.findMany({
       orderBy: { code: "asc" },
@@ -155,7 +155,7 @@ async function getQuestionIdsForExam(questionSetId: string, request: QuestionSel
 }
 
 export async function createExam(formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   const title = String(formData.get("title") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
@@ -269,7 +269,7 @@ export async function createExam(formData: FormData) {
 }
 
 export async function updateExam(id: string, formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   const title = String(formData.get("title") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
@@ -400,7 +400,7 @@ export async function updateExam(id: string, formData: FormData) {
 }
 
 export async function changeExamStatus(id: string, status: "DRAFT" | "ACTIVE" | "CLOSED") {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   try {
     const previous = await prisma.exam.findUnique({
       where: { id },
@@ -429,7 +429,7 @@ export async function changeExamStatus(id: string, status: "DRAFT" | "ACTIVE" | 
 }
 
 export async function deleteExam(id: string, force = false) {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
   try {
     const exam = await prisma.exam.findUnique({
       where: { id },

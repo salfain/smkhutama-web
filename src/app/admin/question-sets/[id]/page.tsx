@@ -6,7 +6,7 @@ import { QuestionSetDetailView } from "@/components/question-sets/QuestionSetDet
 export const dynamic = "force-dynamic";
 
 export default async function AdminQuestionSetDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireAuth("ADMIN");
+  await requireAuth("ADMIN_CBT");
 
   const { id } = await params;
   const questionSet = await prisma.questionSet.findUnique({

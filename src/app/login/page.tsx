@@ -9,11 +9,22 @@ import { Eye, EyeOff, LogIn, ArrowLeft, GraduationCap, HeartHandshake, Clipboard
 import { getStudentWebLoginEnabled, loginAction } from "./actions";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 
-type Role = "ADMIN" | "TEACHER" | "STUDENT" | "COUNSELOR" | "PIKET";
+type Role =
+  | "ADMIN"
+  | "TEACHER"
+  | "STUDENT"
+  | "COUNSELOR"
+  | "PIKET"
+  | "KURIKULUM"
+  | "KESISWAAN"
+  | "ADMIN_CBT";
 type System = "CBT" | "SIBIKONS" | "PIKET";
 
 const roleConfig: Record<Role, { label: string; bg: string; placeholder: string }> = {
   ADMIN:   { label: "Admin",      bg: "bg-blue-600 hover:bg-blue-700",       placeholder: "admin" },
+  KURIKULUM: { label: "Kurikulum", bg: "bg-blue-600 hover:bg-blue-700",      placeholder: "kurikulum.hutama" },
+  KESISWAAN: { label: "Kesiswaan", bg: "bg-blue-600 hover:bg-blue-700",      placeholder: "kesiswaan.hutama" },
+  ADMIN_CBT: { label: "Admin CBT", bg: "bg-blue-600 hover:bg-blue-700",      placeholder: "admincbt.hutama" },
   TEACHER: { label: "Guru",       bg: "bg-emerald-600 hover:bg-emerald-700", placeholder: "sari.dewi" },
   STUDENT: { label: "Siswa",      bg: "bg-blue-500 hover:bg-blue-600",       placeholder: "2324001 / NIS / Username" },
   COUNSELOR: { label: "Guru BK",  bg: "bg-purple-600 hover:bg-purple-700",   placeholder: "bk.hutama" },
@@ -27,7 +38,7 @@ const systemConfig: Record<System, {
   CBT: {
     title: "CBT — Ujian Online",
     subtitle: "Untuk Admin, Guru, dan Siswa",
-    roles: ["ADMIN", "TEACHER", "STUDENT"],
+    roles: ["ADMIN", "KURIKULUM", "KESISWAAN", "ADMIN_CBT", "TEACHER", "STUDENT"],
     accent: "blue",
     icon: GraduationCap,
     tagline: "Sistem ujian digital berbasis web yang modern, aman, dan responsif untuk seluruh civitas SMK HUTAMA.",

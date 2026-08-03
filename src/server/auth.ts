@@ -34,7 +34,16 @@ const ACTOR_INCLUDE = {
 
 export type ApiActor = NonNullable<Awaited<ReturnType<typeof findActor>>>;
 
-export type ActorRole = "ADMIN" | "TEACHER" | "STUDENT" | "LANDING_ADMIN" | "COUNSELOR" | "PIKET";
+export type ActorRole =
+  | "ADMIN"
+  | "TEACHER"
+  | "STUDENT"
+  | "LANDING_ADMIN"
+  | "COUNSELOR"
+  | "PIKET"
+  | "KURIKULUM"
+  | "KESISWAAN"
+  | "ADMIN_CBT";
 
 async function findActor(userId: string) {
   const user = await prisma.user.findUnique({

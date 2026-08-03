@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getSubjects, getMajorsForSelect } from "./actions";
 import { SubjectTable } from "./SubjectTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function SubjectsPage() {
+  await requireAuth("KURIKULUM");
   const [subjects, majors] = await Promise.all([
     getSubjects().catch(() => []),
     getMajorsForSelect().catch(() => []),

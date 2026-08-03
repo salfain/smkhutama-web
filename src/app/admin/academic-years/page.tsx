@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/session";
 import { getAcademicYears } from "./actions";
 import { AcademicYearTable } from "./AcademicYearTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function AcademicYearsPage() {
+  await requireAuth("KURIKULUM");
   const years = await getAcademicYears().catch(() => []);
   const active = years.find((y) => y.isActive);
 

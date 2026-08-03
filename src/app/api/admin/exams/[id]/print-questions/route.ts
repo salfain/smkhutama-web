@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await requireAuth();
-  if (!user || (user.role !== "ADMIN" && user.role !== "TEACHER")) {
+  if (!user || (user.role !== "ADMIN_CBT" && user.role !== "TEACHER")) {
     return NextResponse.json({ error: "Tidak diizinkan" }, { status: 403 });
   }
 

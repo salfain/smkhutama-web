@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Jadwal Piket – Admin" };
 
 export default async function PiketSchedulePage() {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   const { schedules, teachers } = await getPiketScheduleData();
 
   return (

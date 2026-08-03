@@ -40,7 +40,7 @@ export function canPrintExam(
   actor: { role: string; teacher?: { id: string } | null },
   exam: { teacherId: string }
 ) {
-  if (actor.role === "ADMIN") return true;
+  if (actor.role === "ADMIN_CBT") return true;
   if (actor.role === "TEACHER") return actor.teacher?.id === exam.teacherId;
   return false;
 }

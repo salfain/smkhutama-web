@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
 export async function getPiketScheduleData() {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
 
   const [schedules, teachers] = await Promise.all([
     prisma.piketSchedule.findMany({
@@ -24,7 +24,7 @@ export async function getPiketScheduleData() {
 }
 
 export async function upsertPiketSchedule(formData: FormData) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
 
   const teacherId = String(formData.get("teacherId") ?? "").trim();
   const dayOfWeek = Number(formData.get("dayOfWeek") ?? -1);
@@ -47,14 +47,14 @@ export async function upsertPiketSchedule(formData: FormData) {
 }
 
 export async function deletePiketSchedule(id: string) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   await prisma.piketSchedule.delete({ where: { id } });
   revalidatePath("/admin/piket-schedule");
   return { success: true };
 }
 
 export async function togglePiketSchedule(id: string) {
-  await requireAuth("ADMIN");
+  await requireAuth("KURIKULUM");
   const current = await prisma.piketSchedule.findUnique({ where: { id } });
   if (!current) return { error: "Jadwal tidak ditemukan" };
   await prisma.piketSchedule.update({

@@ -21,6 +21,9 @@ enum Role {
   LANDING_ADMIN
   COUNSELOR
   PIKET
+  KURIKULUM
+  KESISWAAN
+  ADMIN_CBT
 }
 
 enum Gender {

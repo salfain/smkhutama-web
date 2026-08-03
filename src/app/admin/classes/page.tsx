@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { requireAuth } from "@/lib/session";
 import { Building2 } from "lucide-react";
 import { getClasses, getMajorsForSelect, getTeachersForSelect } from "./actions";
 import { ClassTable } from "./ClassTable";
@@ -7,6 +8,7 @@ import { ClassTable } from "./ClassTable";
 export const dynamic = "force-dynamic";
 
 export default async function ClassesPage() {
+  await requireAuth("KURIKULUM");
   const [classes, majors, teachers] = await Promise.all([
     getClasses().catch(() => []),
     getMajorsForSelect().catch(() => []),

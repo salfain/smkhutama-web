@@ -1,10 +1,12 @@
 import { School } from "lucide-react";
+import { requireAuth } from "@/lib/session";
 import { getSchoolProfile } from "./actions";
 import { SchoolProfileForm } from "./SchoolProfileForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function SchoolProfilePage() {
+  await requireAuth("ADMIN");
   const profile = await getSchoolProfile().catch(() => null);
 
   return (

@@ -12,7 +12,7 @@ import { toExamPrint } from "@/server/modules/cbt/dto";
  */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
-    const actor = await requireRole(req, "ADMIN", "TEACHER");
+    const actor = await requireRole(req, "ADMIN_CBT", "TEACHER");
     const { id: examId } = await ctx.params;
 
     const exam = await getExamForPrint(examId);
