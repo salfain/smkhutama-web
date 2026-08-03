@@ -1,7 +1,15 @@
 import Link from "next/link";
+import { ArrowRight, BarChart3, GraduationCap, Image as ImageIcon, Newspaper, Settings, Users } from "lucide-react";
+import {
+  DashboardHeader,
+  DashboardMetric,
+  DashboardPanel,
+  DashboardPanelHeader,
+  DashboardPill,
+  DashboardSectionHeading,
+  GenesisDashboard,
+} from "@/components/dashboard/GenesisDashboard";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent } from "@/components/ui/card";
-import { GraduationCap, Newspaper, Users, BarChart3, Image as ImageIcon, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard CMS" };
@@ -17,54 +25,63 @@ export default async function CmsDashboard() {
   ]);
 
   const cards = [
-    { label: "Jurusan", value: majors, icon: GraduationCap, color: "text-blue-600", bg: "bg-blue-50", href: "/cms/majors" },
-    { label: "Berita", value: news, icon: Newspaper, color: "text-indigo-600", bg: "bg-indigo-50", href: "/cms/news" },
-    { label: "Pendaftar PPDB", value: registrations, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", href: "/cms/registrations" },
-    { label: "Statistik", value: stats, icon: BarChart3, color: "text-blue-600", bg: "bg-blue-50", href: "/cms/stats" },
-    { label: "Gambar Hero", value: heroImages, icon: ImageIcon, color: "text-cyan-600", bg: "bg-cyan-50", href: "/cms/hero-images" },
+    { label: "Jurusan", value: majors, icon: GraduationCap, detail: "Program keahlian", href: "/cms/majors" },
+    { label: "Berita", value: news, icon: Newspaper, detail: "Konten publikasi", href: "/cms/news" },
+    { label: "Pendaftar PPDB", value: registrations, icon: Users, detail: `${pendingReg} menunggu`, href: "/cms/registrations" },
+    { label: "Statistik", value: stats, icon: BarChart3, detail: "Data beranda", href: "/cms/stats" },
+    { label: "Gambar Hero", value: heroImages, icon: ImageIcon, detail: "Media aktif", href: "/cms/hero-images" },
+  ];
+
+  const guides = [
+    { href: "/cms/profile", label: "Profil & Hero", description: "Atur judul, logo, kontak, dan status PPDB." },
+    { href: "/cms/majors", label: "Jurusan", description: "Kelola program keahlian yang tampil di beranda." },
+    { href: "/cms/news", label: "Berita", description: "Publikasikan kegiatan dan informasi terbaru." },
+    { href: "/cms/registrations", label: "Pendaftar PPDB", description: "Tinjau dan verifikasi calon siswa." },
   ];
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-gray-900">Dashboard CMS</h1>
-        <p className="text-sm text-gray-500">Kelola konten halaman beranda & pendaftaran online</p>
-      </div>
+    <GenesisDashboard>
+      <DashboardHeader
+        eyebrow="Content management system"
+        title="Dashboard CMS"
+        description="Kelola konten halaman beranda dan pendaftaran online SMK Hutama."
+        status={pendingReg > 0 ? <DashboardPill tone="warning">{pendingReg} pendaftar menunggu</DashboardPill> : <DashboardPill tone="success">Semua tertangani</DashboardPill>}
+      />
 
       {pendingReg > 0 && (
-        <Link href="/cms/registrations">
-          <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-            <p className="text-sm text-emerald-800"><strong>{pendingReg} pendaftar baru</strong> menunggu verifikasi</p>
-            <ArrowRight className="h-4 w-4 text-emerald-600" />
-          </div>
+        <Link
+          href="/cms/registrations"
+          className="mb-8 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 text-sm text-amber-900 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(245,158,11,0.18)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500/15 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
+        >
+          <span><strong>{pendingReg} pendaftar baru</strong> menunggu verifikasi.</span>
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       )}
 
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        {cards.map((c) => (
-          <Link key={c.label} href={c.href}>
-            <Card className="border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-              <CardContent className="p-4">
-                <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${c.bg}`}>
-                  <c.icon className={`h-5 w-5 ${c.color}`} />
-                </div>
-                <p className="font-heading text-2xl font-bold text-gray-900">{c.value}</p>
-                <p className="text-xs text-gray-500">{c.label}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      <section className="mb-10" aria-labelledby="cms-summary">
+        <DashboardSectionHeading title="Ringkasan konten" description="Jumlah data yang saat ini tampil dan dikelola." />
+        <div id="cms-summary" className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 lg:gap-5">
+          {cards.map((card) => <DashboardMetric key={card.label} {...card} />)}
+        </div>
+      </section>
 
-      <div className="mt-8 rounded-xl border bg-white p-5 shadow-sm">
-        <p className="font-semibold text-gray-700 mb-2">Mulai dari sini</p>
-        <ul className="space-y-1.5 text-sm text-gray-600">
-          <li>• <Link href="/cms/profile" className="text-blue-600 hover:underline">Profil & Hero</Link> — atur judul, logo, kontak, status PPDB</li>
-          <li>• <Link href="/cms/majors" className="text-blue-600 hover:underline">Jurusan</Link> — kelola program keahlian</li>
-          <li>• <Link href="/cms/news" className="text-blue-600 hover:underline">Berita</Link> — publikasikan kegiatan terbaru</li>
-          <li>• <Link href="/cms/registrations" className="text-blue-600 hover:underline">Pendaftar PPDB</Link> — verifikasi calon siswa</li>
-        </ul>
-      </div>
-    </div>
+      <section aria-labelledby="cms-guide">
+        <DashboardSectionHeading title="Mulai dari sini" description="Akses cepat untuk pekerjaan pengelolaan konten." />
+        <DashboardPanel>
+          <DashboardPanelHeader icon={Settings} title="Panduan pengelolaan" description="Pilih area yang ingin diperbarui" />
+          <div id="cms-guide" className="divide-y divide-[#E8E8EC] dark:divide-white/10">
+            {guides.map((guide) => (
+              <Link key={guide.href} href={guide.href} className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-[#FAFAFA] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-brand/15 dark:hover:bg-white/[0.03]">
+                <div>
+                  <p className="text-sm font-medium text-[#0A0A0A] group-hover:text-brand-text dark:text-[#F5F5F7] dark:group-hover:text-brand-text">{guide.label}</p>
+                  <p className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A7A7AE]">{guide.description}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-[#9C9C9C] transition-transform group-hover:translate-x-1 group-hover:text-brand-text" aria-hidden="true" />
+              </Link>
+            ))}
+          </div>
+        </DashboardPanel>
+      </section>
+    </GenesisDashboard>
   );
 }

@@ -6,9 +6,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const user = await requireAdminArea();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-slate-950">
+    <div className="genesis-app flex h-screen overflow-hidden bg-[#FAFAFA] dark:bg-[#111113]">
       <AdminSidebar user={{ name: user.name, username: user.username, email: user.email, role: user.role }} />
-      <main className="flex-1 overflow-y-auto flex flex-col">
+      <main className="flex-1 overflow-y-auto flex flex-col pb-24 lg:pb-0">
         <PageTransition>
           {children}
         </PageTransition>

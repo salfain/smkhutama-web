@@ -1,7 +1,10 @@
-import { PrismaClient, Role, Gender, Semester, QuestionType, Difficulty, ExamStatus } from "../src/generated/prisma";
+import "dotenv/config";
+import { PrismaClient, Role, Gender, Semester, QuestionType, Difficulty, ExamStatus } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import * as bcryptModule from "bcryptjs";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg(process.env.DATABASE_URL!);
+const prisma = new PrismaClient({ adapter });
 
 async function hashPassword(password: string): Promise<string> {
   return bcryptModule.hash(password, 10);
@@ -127,6 +130,25 @@ async function main() {
       nip: "198505012010012001",
       subjectId: matematika.id,
     },
+  });
+
+  // 7b. Guru BK / SIBIKONS
+  const counselorUser = await prisma.user.upsert({
+    where: { username: "bk.hutama" },
+    update: { isActive: true },
+    create: {
+      id: "user-counselor-1",
+      name: "Guru BK SMK Hutama",
+      username: "bk.hutama",
+      email: "bk@smkhutama.sch.id",
+      passwordHash: await hashPassword("bk123"),
+      role: Role.COUNSELOR,
+    },
+  });
+  await prisma.counselor.upsert({
+    where: { userId: counselorUser.id },
+    update: {},
+    create: { id: "counselor-1", userId: counselorUser.id },
   });
 
   // 8. Students
@@ -315,6 +337,7 @@ async function main() {
   console.log("📋 Akun Login:");
   console.log("   Admin    → username: admin       password: admin123");
   console.log("   Guru     → username: sari.dewi   password: guru123");
+  console.log("   Guru BK  → username: bk.hutama   password: bk123");
   console.log("   Siswa    → username: 2324001     password: siswa123");
   console.log("   CMS      → username: cms         password: cms123");
   console.log("");

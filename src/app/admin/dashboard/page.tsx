@@ -3,10 +3,10 @@ import { getDashboardStats, getChartData } from "./actions";
 import { DashboardClient } from "./DashboardClient";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Dashboard Admin" };
+export const metadata = { title: "Dashboard" };
 
 export default async function AdminDashboard() {
-  await requireAdminArea();
+  const user = await requireAdminArea();
   const [stats, charts] = await Promise.all([
     getDashboardStats().catch(() => null),
     getChartData().catch(() => null),
@@ -32,6 +32,8 @@ export default async function AdminDashboard() {
       scoreChartData={charts?.scoreChartData ?? []}
       schoolName={schoolName}
       activeYear={activeYearStr}
+      userName={user.name}
+      role={user.role}
     />
   );
 }

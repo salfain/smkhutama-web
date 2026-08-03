@@ -28,8 +28,8 @@ function normalize(input?: ConfirmOptions | string): ConfirmOptions {
 
 const variantStyle: Record<Variant, { iconBg: string; iconColor: string; btn: string }> = {
   danger: { iconBg: "bg-red-100 dark:bg-red-900/30", iconColor: "text-red-600 dark:text-red-400", btn: "bg-red-600 hover:bg-red-700 text-white" },
-  warning: { iconBg: "bg-sky-100 dark:bg-sky-900/30", iconColor: "text-sky-600 dark:text-sky-400", btn: "bg-sky-600 hover:bg-sky-700 text-white" },
-  info: { iconBg: "bg-blue-100 dark:bg-blue-900/30", iconColor: "text-blue-600 dark:text-blue-400", btn: "bg-blue-600 hover:bg-blue-700 text-white" },
+  warning: { iconBg: "bg-brand-soft dark:bg-brand/15", iconColor: "text-brand-text dark:text-brand-text", btn: "bg-brand hover:bg-brand-strong text-white" },
+  info: { iconBg: "bg-brand-soft dark:bg-brand/15", iconColor: "text-brand-text dark:text-brand-text", btn: "bg-brand hover:bg-brand-strong text-white" },
 };
 
 const iconMap = { trash: Trash2, logout: LogOut, warning: AlertTriangle, info: Info };

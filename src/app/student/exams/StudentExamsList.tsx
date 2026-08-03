@@ -109,10 +109,10 @@ function ExamCard({ exam, now }: { exam: Exam; now: Date }) {
             <p className="font-semibold text-gray-900">{exam.title}</p>
             <Badge className={`text-xs hover:opacity-100 ${typeInfo.color}`}>{typeInfo.short}</Badge>
             <Badge variant="secondary" className="text-xs">{exam.subject.code}</Badge>
-            {isDone && <Badge className="bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100 text-xs">Sudah Dikerjakan</Badge>}
+            {isDone && <Badge className="bg-brand-soft text-brand-text border-brand-soft hover:bg-brand-soft text-xs">Sudah Dikerjakan</Badge>}
             {isInProgress && <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-100 text-xs">Sedang Dikerjakan</Badge>}
             {isAvailable && !attempt && <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-xs">● Tersedia</Badge>}
-            {isUpcoming && <Badge className="bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100 text-xs">Akan Datang</Badge>}
+            {isUpcoming && <Badge className="bg-brand-soft text-brand-text border-brand-soft hover:bg-brand-soft text-xs">Akan Datang</Badge>}
           </div>
           <p className="text-sm text-gray-500 mb-2">{exam.subject.name}</p>
           <div className="flex flex-wrap gap-3 text-xs text-gray-400">
@@ -124,7 +124,7 @@ function ExamCard({ exam, now }: { exam: Exam; now: Date }) {
         <div className="shrink-0">
           {isDone && (
             <Link href="/student/results">
-              <Button variant="outline" size="sm" className="gap-1.5 text-blue-600">
+              <Button variant="outline" size="sm" className="gap-1.5 text-brand-text">
                 <CheckCircle className="h-3.5 w-3.5" />Lihat Nilai
               </Button>
             </Link>

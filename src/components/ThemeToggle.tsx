@@ -1,20 +1,38 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+// Tema baru diketahui setelah hidrasi. useSyncExternalStore memberi false di
+// server dan true di klien tanpa setState di dalam effect — pola lama
+// (useState + useEffect) melanggar aturan react-hooks/set-state-in-effect.
+const noopSubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
-  useEffect(() => setMounted(true), []);
+export function ThemeToggle({
+  className = "",
+  /** Tampilkan teks "Mode Terang/Gelap" — untuk baris menu, bukan tombol ikon. */
+  showLabel = false,
+}: {
+  className?: string;
+  showLabel?: boolean;
+}) {
+  const { theme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(noopSubscribe, getClientSnapshot, getServerSnapshot);
+
+  // Saat showLabel aktif, ukuran diserahkan ke className pemanggil supaya
+  // `h-9 w-9` bawaan tombol ikon tidak beradu dengan lebar penuh.
+  const sizeClass = showLabel ? "" : "h-9 w-9";
+  const label = theme === "dark" ? "Mode Terang" : "Mode Gelap";
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className={`h-9 w-9 ${className}`} disabled>
+      <Button variant="ghost" size={showLabel ? "sm" : "icon"} className={`${sizeClass} ${className}`} disabled>
         <Sun className="h-4 w-4" />
+        {showLabel && <span>Mode Terang</span>}
       </Button>
     );
   }
@@ -22,16 +40,18 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   return (
     <Button
       variant="ghost"
-      size="icon"
-      className={`h-9 w-9 ${className}`}
+      size={showLabel ? "sm" : "icon"}
+      className={`${sizeClass} ${className}`}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      title={theme === "dark" ? "Mode Terang" : "Mode Gelap"}
+      title={label}
+      aria-label={label}
     >
       {theme === "dark" ? (
         <Sun className="h-4 w-4 text-yellow-400" />
       ) : (
         <Moon className="h-4 w-4" />
       )}
+      {showLabel && <span>{label}</span>}
     </Button>
   );
 }

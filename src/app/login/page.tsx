@@ -22,11 +22,8 @@ export default async function LoginChooserPage() {
   const studentLoginEnabled = await getStudentWebLoginEnabled().catch(() => true);
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-5 py-12 dark:bg-slate-950">
-      <div aria-hidden className="pointer-events-none absolute -left-40 -top-40 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl" />
-
-      <div className="relative w-full max-w-2xl">
+    <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA] px-5 py-12 dark:bg-[#111113]">
+      <div className="w-full max-w-2xl">
         <Link
           href="/"
           className="mb-8 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
@@ -36,12 +33,12 @@ export default async function LoginChooserPage() {
         </Link>
 
         <div className="mb-9 flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-[#E8E8EC] bg-[#FFFFFF] dark:border-white/10 dark:bg-[#19191C]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/api/school/logo" alt="Logo SMK Hutama" className="h-10 w-10 object-contain" />
           </div>
           <div>
-            <h1 className="font-heading text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="genesis-heading text-3xl font-bold text-[#0A0A0A] dark:text-[#F5F5F7]">
               Masuk ke Portal
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -54,7 +51,7 @@ export default async function LoginChooserPage() {
           {PORTAL_GROUPS.map((group) => (
             <section key={group.label}>
               <div className="mb-3 flex items-baseline gap-2">
-                <h2 className="font-heading text-sm font-bold text-slate-900 dark:text-white">{group.label}</h2>
+                <h2 className="genesis-heading text-sm font-semibold text-[#0A0A0A] dark:text-[#F5F5F7]">{group.label}</h2>
                 <p className="text-xs text-slate-400 dark:text-slate-500">{group.hint}</p>
               </div>
 
@@ -67,14 +64,14 @@ export default async function LoginChooserPage() {
                     <Link
                       key={key}
                       href={portalPath(key)}
-                      className={`group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 ring-4 ring-transparent transition-all hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 ${def.theme.card}`}
+                      className="group flex items-center gap-4 rounded-xl border border-[#E8E8EC] bg-[#FFFFFF] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand/15 dark:border-white/10 dark:bg-[#19191C] dark:hover:border-brand"
                     >
-                      <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white ${def.theme.icon}`}>
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#F5F5F7] text-[#6B6B6B] transition-colors group-hover:bg-brand-soft group-hover:text-brand-text dark:bg-white/5 dark:text-[#A7A7AE] dark:group-hover:bg-brand/10 dark:group-hover:text-brand-text">
                         <Icon className="h-5 w-5" />
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2">
-                          <span className={`font-heading text-base font-bold ${def.theme.text}`}>{def.title}</span>
+                          <span className="genesis-heading text-base font-semibold text-[#0A0A0A] group-hover:text-brand-text dark:text-[#F5F5F7] dark:group-hover:text-brand-text">{def.title}</span>
                           {disabled && (
                             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
                               Lewat aplikasi mobile
@@ -84,7 +81,7 @@ export default async function LoginChooserPage() {
                         <span className="mt-0.5 block text-sm text-slate-500 dark:text-slate-400">{def.subtitle}</span>
                         <span className="mt-2 block text-xs text-slate-400 dark:text-slate-500">{def.audience}</span>
                       </span>
-                      <ArrowRight className="h-5 w-5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-1 dark:text-slate-600" />
+                      <ArrowRight className="h-5 w-5 shrink-0 text-[#9C9C9C] transition-all group-hover:translate-x-1 group-hover:text-brand-text" />
                     </Link>
                   );
                 })}

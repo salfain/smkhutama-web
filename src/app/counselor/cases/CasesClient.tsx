@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, MessagesSquare, Lock, FileDown } from "lucide-react";
+import { Plus, Pencil, Trash2, MessagesSquare, Lock, FileDown, ArrowRight } from "lucide-react";
 import { saveCase, deleteCase } from "../actions";
 import { useConfirm } from "@/components/ConfirmDialog";
 
@@ -15,14 +16,19 @@ type Student = { id: string; name: string; nis: string; className: string };
 type Case = {
   id: string; studentId: string; studentName: string; className: string;
   type: string; status: string; title: string; description: string; notes: string; followUp: string;
+  priority: string; riskLevel: string; nextFollowUpAt: string | Date | null;
   isConfidential: boolean; sessionDate: string | Date;
 };
 
 const TYPES = [["PRIBADI", "Pribadi"], ["SOSIAL", "Sosial"], ["BELAJAR", "Belajar"], ["KARIR", "Karir"]];
 const STATUSES = [["OPEN", "Terbuka"], ["IN_PROGRESS", "Proses"], ["RESOLVED", "Selesai"], ["REFERRED", "Rujukan"]];
 const statusCls: Record<string, string> = {
-  OPEN: "bg-blue-100 text-blue-700", IN_PROGRESS: "bg-sky-100 text-sky-700",
+  OPEN: "bg-brand-soft text-brand-text", IN_PROGRESS: "bg-brand-soft text-brand-text",
   RESOLVED: "bg-green-100 text-green-700", REFERRED: "bg-purple-100 text-purple-700",
+};
+const priorityCls: Record<string, string> = {
+  LOW: "bg-gray-100 text-gray-600", MEDIUM: "bg-brand-soft text-brand-text",
+  HIGH: "bg-amber-50 text-amber-700", CRITICAL: "bg-red-50 text-red-700",
 };
 
 function toDateInput(d: string | Date) {
@@ -101,7 +107,7 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <p className="font-semibold text-gray-900">{c.title}</p>
+                    <Link href={`/counselor/cases/${c.id}`} className="font-semibold text-gray-900 hover:text-brand-text dark:text-white">{c.title}</Link>
                     {c.isConfidential && <Lock className="h-3.5 w-3.5 text-gray-400" />}
                   </div>
                   <p className="text-xs text-gray-500">{c.studentName} · {c.className}</p>
@@ -111,11 +117,16 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
                 </span>
               </div>
               {c.description && <p className="mt-2 line-clamp-2 text-xs text-gray-600">{c.description}</p>}
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${priorityCls[c.priority] ?? priorityCls.MEDIUM}`}>Prioritas {c.priority === "CRITICAL" ? "Kritis" : c.priority === "HIGH" ? "Tinggi" : c.priority === "LOW" ? "Rendah" : "Sedang"}</span>
+                {c.riskLevel !== "NONE" && <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-600">Risiko {c.riskLevel}</span>}
+              </div>
               <div className="mt-3 flex items-center justify-between">
                 <span className="text-[11px] text-gray-400">
                   {TYPES.find(([k]) => k === c.type)?.[1]} · {new Date(c.sessionDate).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
                 <div className="flex gap-1">
+                  <Button asChild variant="ghost" size="sm" className="h-8 gap-1 text-brand-text"><Link href={`/counselor/cases/${c.id}`}>Buka <ArrowRight className="h-3.5 w-3.5" /></Link></Button>
                   {c.status === "RESOLVED" && (
                     <a href={`/counselor/cases/${c.id}/print`} target="_blank" rel="noopener noreferrer">
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Ekspor PDF">

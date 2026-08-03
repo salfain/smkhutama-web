@@ -39,9 +39,9 @@ export function NewsClient({ news }: { news: News[] }) {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full">
       <div className="mb-4 flex justify-end">
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={openCreate}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Berita
         </Button>
       </div>
@@ -64,7 +64,7 @@ export function NewsClient({ news }: { news: News[] }) {
                 <p className="mt-1 line-clamp-2 text-sm text-gray-500">{n.excerpt}</p>
               </div>
               <div className="flex shrink-0 gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => openEdit(n)}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" onClick={() => openEdit(n)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(n.id)}>
@@ -85,13 +85,13 @@ export function NewsClient({ news }: { news: News[] }) {
             <div className="space-y-1.5"><Label>Isi Lengkap (opsional)</Label><Textarea name="content" defaultValue={editing?.content ?? ""} rows={4} /></div>
             <div className="space-y-1.5"><Label>URL Gambar (opsional)</Label><Input name="imageUrl" defaultValue={editing?.imageUrl ?? ""} placeholder="https://..." /></div>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-text" />
               <span className="text-sm text-gray-700">Terbitkan (tampil di beranda)</span>
             </label>
             {err && <p className="text-sm text-red-600">{err}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>Simpan</Button>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>Simpan</Button>
             </div>
           </form>
         </DialogContent>

@@ -85,7 +85,7 @@ function Stat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-lg border border-white/20 bg-white/15 p-3 text-center text-white shadow-sm backdrop-blur">
       <p className="text-xl font-bold">{value}</p>
-      <p className="text-xs text-blue-50">{label}</p>
+      <p className="text-xs text-white">{label}</p>
     </div>
   );
 }
@@ -109,21 +109,21 @@ export function QuestionSetDetailView({
           </Link>
         </Button>
 
-        <div className="overflow-hidden rounded-xl bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-600 text-white shadow-lg">
+        <div className="overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand to-cyan-600 text-white shadow-lg">
           <div className="flex flex-col gap-5 p-5 md:flex-row md:items-start md:justify-between md:p-6">
             <div className="max-w-3xl">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge className="bg-white/15 text-white hover:bg-white/15">Paket Bank Soal</Badge>
-                <Badge className="bg-white text-blue-700 hover:bg-white">
+                <Badge className="bg-white text-brand-text hover:bg-white">
                   {statusLabel[questionSet.status] ?? questionSet.status}
                 </Badge>
               </div>
               <h1 className="font-heading text-2xl font-bold md:text-3xl">{questionSet.title}</h1>
-              <p className="mt-2 text-sm text-blue-50">
+              <p className="mt-2 text-sm text-white">
                 {questionSet.subject.code} - {questionSet.subject.name} - {questionSet.examType}
                 {questionSet.grade ? ` - ${questionSet.grade}` : ""}
               </p>
-              <div className="mt-4 flex flex-wrap gap-3 text-xs text-blue-50">
+              <div className="mt-4 flex flex-wrap gap-3 text-xs text-white">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1">
                   <UserRound className="h-3.5 w-3.5" />
                   {questionSet.ownerTeacher.user.name}
@@ -136,7 +136,7 @@ export function QuestionSetDetailView({
             </div>
             <div className="shrink-0">
               <QuestionSetPrintActions />
-              <p className="mt-2 text-center text-xs text-blue-100">Pilih Save as PDF pada dialog cetak</p>
+              <p className="mt-2 text-center text-xs text-white">Pilih Save as PDF pada dialog cetak</p>
             </div>
           </div>
 
@@ -183,7 +183,7 @@ export function QuestionSetDetailView({
       <Card className="question-set-print-paper border shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-            <FileText className="h-4 w-4 text-blue-600" />
+            <FileText className="h-4 w-4 text-brand-text" />
             Preview Soal
           </CardTitle>
         </CardHeader>
@@ -196,7 +196,7 @@ export function QuestionSetDetailView({
             <div key={question.id} className="question-set-question rounded-lg border p-4">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">No. {index + 1}</Badge>
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
+                <Badge className="bg-brand-soft text-brand-text hover:bg-brand-soft">
                   {questionTypeLabel[question.questionType] ?? question.questionType}
                 </Badge>
                 <Badge variant="outline">{difficultyLabel[question.difficulty] ?? question.difficulty}</Badge>

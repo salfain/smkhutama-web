@@ -18,10 +18,10 @@ export default async function FaqPage() {
         subtitle="Jawaban atas pertanyaan yang sering diajukan seputar PPDB, ujian, dan sekolah."
       />
 
-      <section className="bg-slate-50 dark:bg-slate-900">
+      <section className="bg-canvas">
         <div className="mx-auto max-w-3xl px-4 py-16">
           {faqs.length === 0 ? (
-            <p className="text-center text-slate-400">Belum ada FAQ.</p>
+            <p className="text-center text-ink-soft">Belum ada FAQ.</p>
           ) : (
             <FaqAccordion items={faqs.map((f) => ({ id: f.id, question: f.question, answer: f.answer }))} />
           )}

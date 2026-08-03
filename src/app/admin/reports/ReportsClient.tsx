@@ -68,10 +68,10 @@ export function ReportsClient({ stats, recentClosed }: { stats: Stats; recentClo
   }
 
   const summaryCards = [
-    { label: "Total Ujian", value: stats.totalExams, sub: `${stats.activeExams} aktif · ${stats.closedExams} selesai`, icon: ClipboardList, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Total Ujian", value: stats.totalExams, sub: `${stats.activeExams} aktif · ${stats.closedExams} selesai`, icon: ClipboardList, color: "text-brand-text", bg: "bg-brand-soft" },
     { label: "Total Siswa", value: stats.totalStudents, sub: "siswa terdaftar", icon: Users, color: "text-emerald-600", bg: "bg-emerald-50" },
     { label: "Total Guru", value: stats.totalTeachers, sub: "guru aktif", icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
-    { label: "Total Kelas", value: stats.totalClasses, sub: `${stats.totalSubjects} mata pelajaran`, icon: Building2, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Total Kelas", value: stats.totalClasses, sub: `${stats.totalSubjects} mata pelajaran`, icon: Building2, color: "text-brand-text", bg: "bg-brand-soft" },
   ];
 
   return (
@@ -101,13 +101,13 @@ export function ReportsClient({ stats, recentClosed }: { stats: Stats; recentClo
         <Card className="border shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5">
             <div className="mb-3 flex items-start justify-between">
-              <div className="rounded-lg p-2.5 bg-blue-50">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
+              <div className="rounded-lg p-2.5 bg-brand-soft">
+                <BarChart3 className="h-5 w-5 text-brand-text" />
               </div>
             </div>
             <h3 className="font-semibold text-gray-900 mb-1">Rekap Nilai per Kelas</h3>
             <p className="text-xs text-gray-500 mb-4">Export rata-rata nilai seluruh siswa per kelas</p>
-            <Button size="sm" className="w-full gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={handleExportRecap} disabled={pending}>
+            <Button size="sm" className="w-full gap-1.5 bg-brand hover:bg-brand-strong" onClick={handleExportRecap} disabled={pending}>
               <Download className="h-3.5 w-3.5" />Export Excel
             </Button>
           </CardContent>
@@ -180,7 +180,7 @@ export function ReportsClient({ stats, recentClosed }: { stats: Stats; recentClo
                     <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => handleExportAttendance(e.id)} disabled={pending}>
                       <Download className="h-3 w-3" />Hadir
                     </Button>
-                    <Button size="sm" className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-700" onClick={() => handleExportScores(e.id)} disabled={pending}>
+                    <Button size="sm" className="gap-1.5 text-xs bg-brand hover:bg-brand-strong" onClick={() => handleExportScores(e.id)} disabled={pending}>
                       <Download className="h-3 w-3" />Nilai
                     </Button>
                   </div>

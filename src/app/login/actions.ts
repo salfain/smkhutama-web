@@ -13,6 +13,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { clearSession, setSession } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
+import { getActiveAssignmentTypes } from "@/lib/assignment-access";
+import type { AssignmentType } from "@/generated/prisma/client";
 import { checkCredentials, type CredentialFailure } from "@/server/modules/auth/service";
 import { portals, suggestedPortal, type Portal, type Role, type System } from "./portals";
 
@@ -34,8 +36,10 @@ function messageFor(reason: CredentialFailure, today?: string) {
   }
 }
 
-function destinationFor(role: string, system?: System) {
+function destinationFor(role: string, system: System | undefined, assignments: AssignmentType[]) {
   if (system === "PIKET") return "/piket/dashboard";
+  if (system === "SIBIKONS" && assignments.includes("COUNSELOR")) return "/counselor/dashboard";
+  if (system === "CBT" && assignments.some((type) => ["KURIKULUM", "KESISWAAN", "ADMIN_CBT"].includes(type))) return "/admin/dashboard";
   if (role === "ADMIN") return "/admin/dashboard";
   if (role === "KURIKULUM") return "/admin/dashboard";
   if (role === "KESISWAAN") return "/admin/dashboard";
@@ -89,8 +93,14 @@ export async function loginAction(
 
     const user = result.user!;
     const role = user.role as Role;
+    const assignments = await getActiveAssignmentTypes(user.id);
 
-    if (!def.roles.includes(role)) {
+    const allowedByAssignment =
+      (portal === "staf" && assignments.some((type) => ["KURIKULUM", "KESISWAAN", "ADMIN_CBT"].includes(type))) ||
+      (portal === "sibikons" && assignments.includes("COUNSELOR")) ||
+      (portal === "piket" && (role === "PIKET" || assignments.includes("PIKET")));
+
+    if (!def.roles.includes(role) && !allowedByAssignment) {
       return { error: wrongPortalMessage(role, portal) };
     }
 
@@ -111,7 +121,7 @@ export async function loginAction(
       details: { username: user.username, role: user.role, portal },
     });
 
-    return { success: true, redirectTo: destinationFor(role, system), role };
+    return { success: true, redirectTo: destinationFor(role, system, assignments), role };
   } catch {
     return { error: "Terjadi kesalahan. Periksa koneksi database." };
   }

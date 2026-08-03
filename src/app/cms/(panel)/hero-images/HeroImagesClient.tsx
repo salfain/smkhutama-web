@@ -28,13 +28,13 @@ export function HeroImagesClient({ images }: { images: Img[] }) {
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <form action={add} className="rounded-xl border bg-white p-5 shadow-sm space-y-4">
         <p className="font-semibold text-gray-700">Tambah Gambar Hero</p>
         <div className="space-y-1.5"><Label>URL Gambar *</Label><Input name="imageUrl" placeholder="https://..." required /></div>
         <div className="space-y-1.5"><Label>Caption (opsional)</Label><Input name="caption" placeholder="Deskripsi gambar" /></div>
         {err && <p className="text-sm text-red-600">{err}</p>}
-        <Button type="submit" className="gap-1.5 bg-blue-600 hover:bg-blue-700" disabled={pending}>
+        <Button type="submit" className="gap-1.5 bg-brand hover:bg-brand-strong" disabled={pending}>
           <Plus className="h-4 w-4" />Tambah Gambar
         </Button>
       </form>

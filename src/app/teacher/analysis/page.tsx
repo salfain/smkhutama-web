@@ -110,7 +110,7 @@ export default async function AnalysisPage({
       {/* Summary cards */}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
-          { label: "Rata-rata Benar",  value: `${Math.round(avgDiff * 100)}%`,  color: "text-blue-600",   sub: "dari seluruh soal" },
+          { label: "Rata-rata Benar",  value: `${Math.round(avgDiff * 100)}%`,  color: "text-brand-text",   sub: "dari seluruh soal" },
           { label: "Soal Mudah",       value: `${easy}`,                          color: "text-green-600",  sub: `${Math.round(easy / stats.length * 100)}% dari total` },
           { label: "Soal Sedang",      value: `${medium}`,                        color: "text-yellow-600", sub: `${Math.round(medium / stats.length * 100)}% dari total` },
           { label: "Soal Sulit",       value: `${hard}`,                          color: "text-red-600",    sub: `${Math.round(hard / stats.length * 100)}% dari total` },

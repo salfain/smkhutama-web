@@ -22,7 +22,7 @@ const statusStyle: Record<string, string> = {
   HADIR: "bg-green-100 text-green-700 border-green-200",
   TIDAK_HADIR: "bg-red-100 text-red-700 border-red-200",
   DIGANTIKAN: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  TUGAS_LUAR: "bg-blue-100 text-blue-700 border-blue-200",
+  TUGAS_LUAR: "bg-brand-soft text-brand-text border-brand-soft",
 };
 const statusLabel: Record<string, string> = {
   HADIR: "Hadir", TIDAK_HADIR: "Tidak Hadir", DIGANTIKAN: "Digantikan", TUGAS_LUAR: "Tugas Luar",

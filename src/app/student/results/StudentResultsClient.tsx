@@ -108,7 +108,7 @@ export function StudentResultsClient({
                     <div><span className="font-semibold text-gray-500">{a.empty}</span> Belum Dinilai</div>
                   </div>
                   {canView && (
-                    <Button variant="outline" size="sm" className="gap-1.5 text-xs text-blue-600 border-blue-200 hover:bg-blue-50 h-7"
+                    <Button variant="outline" size="sm" className="gap-1.5 text-xs text-brand-text border-brand-soft hover:bg-brand-soft h-7"
                       onClick={() => { setReviewAttemptId(a.id); setReviewOpen(true); }}>
                       <Eye className="h-3 w-3" />Lihat Jawaban
                     </Button>

@@ -13,9 +13,9 @@ export default async function PpdbPage() {
   const majors = await getMajorOptions().catch(() => []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-canvas">
       {/* Hero */}
-      <div className="relative overflow-hidden bg-[#f8fafc] text-slate-900 dark:bg-[#0a0a0f] dark:text-white">
+      <div className="relative overflow-hidden bg-canvas text-ink">
         <div
           className="pointer-events-none absolute inset-0 text-slate-900 opacity-[0.05] dark:text-white dark:opacity-[0.06]"
           style={{
@@ -27,16 +27,16 @@ export default async function PpdbPage() {
           }}
         />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-sky-500/20 blur-[110px]" />
+          <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-brand/20 blur-[110px]" />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 pt-32 pb-20 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-strong shadow-lg shadow-brand/25">
             <GraduationCap className="h-8 w-8 text-slate-900" />
           </div>
           <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-5xl">
             Pendaftaran Peserta Didik Baru
           </h1>
-          <p className="mx-auto mt-4 max-w-lg text-slate-500 dark:text-slate-400 text-base md:text-lg">
+          <p className="mx-auto mt-4 max-w-lg text-ink-soft text-base md:text-lg">
             Bergabunglah bersama SMK Hutama. Isi formulir di bawah ini dengan lengkap — 
             proses cepat, mudah, dan sepenuhnya online.
           </p>
@@ -66,12 +66,12 @@ export default async function PpdbPage() {
           {/* Sidebar Info */}
           <aside className="space-y-6">
             {/* Persyaratan */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-              <h3 className="font-heading text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600" />
+            <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-sm">
+              <h3 className="font-heading text-base font-bold text-ink flex items-center gap-2">
+                <FileText className="h-5 w-5 text-brand-text" />
                 Persyaratan
               </h3>
-              <ul className="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
+              <ul className="mt-4 space-y-2.5 text-sm text-ink-soft">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                   Fotokopi Ijazah / Surat Keterangan Lulus
@@ -93,15 +93,15 @@ export default async function PpdbPage() {
                   Fotokopi Akta Kelahiran
                 </li>
               </ul>
-              <p className="mt-4 text-xs text-slate-400">
+              <p className="mt-4 text-xs text-ink-soft">
                 * Berkas fisik diserahkan saat daftar ulang
               </p>
             </div>
 
             {/* Timeline */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-              <h3 className="font-heading text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Clock className="h-5 w-5 text-indigo-600" />
+            <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-sm">
+              <h3 className="font-heading text-base font-bold text-ink flex items-center gap-2">
+                <Clock className="h-5 w-5 text-brand-text" />
                 Jadwal PPDB
               </h3>
               <div className="mt-4 space-y-4">
@@ -113,12 +113,12 @@ export default async function PpdbPage() {
             </div>
 
             {/* Kontak */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-              <h3 className="font-heading text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-sm">
+              <h3 className="font-heading text-base font-bold text-ink flex items-center gap-2">
                 <Phone className="h-5 w-5 text-emerald-600" />
                 Butuh Bantuan?
               </h3>
-              <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+              <p className="mt-3 text-sm text-ink-soft">
                 Hubungi panitia PPDB melalui WhatsApp:
               </p>
               <a
@@ -143,11 +143,11 @@ export default async function PpdbPage() {
 function StepBadge({ number, label, icon }: { number: string; label: string; icon: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm dark:border-white/10 dark:bg-white/5">
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-400 text-xs font-bold text-slate-900">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-ink">
         {number}
       </span>
-      <span className="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
-      <span className="sm:hidden text-sky-500">{icon}</span>
+      <span className="hidden sm:inline text-sm font-medium text-ink">{label}</span>
+      <span className="sm:hidden text-brand-text">{icon}</span>
     </div>
   );
 }
@@ -156,12 +156,12 @@ function TimelineItem({ date, label, active }: { date: string; label: string; ac
   return (
     <div className="flex items-start gap-3">
       <div className="relative flex flex-col items-center">
-        <div className={`h-3 w-3 rounded-full ${active ? "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900/40" : "bg-slate-300 dark:bg-slate-600"}`} />
-        <div className="mt-1 h-full w-px bg-slate-200 dark:bg-slate-600" />
+        <div className={`h-3 w-3 rounded-full ${active ? "bg-brand ring-4 ring-brand-soft" : "bg-ink-soft/40"}`} />
+        <div className="mt-1 h-full w-px bg-hairline" />
       </div>
       <div className="-mt-0.5">
-        <p className={`text-sm font-semibold ${active ? "text-blue-700 dark:text-blue-400" : "text-slate-700 dark:text-slate-300"}`}>{label}</p>
-        <p className="text-xs text-slate-400">{date}</p>
+        <p className={`text-sm font-semibold ${active ? "text-brand-text" : "text-ink"}`}>{label}</p>
+        <p className="text-xs text-ink-soft">{date}</p>
       </div>
     </div>
   );

@@ -198,7 +198,7 @@ export function TakeExam({
   function getNumColor(idx: number): string {
     const q = questions[idx];
     const a = answers[q.id];
-    if (idx === currentQ) return "bg-blue-600 text-white border-blue-600";
+    if (idx === currentQ) return "bg-brand text-white border-brand";
     if (a?.isDoubtful) return "bg-yellow-400 text-white border-yellow-400";
     if (a && (a.selectedOptionId || a.answerText)) return "bg-green-500 text-white border-green-500";
     return "bg-white text-gray-600 border-gray-300";
@@ -226,7 +226,7 @@ export function TakeExam({
       <p className="mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Navigasi Soal</p>
       <div className="mb-3 flex flex-wrap gap-1.5 text-xs">
         {[
-          { color: "bg-blue-600", label: "Sedang dibuka" },
+          { color: "bg-brand", label: "Sedang dibuka" },
           { color: "bg-green-500", label: "Sudah dijawab" },
           { color: "bg-yellow-400", label: "Ragu-ragu" },
           { color: "bg-white border border-gray-300", label: "Belum dijawab" },
@@ -258,13 +258,13 @@ export function TakeExam({
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
-      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-blue-500" : "bg-white"}`}>
+      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-brand" : "bg-white"}`}>
         <div className={`text-sm font-medium ${isCritical || isWarning ? "text-white" : "text-gray-700"}`}>
           <span className="font-semibold">{subjectCode}</span>
           <span className="mx-2 opacity-40">·</span>
           <span className="text-xs opacity-75 truncate max-w-[200px] inline-block align-bottom">{title}</span>
         </div>
-        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}`}>
+        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-brand text-white" : "bg-gray-100 text-gray-800"}`}>
           <Clock className="h-4 w-4" />{formatTime(timeLeft)}
         </div>
         <div className="flex items-center gap-2">
@@ -319,15 +319,15 @@ export function TakeExam({
                       key={opt.id}
                       onClick={() => selectOption(q.id, opt.id)}
                       className={`group flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-                        selected ? "border-blue-500 bg-blue-50 shadow-sm" : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/30"
+                        selected ? "border-brand bg-brand-soft shadow-sm" : "border-gray-200 bg-white hover:border-brand-soft hover:bg-brand-soft"
                       }`}
                     >
                       <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors ${
-                        selected ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-500 group-hover:border-blue-400"
+                        selected ? "border-brand bg-brand text-white" : "border-gray-300 text-gray-500 group-hover:border-brand"
                       }`}>
                         {selected ? <CheckCircle className="h-4 w-4" /> : opt.label}
                       </div>
-                      <MathText text={opt.text} className={`text-sm ${selected ? "font-medium text-blue-800" : "text-gray-700"}`} />
+                      <MathText text={opt.text} className={`text-sm ${selected ? "font-medium text-brand-text" : "text-gray-700"}`} />
                     </button>
                   );
                 })}
@@ -349,7 +349,7 @@ export function TakeExam({
                 <ChevronLeft className="h-4 w-4" />Sebelumnya
               </Button>
               {currentQ < questions.length - 1 ? (
-                <Button className="gap-2 bg-blue-600 hover:bg-blue-700" onClick={() => setCurrentQ((p) => p + 1)}>
+                <Button className="gap-2 bg-brand hover:bg-brand-strong" onClick={() => setCurrentQ((p) => p + 1)}>
                   Selanjutnya<ChevronRight className="h-4 w-4" />
                 </Button>
               ) : (
@@ -380,7 +380,7 @@ export function TakeExam({
             <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
               Pelanggaran ke-<b>{violations}</b> dari {MAX_VIOLATIONS}. Setelah {MAX_VIOLATIONS} kali, ujian akan otomatis dikumpulkan.
             </div>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setShowWarning(false)}>
+            <Button className="w-full bg-brand hover:bg-brand-strong" onClick={() => setShowWarning(false)}>
               Saya Mengerti
             </Button>
           </div>
@@ -391,7 +391,7 @@ export function TakeExam({
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-500" />Konfirmasi Submit Ujian
+              <AlertCircle className="h-5 w-5 text-brand-text" />Konfirmasi Submit Ujian
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -402,7 +402,7 @@ export function TakeExam({
               <div className="flex justify-between"><span className="text-gray-500">Belum dijawab</span><span className="font-semibold text-red-500">{unanswered}</span></div>
             </div>
             {unanswered > 0 && (
-              <p className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg p-2.5">
+              <p className="text-xs text-brand-text bg-brand-soft border border-brand-soft rounded-lg p-2.5">
                 Masih ada {unanswered} soal yang belum dijawab. Yakin ingin submit?
               </p>
             )}

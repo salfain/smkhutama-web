@@ -11,6 +11,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { requireCurrentAcademicYearId } from "@/lib/academic-year";
 import { dayRange, isDateOnly, todayDateOnly } from "@/server/date-range";
 
 // ─── Bentuk include yang dipakai ulang ──────────────────────────────────────
@@ -98,6 +99,7 @@ export type CreateTardinessInput = {
 };
 
 export async function createTardiness(input: CreateTardinessInput) {
+  const academicYearId = await requireCurrentAcademicYearId();
   const dateOnly = isDateOnly(input.date) ? input.date : todayDateOnly();
   const recordDate = new Date(`${dateOnly}T00:00:00`);
 
@@ -115,6 +117,7 @@ export async function createTardiness(input: CreateTardinessInput) {
   return prisma.studentTardiness.create({
     data: {
       studentId: input.studentId,
+      academicYearId,
       recordedBy: input.recordedBy,
       arrivalTime,
       date: recordDate,
@@ -153,9 +156,11 @@ export type CreatePermitInput = {
 };
 
 export async function createPermit(input: CreatePermitInput) {
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.studentPermit.create({
     data: {
       studentId: input.studentId,
+      academicYearId,
       recordedBy: input.recordedBy,
       type: "KELUAR",
       reason: input.reason,
@@ -231,11 +236,13 @@ export type CreateAttendanceInput = {
 };
 
 export async function createAttendance(input: CreateAttendanceInput) {
+  const academicYearId = await requireCurrentAcademicYearId();
   const recordDate = isDateOnly(input.date) ? new Date(`${input.date}T00:00:00`) : new Date();
 
   return prisma.teacherAttendance.create({
     data: {
       teacherId: input.teacherId,
+      academicYearId,
       classId: input.classId,
       recordedBy: input.recordedBy,
       status: input.status || "HADIR",

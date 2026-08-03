@@ -28,11 +28,11 @@ export function GalleryClient({ photos }: { photos: Photo[] }) {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div className="w-full">
       <form action={add} className="mb-6 flex flex-col gap-2 rounded-xl border bg-white p-4 shadow-sm sm:flex-row sm:items-end">
         <div className="flex-1 space-y-1.5"><Label>URL Gambar *</Label><Input name="imageUrl" placeholder="https://..." required /></div>
         <div className="flex-1 space-y-1.5"><Label>Caption</Label><Input name="caption" placeholder="Keterangan foto (opsional)" /></div>
-        <Button type="submit" className="gap-1.5 bg-blue-600 hover:bg-blue-700" disabled={pending}><Plus className="h-4 w-4" />Tambah</Button>
+        <Button type="submit" className="gap-1.5 bg-brand hover:bg-brand-strong" disabled={pending}><Plus className="h-4 w-4" />Tambah</Button>
       </form>
       {err && <p className="mb-3 text-sm text-red-600">{err}</p>}
 

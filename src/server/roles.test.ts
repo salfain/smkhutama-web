@@ -19,6 +19,7 @@ const ADMIN_ROOT = join(SRC_ROOT, "app", "admin");
 
 const OWNED_PAGES: Record<AdminRole, readonly string[]> = {
   ADMIN: [
+    "access-control",
     "audit-logs",
     "majors",
     "school-profile",
@@ -26,7 +27,7 @@ const OWNED_PAGES: Record<AdminRole, readonly string[]> = {
     "students",
     "teachers",
   ],
-  KURIKULUM: ["academic-years", "classes", "piket-schedules", "subjects"],
+  KURIKULUM: ["academic-years", "classes", "lesson-schedules", "piket-schedules", "subjects", "teaching-assignments"],
   KESISWAAN: ["achievements", "permits", "tardiness", "violations"],
   ADMIN_CBT: [
     "exams",
@@ -44,8 +45,8 @@ const SHARED_PAGES = ["change-password", "dashboard"] as const;
 const ADMIN_ROLES = Object.keys(OWNED_PAGES) as AdminRole[];
 
 const OWNED_ACTIONS: Record<Exclude<AdminRole, "KESISWAAN">, readonly string[]> = {
-  ADMIN: ["majors", "school-profile", "settings", "students", "teachers"],
-  KURIKULUM: ["academic-years", "classes", "piket-schedules", "subjects"],
+  ADMIN: ["access-control", "majors", "school-profile", "settings", "students", "teachers"],
+  KURIKULUM: ["academic-years", "classes", "lesson-schedules", "piket-schedules", "subjects", "teaching-assignments"],
   ADMIN_CBT: ["exams", "monitoring", "print", "question-sets", "reports", "tokens"],
 };
 
@@ -203,6 +204,21 @@ describe("pemisahan mutasi BK dan Kesiswaan", () => {
 describe("sidebar mengikuti matriks halaman", () => {
   const sidebar = read("components/layouts/AdminSidebar.tsx");
 
+  test("identitas sidebar mengikuti peran pengguna", () => {
+    for (const [role, label, title] of [
+      ["ADMIN", "Administrator", "ADMIN SMK HUTAMA"],
+      ["KURIKULUM", "Kurikulum", "KURIKULUM SMK HUTAMA"],
+      ["KESISWAAN", "Kesiswaan", "KESISWAAN SMK HUTAMA"],
+      ["ADMIN_CBT", "Admin CBT", "ADMIN CBT SMK HUTAMA"],
+    ]) {
+      assert.match(sidebar, new RegExp(`${role}: "${label}"`));
+      assert.match(sidebar, new RegExp(`${role}: "${title}"`));
+    }
+
+    assert.match(sidebar, /\{roleLabels\[user\.role\]\}/);
+    assert.match(sidebar, /\{roleTitles\[user\.role\]\}/);
+  });
+
   for (const role of ADMIN_ROLES) {
     test(`menu ${role} hanya ditampilkan kepada ${role}`, () => {
       for (const route of OWNED_PAGES[role].filter((path) => !path.includes("[id]"))) {
@@ -213,4 +229,40 @@ describe("sidebar mengikuti matriks halaman", () => {
       }
     });
   }
+});
+
+describe("sistem visual Genesis", () => {
+  test("seluruh layout aplikasi internal memakai Genesis, landing tidak", () => {
+    for (const layout of [
+      "app/admin/layout.tsx",
+      "app/teacher/layout.tsx",
+      "app/student/layout.tsx",
+      "app/counselor/layout.tsx",
+      "app/piket/layout.tsx",
+      "app/cms/(panel)/layout.tsx",
+      "app/login/layout.tsx",
+    ]) {
+      assert.match(read(layout), /genesis-app/, `${layout} harus memakai sistem visual Genesis`);
+    }
+
+    assert.doesNotMatch(read("app/(landing)/layout.tsx"), /genesis-app/);
+  });
+
+  test("navigasi mobile memakai bottom bar melayang dan panel akun", () => {
+    const bottomNav = read("components/layouts/MobileBottomNav.tsx");
+    assert.match(bottomNav, /fixed inset-x-0 bottom-0/);
+    assert.match(bottomNav, /aria-label="Navigasi utama"/);
+    assert.match(bottomNav, /rounded-full/);
+
+    for (const shell of [
+      "components/layouts/GenesisSidebar.tsx",
+      "components/layouts/StudentHeader.tsx",
+      "components/landing/LandingNavbar.tsx",
+    ]) {
+      assert.match(read(shell), /MobileBottomNav/, `${shell} harus memakai bottom bar bersama`);
+    }
+
+    assert.match(read("components/layouts/GenesisSidebar.tsx"), /AccountControls/);
+    assert.match(read("components/layouts/StudentHeader.tsx"), /StudentAccount/);
+  });
 });

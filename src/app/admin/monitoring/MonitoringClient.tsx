@@ -51,7 +51,7 @@ type StatusFilter = "ALL" | "IN_PROGRESS" | "LOCKED" | "SUBMITTED" | "NOT_STARTE
 
 const statusInfo = {
   IN_PROGRESS:    { label: "Mengerjakan",  color: "bg-green-100 text-green-700 border-green-200",    icon: Monitor },
-  SUBMITTED:      { label: "Selesai",      color: "bg-blue-100 text-blue-700 border-blue-200",       icon: CheckCircle },
+  SUBMITTED:      { label: "Selesai",      color: "bg-brand-soft text-brand-text border-brand-soft",       icon: CheckCircle },
   AUTO_SUBMITTED: { label: "Auto Submit",  color: "bg-purple-100 text-purple-700 border-purple-200", icon: CheckCircle },
   NOT_STARTED:    { label: "Belum Mulai",  color: "bg-gray-100 text-gray-600 border-gray-200",       icon: Clock },
 } as const;
@@ -197,7 +197,7 @@ export function MonitoringClient({
       </div>
 
       {/* Exam info */}
-      <div className="mb-6 rounded-xl border bg-blue-50 border-blue-100 p-4">
+      <div className="mb-6 rounded-xl border bg-brand-soft border-brand-soft p-4">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 text-sm">
           <div><p className="text-gray-500">Pengawas</p><p className="font-semibold text-gray-800">{exam.teacher.user.name}</p></div>
           <div><p className="text-gray-500">Mata Pelajaran</p><p className="font-semibold text-gray-800">{exam.subject.name}</p></div>
@@ -212,14 +212,14 @@ export function MonitoringClient({
           { label: "Total Peserta", value: totalCounts.total,      color: "text-gray-700",  bg: "bg-gray-50",  icon: Monitor,       filter: "ALL" as StatusFilter },
           { label: "Mengerjakan",   value: totalCounts.inProgress, color: "text-green-600", bg: "bg-green-50", icon: Wifi,          filter: "IN_PROGRESS" as StatusFilter },
           { label: "Terkunci",      value: totalCounts.locked,     color: "text-red-600",   bg: "bg-red-50",   icon: Lock,          filter: "LOCKED" as StatusFilter },
-          { label: "Selesai Submit",value: totalCounts.submitted,  color: "text-blue-600",  bg: "bg-blue-50",  icon: CheckCircle,   filter: "SUBMITTED" as StatusFilter },
+          { label: "Selesai Submit",value: totalCounts.submitted,  color: "text-brand-text",  bg: "bg-brand-soft",  icon: CheckCircle,   filter: "SUBMITTED" as StatusFilter },
           { label: "Belum Mulai",   value: totalCounts.notStarted, color: "text-gray-600",  bg: "bg-gray-50",  icon: Clock,         filter: "NOT_STARTED" as StatusFilter },
         ].map((s) => (
           <button
             key={s.label}
             onClick={() => setStatusFilter(statusFilter === s.filter ? "ALL" : s.filter)}
             className={`rounded-xl border ${s.bg} p-4 text-left transition-all ${
-              statusFilter === s.filter ? "ring-2 ring-offset-1 ring-blue-400" : "hover:shadow-sm"
+              statusFilter === s.filter ? "ring-2 ring-offset-1 ring-brand" : "hover:shadow-sm"
             }`}
           >
             <div className="flex items-center justify-between">
@@ -242,8 +242,8 @@ export function MonitoringClient({
               onClick={() => setSelectedClass("ALL")}
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all ${
                 selectedClass === "ALL"
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
+                  ? "bg-brand text-white border-brand"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-brand-soft"
               }`}
             >
               <Users className="h-3 w-3" />
@@ -261,8 +261,8 @@ export function MonitoringClient({
                   onClick={() => setSelectedClass(cls)}
                   className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all ${
                     isActive
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
+                      ? "bg-brand text-white border-brand"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-brand-soft"
                   }`}
                 >
                   {cls}
@@ -353,7 +353,7 @@ export function MonitoringClient({
                       </span>
                     )}
                     {groupDone > 0 && (
-                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-text">
                         {groupDone} selesai
                       </span>
                     )}
@@ -412,7 +412,7 @@ export function MonitoringClient({
                                 {r.attempt?.loginStatus ? <><Wifi className="h-3 w-3" />Online</> : <><WifiOff className="h-3 w-3" />Offline</>}
                               </span>
                             ) : (
-                              <span className="font-medium text-blue-600">
+                              <span className="font-medium text-brand-text">
                                 {fmtTime(r.attempt?.submittedAt ?? null)}
                                 {r.attempt?.score !== null && r.attempt?.score !== undefined && (
                                   <span className="ml-2 text-purple-600">· {r.attempt.score}</span>
@@ -446,7 +446,7 @@ export function MonitoringClient({
                             )}
                             <Button
                               variant="outline" size="sm"
-                              className="w-full gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
+                              className="w-full gap-1.5 text-brand-text border-brand-soft hover:bg-brand-soft text-xs"
                               onClick={() => handleReset(r.attempt!.id, r.user.name)}
                               disabled={pending}
                             >

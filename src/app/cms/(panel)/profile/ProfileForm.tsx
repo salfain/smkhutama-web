@@ -27,7 +27,10 @@ export function ProfileForm({ profile }: { profile: P }) {
   }
 
   return (
-    <form action={submit} className="max-w-2xl space-y-5">
+    <form action={submit} className="space-y-5">
+      {/* Kartu dipecah dua kolom di layar lebar: form mengisi ruang tanpa
+          membuat satu input membentang selebar layar. */}
+      <div className="grid items-start gap-5 xl:grid-cols-2">
       <div className="rounded-xl border bg-white p-5 shadow-sm space-y-4">
         <p className="font-semibold text-gray-700">Identitas Sekolah</p>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -78,18 +81,19 @@ export function ProfileForm({ profile }: { profile: P }) {
 
       <div className="rounded-xl border bg-white p-5 shadow-sm">
         <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={ppdbOpen} onChange={(e) => setPpdbOpen(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+          <input type="checkbox" checked={ppdbOpen} onChange={(e) => setPpdbOpen(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-text" />
           <div>
             <p className="text-sm font-medium text-gray-700">Pendaftaran PPDB Dibuka</p>
             <p className="text-xs text-gray-500">Jika aktif, tombol & halaman pendaftaran online tampil di beranda</p>
           </div>
         </label>
       </div>
+      </div>
 
       {err && <p className="rounded-lg bg-red-50 border border-red-200 px-4 py-2.5 text-sm text-red-600">{err}</p>}
       {ok && <div className="flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-2.5 text-sm text-green-700"><CheckCircle className="h-4 w-4" />Profil tersimpan</div>}
 
-      <Button type="submit" className="gap-2 bg-blue-600 hover:bg-blue-700" disabled={pending}>
+      <Button type="submit" className="gap-2 bg-brand hover:bg-brand-strong" disabled={pending}>
         <Save className="h-4 w-4" />{pending ? "Menyimpan..." : "Simpan Perubahan"}
       </Button>
     </form>

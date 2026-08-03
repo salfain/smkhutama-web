@@ -94,6 +94,37 @@ enum CounselingStatus {
   REFERRED
 }
 
+enum CasePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RiskLevel {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CounselingSessionMode {
+  INDIVIDUAL
+  GROUP
+  PARENT
+  TEACHER
+  ONLINE
+}
+
+enum ReferralStatus {
+  PLANNED
+  SENT
+  ACCEPTED
+  COMPLETED
+  CANCELLED
+}
+
 enum ViolationCategory {
   RINGAN
   SEDANG
@@ -126,6 +157,41 @@ enum QuestionSetSource {
   ADMIN_IMPORT
 }
 
+/// Penugasan tambahan. Satu pengguna dapat memegang beberapa tugas sekaligus.
+enum AssignmentType {
+  KURIKULUM
+  KESISWAAN
+  ADMIN_CBT
+  COUNSELOR
+  PIKET
+  HOMEROOM_TEACHER
+  STUDENT_ADVISOR
+  OSIS_ADVISOR
+  EXTRACURRICULAR_ADVISOR
+  HEAD_OF_PROGRAM
+  PKL_ADVISOR
+  BKK
+  LSP
+  SAFE_SCHOOL_TEAM
+  CMS
+  PPDB
+  LEADERSHIP
+  FACILITIES
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ACTION_REQUIRED
+}
+
+enum SensitiveAccessAction {
+  VIEW
+  PRINT
+  EXPORT
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -155,7 +221,21 @@ model AcademicYear {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  exams Exam[]
+  exams               Exam[]
+  lessonSchedules     LessonSchedule[]
+  teachingAssignments TeachingAssignment[]
+  userAssignments     UserAssignment[]
+  counselingCases     CounselingCase[]
+  violationRecords    ViolationRecord[]
+  achievementRecords  AchievementRecord[]
+  counselingRequests  CounselingRequest[]
+  parentSummons       ParentSummon[]
+  homeVisits          HomeVisit[]
+  surveys             Survey[]
+  piketSchedules      PiketSchedule[]
+  teacherAttendances  TeacherAttendance[]
+  studentTardiness    StudentTardiness[]
+  studentPermits      StudentPermit[]
 
   @@map("academic_years")
 }
@@ -176,6 +256,13 @@ model User {
   teacher   Teacher?
   counselor Counselor?
 
+  assignments         UserAssignment[]     @relation("AssignmentUser")
+  assignmentsCreated  UserAssignment[]     @relation("AssignmentCreator")
+  permissionOverrides UserPermission[]     @relation("PermissionUser")
+  permissionsGranted  UserPermission[]     @relation("PermissionGrantor")
+  notifications       Notification[]
+  sensitiveAccessLogs SensitiveAccessLog[]
+
   violationsRecorded   ViolationRecord[]   @relation("ViolationRecorder")
   achievementsRecorded AchievementRecord[] @relation("AchievementRecorder")
 
@@ -190,9 +277,10 @@ model Major {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  classes  Class[]
-  students Student[]
-  subjects Subject[]
+  classes     Class[]
+  students    Student[]
+  subjects    Subject[]
+  assignments UserAssignment[]
 
   @@map("majors")
 }
@@ -207,11 +295,14 @@ model Class {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
-  major              Major               @relation(fields: [majorId], references: [id])
-  homeroomTeacher    Teacher?            @relation("Homeroom", fields: [homeroomTeacherId], references: [id])
-  students           Student[]
-  examParticipants   ExamClass[]
-  teacherAttendances TeacherAttendance[]
+  major               Major                @relation(fields: [majorId], references: [id])
+  homeroomTeacher     Teacher?             @relation("Homeroom", fields: [homeroomTeacherId], references: [id])
+  students            Student[]
+  examParticipants    ExamClass[]
+  teacherAttendances  TeacherAttendance[]
+  lessonSchedules     LessonSchedule[]
+  teachingAssignments TeachingAssignment[]
+  assignments         UserAssignment[]
 
   @@map("classes")
 }
@@ -225,11 +316,13 @@ model Subject {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  major        Major?        @relation(fields: [majorId], references: [id])
-  teachers     Teacher[]
-  questions    Question[]
-  questionSets QuestionSet[]
-  exams        Exam[]
+  major               Major?               @relation(fields: [majorId], references: [id])
+  teachers            Teacher[]
+  questions           Question[]
+  questionSets        QuestionSet[]
+  exams               Exam[]
+  lessonSchedules     LessonSchedule[]
+  teachingAssignments TeachingAssignment[]
 
   @@map("subjects")
 }
@@ -272,14 +365,16 @@ model Teacher {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject         Subject?            @relation(fields: [subjectId], references: [id])
-  questions       Question[]
-  questionSets    QuestionSet[]
-  exams           Exam[]
-  homeroomClasses Class[]             @relation("Homeroom")
-  attendances     TeacherAttendance[]
-  piketSchedules  PiketSchedule[]
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject             Subject?             @relation(fields: [subjectId], references: [id])
+  questions           Question[]
+  questionSets        QuestionSet[]
+  exams               Exam[]
+  homeroomClasses     Class[]              @relation("Homeroom")
+  attendances         TeacherAttendance[]
+  piketSchedules      PiketSchedule[]
+  lessonSchedules     LessonSchedule[]
+  teachingAssignments TeachingAssignment[]
 
   @@map("teachers")
 }
@@ -517,6 +612,103 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+/// Penugasan pengguna yang dapat dibatasi periode, kelas, dan jurusan.
+model UserAssignment {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  type           AssignmentType
+  academicYearId String?        @map("academic_year_id")
+  classId        String?        @map("class_id")
+  majorId        String?        @map("major_id")
+  startDate      DateTime?      @map("start_date")
+  endDate        DateTime?      @map("end_date")
+  isActive       Boolean        @default(true) @map("is_active")
+  note           String?
+  createdById    String?        @map("created_by_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  user         User          @relation("AssignmentUser", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy    User?         @relation("AssignmentCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  academicYear AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: SetNull)
+  class        Class?        @relation(fields: [classId], references: [id], onDelete: SetNull)
+  major        Major?        @relation(fields: [majorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, type, isActive])
+  @@index([academicYearId])
+  @@map("user_assignments")
+}
+
+/// Katalog capability agar fitur baru tidak bergantung pada role tunggal.
+model Permission {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  category    String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userOverrides UserPermission[]
+
+  @@map("permissions")
+}
+
+/// Override izin per pengguna; allowed=false dapat mencabut izin bawaan role.
+model UserPermission {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  permissionId String    @map("permission_id")
+  allowed      Boolean   @default(true)
+  expiresAt    DateTime? @map("expires_at")
+  grantedById  String?   @map("granted_by_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user       User       @relation("PermissionUser", fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  grantedBy  User?      @relation("PermissionGrantor", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@unique([userId, permissionId])
+  @@index([userId, allowed])
+  @@map("user_permissions")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType @default(INFO)
+  title     String
+  message   String
+  href      String?
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+/// Jejak baca/cetak/ekspor data sensitif, terpisah dari audit mutasi biasa.
+model SensitiveAccessLog {
+  id           String                @id @default(uuid())
+  userId       String                @map("user_id")
+  action       SensitiveAccessAction @default(VIEW)
+  resourceType String                @map("resource_type")
+  resourceId   String?               @map("resource_id")
+  purpose      String?
+  ipAddress    String?               @map("ip_address")
+  userAgent    String?               @map("user_agent")
+  createdAt    DateTime              @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([resourceType, resourceId])
+  @@map("sensitive_access_logs")
+}
+
 /// Pengaturan sistem (key-value)
 model SystemSetting {
   id        String   @id @default(uuid())
@@ -716,8 +908,10 @@ model Counselor {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   cases         CounselingCase[]
+  sessions      CounselingSession[]
+  referrals     CounselingReferral[]
   parentSummons ParentSummon[]
   homeVisits    HomeVisit[]
 
@@ -744,21 +938,78 @@ model CounselingCase {
   id             String           @id @default(uuid())
   studentId      String           @map("student_id")
   counselorId    String           @map("counselor_id")
+  academicYearId String           @map("academic_year_id")
   type           CounselingType   @default(PRIBADI)
   status         CounselingStatus @default(OPEN)
+  priority       CasePriority     @default(MEDIUM)
+  riskLevel      RiskLevel        @default(NONE) @map("risk_level")
+  riskNotes      String?          @map("risk_notes")
   title          String
   description    String?
   notes          String?          @map("session_notes")
   followUp       String?          @map("follow_up")
   isConfidential Boolean          @default(true) @map("is_confidential")
   sessionDate    DateTime         @default(now()) @map("session_date")
+  nextFollowUpAt DateTime?        @map("next_follow_up_at")
+  resolvedAt     DateTime?        @map("resolved_at")
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedAt      DateTime         @updatedAt @map("updated_at")
 
-  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  counselor Counselor @relation(fields: [counselorId], references: [id])
+  student      Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor    Counselor            @relation(fields: [counselorId], references: [id])
+  academicYear AcademicYear         @relation(fields: [academicYearId], references: [id])
+  sessions     CounselingSession[]
+  referrals    CounselingReferral[]
 
+  @@index([status, priority, nextFollowUpAt])
   @@map("counseling_cases")
+}
+
+/// Pertemuan/touchpoint di dalam satu kasus konseling.
+model CounselingSession {
+  id              String                @id @default(uuid())
+  caseId          String                @map("case_id")
+  counselorId     String                @map("counselor_id")
+  sessionDate     DateTime              @default(now()) @map("session_date")
+  durationMinutes Int                   @default(45) @map("duration_minutes")
+  mode            CounselingSessionMode @default(INDIVIDUAL)
+  location        String?
+  summary         String
+  intervention    String?
+  outcome         String?
+  nextPlan        String?               @map("next_plan")
+  isConfidential  Boolean               @default(true) @map("is_confidential")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+
+  case      CounselingCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  counselor Counselor      @relation(fields: [counselorId], references: [id])
+
+  @@index([caseId, sessionDate])
+  @@map("counseling_sessions")
+}
+
+/// Rujukan kasus ke psikolog, fasilitas kesehatan, lembaga perlindungan, dll.
+model CounselingReferral {
+  id          String         @id @default(uuid())
+  caseId      String         @map("case_id")
+  counselorId String         @map("counselor_id")
+  referredTo  String         @map("referred_to")
+  institution String?
+  contact     String?
+  reason      String
+  status      ReferralStatus @default(PLANNED)
+  referredAt  DateTime       @default(now()) @map("referred_at")
+  followUpAt  DateTime?      @map("follow_up_at")
+  result      String?
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  case      CounselingCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  counselor Counselor      @relation(fields: [counselorId], references: [id])
+
+  @@index([caseId, status])
+  @@map("counseling_referrals")
 }
 
 /// Catatan pelanggaran siswa (poin negatif)
@@ -767,6 +1018,7 @@ model ViolationRecord {
   studentId       String   @map("student_id")
   recordedById    String   @map("recorded_by_id")
   violationTypeId String?  @map("violation_type_id")
+  academicYearId  String   @map("academic_year_id")
   description     String
   points          Int      @default(0)
   sanction        String?
@@ -776,94 +1028,105 @@ model ViolationRecord {
   student       Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
   recordedBy    User           @relation("ViolationRecorder", fields: [recordedById], references: [id])
   violationType ViolationType? @relation(fields: [violationTypeId], references: [id])
+  academicYear  AcademicYear   @relation(fields: [academicYearId], references: [id])
 
   @@map("violation_records")
 }
 
 /// Catatan prestasi siswa (poin positif)
 model AchievementRecord {
-  id           String   @id @default(uuid())
-  studentId    String   @map("student_id")
-  recordedById String   @map("recorded_by_id")
-  title        String
-  description  String?
-  points       Int      @default(0)
-  level        String?
-  date         DateTime @default(now())
-  createdAt    DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  studentId      String   @map("student_id")
+  recordedById   String   @map("recorded_by_id")
+  academicYearId String   @map("academic_year_id")
+  title          String
+  description    String?
+  points         Int      @default(0)
+  level          String?
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  student    Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  recordedBy User    @relation("AchievementRecorder", fields: [recordedById], references: [id])
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  recordedBy   User         @relation("AchievementRecorder", fields: [recordedById], references: [id])
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("achievement_records")
 }
 
 /// Permohonan konseling yang diajukan siswa
 model CounselingRequest {
-  id            String        @id @default(uuid())
-  studentId     String        @map("student_id")
-  topic         String
-  description   String?
-  urgency       String        @default("SEDANG")
-  preferredDate DateTime?     @map("preferred_date")
-  status        RequestStatus @default(PENDING)
-  response      String?
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
+  id             String        @id @default(uuid())
+  studentId      String        @map("student_id")
+  academicYearId String        @map("academic_year_id")
+  topic          String
+  description    String?
+  urgency        String        @default("SEDANG")
+  preferredDate  DateTime?     @map("preferred_date")
+  status         RequestStatus @default(PENDING)
+  response       String?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("counseling_requests")
 }
 
 /// Surat pemanggilan orang tua
 model ParentSummon {
-  id          String       @id @default(uuid())
-  studentId   String       @map("student_id")
-  counselorId String       @map("counselor_id")
-  level       String // SP1 / SP2 / SP3 / PANGGILAN
-  reason      String
-  totalPoints Int          @default(0) @map("total_points")
-  meetingDate DateTime?    @map("meeting_date")
-  status      SummonStatus @default(PENDING)
-  notes       String?
-  createdAt   DateTime     @default(now()) @map("created_at")
+  id             String       @id @default(uuid())
+  studentId      String       @map("student_id")
+  counselorId    String       @map("counselor_id")
+  academicYearId String       @map("academic_year_id")
+  level          String // SP1 / SP2 / SP3 / PANGGILAN
+  reason         String
+  totalPoints    Int          @default(0) @map("total_points")
+  meetingDate    DateTime?    @map("meeting_date")
+  status         SummonStatus @default(PENDING)
+  notes          String?
+  createdAt      DateTime     @default(now()) @map("created_at")
 
-  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  counselor Counselor @relation(fields: [counselorId], references: [id])
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor    Counselor    @relation(fields: [counselorId], references: [id])
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("parent_summons")
 }
 
 /// Kunjungan rumah (home visit)
 model HomeVisit {
-  id          String   @id @default(uuid())
-  studentId   String   @map("student_id")
-  counselorId String   @map("counselor_id")
-  visitDate   DateTime @default(now()) @map("visit_date")
-  purpose     String
-  address     String?
-  findings    String?
-  result      String?
-  createdAt   DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  studentId      String   @map("student_id")
+  counselorId    String   @map("counselor_id")
+  academicYearId String   @map("academic_year_id")
+  visitDate      DateTime @default(now()) @map("visit_date")
+  purpose        String
+  address        String?
+  findings       String?
+  result         String?
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  counselor Counselor @relation(fields: [counselorId], references: [id])
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor    Counselor    @relation(fields: [counselorId], references: [id])
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("home_visits")
 }
 
 /// Angket / asesmen kebutuhan siswa (AKPD)
 model Survey {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  title          String
+  academicYearId String   @map("academic_year_id")
+  description    String?
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  questions SurveyQuestion[]
-  responses SurveyResponse[]
+  questions    SurveyQuestion[]
+  responses    SurveyResponse[]
+  academicYear AcademicYear     @relation(fields: [academicYearId], references: [id])
 
   @@map("surveys")
 }
@@ -914,69 +1177,129 @@ model SurveyAnswer {
 
 /// Jadwal guru piket mingguan yang ditentukan admin
 model PiketSchedule {
-  id        String   @id @default(uuid())
-  teacherId String   @map("teacher_id")
-  dayOfWeek Int      @map("day_of_week") // 0 Minggu, 1 Senin, ... 6 Sabtu
-  isActive  Boolean  @default(true) @map("is_active")
-  note      String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  teacherId      String   @map("teacher_id")
+  academicYearId String   @map("academic_year_id")
+  dayOfWeek      Int      @map("day_of_week") // 0 Minggu, 1 Senin, ... 6 Sabtu
+  isActive       Boolean  @default(true) @map("is_active")
+  note           String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
-  @@unique([teacherId, dayOfWeek])
+  @@unique([academicYearId, teacherId, dayOfWeek])
   @@map("piket_schedules")
+}
+
+/// Jadwal mata pelajaran mingguan per kelas dan tahun ajaran
+model LessonSchedule {
+  id             String   @id @default(uuid())
+  academicYearId String   @map("academic_year_id")
+  classId        String   @map("class_id")
+  subjectId      String   @map("subject_id")
+  teacherId      String   @map("teacher_id")
+  dayOfWeek      Int      @map("day_of_week") // 1 Senin, ... 6 Sabtu
+  startTime      String   @map("start_time") // HH:mm
+  endTime        String   @map("end_time") // HH:mm
+  room           String?
+  note           String?
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  class        Class        @relation(fields: [classId], references: [id])
+  subject      Subject      @relation(fields: [subjectId], references: [id])
+  teacher      Teacher      @relation(fields: [teacherId], references: [id])
+
+  @@unique([academicYearId, classId, dayOfWeek, startTime])
+  @@unique([academicYearId, teacherId, dayOfWeek, startTime])
+  @@index([classId, dayOfWeek])
+  @@index([teacherId, dayOfWeek])
+  @@map("lesson_schedules")
+}
+
+/// Pembagian tugas mengajar guru per kelas dan tahun ajaran
+model TeachingAssignment {
+  id             String   @id @default(uuid())
+  academicYearId String   @map("academic_year_id")
+  teacherId      String   @map("teacher_id")
+  subjectId      String   @map("subject_id")
+  classId        String   @map("class_id")
+  weeklyPeriods  Int      @map("weekly_periods")
+  note           String?
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  class        Class        @relation(fields: [classId], references: [id], onDelete: Restrict)
+
+  @@unique([academicYearId, teacherId, subjectId, classId])
+  @@index([academicYearId, classId])
+  @@index([academicYearId, teacherId])
+  @@map("teaching_assignments")
 }
 
 /// Kehadiran guru di kelas (dicatat guru piket)
 model TeacherAttendance {
-  id         String   @id @default(uuid())
-  teacherId  String   @map("teacher_id")
-  classId    String   @map("class_id")
-  recordedBy String   @map("recorded_by")
-  status     String // HADIR / TIDAK_HADIR / DIGANTIKAN / TUGAS_LUAR
-  period     String?
-  substitute String?
-  note       String?
-  date       DateTime @default(now())
-  createdAt  DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  teacherId      String   @map("teacher_id")
+  classId        String   @map("class_id")
+  academicYearId String   @map("academic_year_id")
+  recordedBy     String   @map("recorded_by")
+  status         String // HADIR / TIDAK_HADIR / DIGANTIKAN / TUGAS_LUAR
+  period         String?
+  substitute     String?
+  note           String?
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  class        Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("teacher_attendances")
 }
 
 /// Pendataan siswa terlambat
 model StudentTardiness {
-  id          String   @id @default(uuid())
-  studentId   String   @map("student_id")
-  recordedBy  String   @map("recorded_by")
-  arrivalTime DateTime @map("arrival_time")
-  reason      String?
-  sanction    String?
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  studentId      String   @map("student_id")
+  recordedBy     String   @map("recorded_by")
+  academicYearId String   @map("academic_year_id")
+  arrivalTime    DateTime @map("arrival_time")
+  reason         String?
+  sanction       String?
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("student_tardiness")
 }
 
 /// Izin keluar/masuk siswa saat jam pelajaran
 model StudentPermit {
-  id         String    @id @default(uuid())
-  studentId  String    @map("student_id")
-  recordedBy String    @map("recorded_by")
-  type       String // KELUAR / MASUK
-  reason     String
-  exitTime   DateTime? @map("exit_time")
-  returnTime DateTime? @map("return_time")
-  status     String    @default("KELUAR") // KELUAR / SUDAH_KEMBALI / TIDAK_KEMBALI
-  date       DateTime  @default(now())
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id             String    @id @default(uuid())
+  studentId      String    @map("student_id")
+  recordedBy     String    @map("recorded_by")
+  academicYearId String    @map("academic_year_id")
+  type           String // KELUAR / MASUK
+  reason         String
+  exitTime       DateTime? @map("exit_time")
+  returnTime     DateTime? @map("return_time")
+  status         String    @default("KELUAR") // KELUAR / SUDAH_KEMBALI / TIDAK_KEMBALI
+  date           DateTime  @default(now())
+  createdAt      DateTime  @default(now()) @map("created_at")
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@map("student_permits")
 }

@@ -14,7 +14,7 @@ export default function PpdbStatusPage() {
         title="Cek Status Pendaftaran"
         subtitle="Masukkan nomor pendaftaran Anda untuk melihat status seleksi PPDB."
       />
-      <section className="bg-slate-50 dark:bg-slate-900">
+      <section className="bg-canvas">
         <div className="mx-auto max-w-lg px-4 py-16">
           <StatusChecker />
         </div>

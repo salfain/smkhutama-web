@@ -3,12 +3,15 @@
 import { usePathname } from "next/navigation";
 import { StudentHeader } from "./StudentHeader";
 
-type Props = { user: { name: string; nis: string | null; className: string | null } };
+type Props = {
+  user: { name: string; nis: string | null; className: string | null };
+  system: "CBT" | "SIBIKONS";
+};
 
-export function StudentHeaderWrapper({ user }: Props) {
+export function StudentHeaderWrapper({ user, system }: Props) {
   const pathname = usePathname();
   // Sembunyikan header saat halaman pengerjaan ujian (test) agar fullscreen
   const isTest = /\/student\/exams\/[^/]+\/test/.test(pathname);
   if (isTest) return null;
-  return <StudentHeader user={user} />;
+  return <StudentHeader user={user} system={system} />;
 }

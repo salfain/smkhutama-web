@@ -17,7 +17,7 @@ export default async function JurusanPage() {
         title="Program Keahlian Unggulan"
         subtitle="Link & match dengan kebutuhan industri dan perguruan tinggi. Siap kerja, siap kuliah."
       />
-      <HomeMajors majors={majors} />
+      <HomeMajors majors={majors} showHeader={false} />
     </>
   );
 }

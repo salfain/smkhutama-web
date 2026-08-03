@@ -133,7 +133,7 @@ export function TokenManager({ tokens, exams }: { tokens: Token[]; exams: Exam[]
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700" disabled={pending} onClick={handleGenerate}>
+            <Button className="w-full gap-2 bg-brand hover:bg-brand-strong" disabled={pending} onClick={handleGenerate}>
               <KeyRound className="h-4 w-4" />Generate Token
             </Button>
 
@@ -205,7 +205,7 @@ export function TokenManager({ tokens, exams }: { tokens: Token[]; exams: Exam[]
                         <Button variant="outline" size="icon" className="h-10 w-10 shrink-0" onClick={() => copy(t.id, t.token)} title="Salin">
                           {copiedId === t.id ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                         </Button>
-                        <Button variant="outline" size="icon" className="h-10 w-10 shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => handleRegen(t.id)} title="Regenerate">
+                        <Button variant="outline" size="icon" className="h-10 w-10 shrink-0 text-brand-text border-brand-soft hover:bg-brand-soft" onClick={() => handleRegen(t.id)} title="Regenerate">
                           <RefreshCw className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${t.isActive ? "text-yellow-600 border-yellow-200 hover:bg-yellow-50" : "text-green-600 border-green-200 hover:bg-green-50"}`} onClick={() => handleToggle(t.id)} title={t.isActive ? "Nonaktifkan" : "Aktifkan"}>

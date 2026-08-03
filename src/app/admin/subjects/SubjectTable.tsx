@@ -89,7 +89,7 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input placeholder="Cari mata pelajaran..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700 sm:ml-auto" onClick={openCreate}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong sm:ml-auto" onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Mapel
         </Button>
       </div>
@@ -125,7 +125,7 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
                     <td className="px-4 py-3 text-center text-gray-600">{s._count.exams}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => openEdit(s)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" onClick={() => openEdit(s)}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => handleDelete(s)}>
@@ -171,7 +171,7 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
             {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                 {pending ? "Menyimpan..." : editing ? "Simpan Perubahan" : "Tambah Mapel"}
               </Button>
             </div>

@@ -19,9 +19,9 @@ type Ekskul = {
 
 const ICON_OPTIONS = ["Sparkles", "Tent", "Trophy", "Volleyball", "Flag", "Moon", "Languages", "Music", "HeartPulse"];
 const COLOR_OPTIONS = [
-  { label: "Biru", value: "from-blue-500 to-indigo-600" },
+  { label: "Biru", value: "from-brand to-brand-strong" },
   { label: "Hijau", value: "from-green-500 to-emerald-600" },
-  { label: "Oranye", value: "from-sky-500 to-blue-600" },
+  { label: "Oranye", value: "from-brand to-brand-strong" },
   { label: "Merah", value: "from-red-500 to-rose-600" },
   { label: "Ungu", value: "from-purple-500 to-fuchsia-600" },
   { label: "Pink", value: "from-pink-500 to-rose-600" },
@@ -59,9 +59,9 @@ export function ExtracurricularsClient({ items }: { items: Ekskul[] }) {
   }
 
   return (
-    <div className="max-w-5xl">
+    <div className="w-full">
       <div className="mb-4 flex justify-end">
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={openCreate}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Ekstrakurikuler
         </Button>
       </div>
@@ -85,9 +85,9 @@ export function ExtracurricularsClient({ items }: { items: Ekskul[] }) {
               <div className="p-4">
                 <p className="font-semibold text-gray-900">{e.name}</p>
                 <p className="mt-1 line-clamp-2 text-xs text-gray-500">{e.description}</p>
-                {e.schedule && <p className="mt-2 text-xs text-blue-600">{e.schedule}</p>}
+                {e.schedule && <p className="mt-2 text-xs text-brand-text">{e.schedule}</p>}
                 <div className="mt-3 flex justify-end gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => openEdit(e)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" onClick={() => openEdit(e)}>
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(e.id)}>
@@ -132,7 +132,7 @@ export function ExtracurricularsClient({ items }: { items: Ekskul[] }) {
             {err && <p className="text-sm text-red-600">{err}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>Simpan</Button>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>Simpan</Button>
             </div>
           </form>
         </DialogContent>

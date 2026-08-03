@@ -78,7 +78,7 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="h-8 w-8 rounded-full border-4 border-gray-200 border-t-blue-600 animate-spin" />
+            <div className="h-8 w-8 rounded-full border-4 border-gray-200 border-t-brand animate-spin" />
           </div>
         ) : !data ? (
           <div className="text-center py-8 text-sm text-gray-500">Gagal memuat data</div>
@@ -123,7 +123,7 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
                 return (
                   <button key={idx} onClick={() => setCurrentQ(idx)}
                     className={`flex h-7 w-7 items-center justify-center rounded text-xs font-bold border transition-all ${
-                      idx === currentQ ? "ring-2 ring-blue-400 ring-offset-1" : ""
+                      idx === currentQ ? "ring-2 ring-brand ring-offset-1" : ""
                     } ${color}`}>
                     {idx + 1}
                   </button>
@@ -160,8 +160,8 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
                 </div>
 
                 {/* Question text */}
-                <div className="rounded-lg bg-blue-50 border border-blue-100 p-3">
-                  <p className="text-sm text-blue-900 whitespace-pre-wrap">{q.questionText}</p>
+                <div className="rounded-lg bg-brand-soft border border-brand-soft p-3">
+                  <p className="text-sm text-brand-text whitespace-pre-wrap">{q.questionText}</p>
                 </div>
 
                 {/* Options for PG/BS */}
@@ -218,9 +218,9 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
 
                 {/* Explanation */}
                 {showCorrectAnswers && q.explanation && (
-                  <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3">
-                    <p className="text-xs font-semibold text-indigo-700 mb-1">Pembahasan:</p>
-                    <p className="text-sm text-indigo-900 whitespace-pre-wrap">{q.explanation}</p>
+                  <div className="rounded-lg bg-brand-soft border border-brand-soft p-3">
+                    <p className="text-xs font-semibold text-brand-text mb-1">Pembahasan:</p>
+                    <p className="text-sm text-brand-text whitespace-pre-wrap">{q.explanation}</p>
                   </div>
                 )}
               </div>

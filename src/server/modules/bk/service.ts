@@ -17,6 +17,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { requireCurrentAcademicYearId } from "@/lib/academic-year";
 
 export type CounselingType = "PRIBADI" | "SOSIAL" | "BELAJAR" | "KARIR";
 export type CounselingStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REFERRED";
@@ -230,13 +231,15 @@ export async function saveCase(input: SaveCaseInput) {
     followUp: input.followUp || null,
     isConfidential: input.isConfidential,
     sessionDate: input.sessionDate ? new Date(input.sessionDate) : new Date(),
+    resolvedAt: input.status === "RESOLVED" ? new Date() : null,
   };
 
   if (input.id) {
     return prisma.counselingCase.update({ where: { id: input.id }, data });
   }
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.counselingCase.create({
-    data: { ...data, studentId: input.studentId, counselorId: input.counselorId },
+    data: { ...data, studentId: input.studentId, counselorId: input.counselorId, academicYearId },
   });
 }
 
@@ -311,8 +314,9 @@ export async function saveViolation(input: SaveViolationInput) {
   };
 
   if (input.id) return prisma.violationRecord.update({ where: { id: input.id }, data });
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.violationRecord.create({
-    data: { ...data, studentId: input.studentId, recordedById: input.recordedById },
+    data: { ...data, studentId: input.studentId, recordedById: input.recordedById, academicYearId },
   });
 }
 
@@ -355,8 +359,9 @@ export async function saveAchievement(input: SaveAchievementInput) {
   };
 
   if (input.id) return prisma.achievementRecord.update({ where: { id: input.id }, data });
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.achievementRecord.create({
-    data: { ...data, studentId: input.studentId, recordedById: input.recordedById },
+    data: { ...data, studentId: input.studentId, recordedById: input.recordedById, academicYearId },
   });
 }
 
@@ -383,9 +388,11 @@ export type CreateRequestInput = {
 };
 
 export async function createRequest(input: CreateRequestInput) {
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.counselingRequest.create({
     data: {
       studentId: input.studentId,
+      academicYearId,
       topic: input.topic,
       description: input.description || null,
       urgency: input.urgency || "SEDANG",
@@ -417,12 +424,15 @@ export async function convertRequestToCase(id: string, counselorId: string) {
     prisma.counselingCase.create({
       data: {
         studentId: request.studentId,
+        academicYearId: request.academicYearId,
         counselorId,
         type: "PRIBADI",
         status: "IN_PROGRESS",
+        priority: request.urgency === "TINGGI" ? "HIGH" : request.urgency === "RENDAH" ? "LOW" : "MEDIUM",
         title: request.topic,
         description: request.description || null,
         sessionDate: request.preferredDate ?? new Date(),
+        nextFollowUpAt: request.preferredDate,
         isConfidential: true,
       },
     }),

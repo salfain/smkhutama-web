@@ -63,7 +63,7 @@ export default async function TeacherMonitoringPage() {
                             <div className="flex flex-col gap-1 items-end shrink-0">
                               <Badge className={`text-xs hover:opacity-100 ${
                                 isInProgress ? "bg-green-100 text-green-700 border-green-200"
-                                : isSubmitted ? "bg-blue-100 text-blue-700 border-blue-200"
+                                : isSubmitted ? "bg-brand-soft text-brand-text border-brand-soft"
                                 : "bg-gray-100 text-gray-600 border-gray-200"
                               }`}>
                                 {isInProgress ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Mengerjakan</span>

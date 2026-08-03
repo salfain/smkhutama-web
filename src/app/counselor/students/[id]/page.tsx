@@ -34,7 +34,7 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
       <div className="mt-4 grid grid-cols-3 gap-4">
         <Stat icon={ShieldAlert} color="bg-red-500" value={s.violationPoints} label="Poin Pelanggaran" />
         <Stat icon={Award} color="bg-emerald-500" value={s.achievementPoints} label="Poin Prestasi" />
-        <Stat icon={Scale} color="bg-blue-500" value={s.netPoints} label="Poin Bersih" />
+        <Stat icon={Scale} color="bg-brand" value={s.netPoints} label="Poin Bersih" />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

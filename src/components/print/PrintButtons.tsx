@@ -11,7 +11,7 @@ export function PrintButtons() {
       </button>
       <button
         onClick={() => window.print()}
-        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700"
+        className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow hover:bg-brand-strong"
       >
         🖨️ Cetak / PDF
       </button>

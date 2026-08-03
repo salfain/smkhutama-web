@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 const kindMeta: Record<string, { cls: string; icon: typeof MessagesSquare }> = {
   Konseling: { cls: "bg-purple-100 text-purple-700", icon: MessagesSquare },
-  Permohonan: { cls: "bg-blue-100 text-blue-700", icon: Inbox },
+  Permohonan: { cls: "bg-brand-soft text-brand-text", icon: Inbox },
   Pemanggilan: { cls: "bg-red-100 text-red-700", icon: Gavel },
 };
 

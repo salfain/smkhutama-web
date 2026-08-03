@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +9,6 @@ import { cmsLogin } from "../actions";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export default function CmsLoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -29,16 +27,12 @@ export default function CmsLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center mesh-bg px-4">
+    <div className="genesis-app flex min-h-screen items-center justify-center bg-[#FAFAFA] px-4 dark:bg-[#111113]">
       {redirecting && <FullScreenLoader message="Mengarahkan ke dashboard..." />}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="animate-float-slow absolute -left-16 top-10 h-64 w-64 rounded-full bg-blue-400/30 blur-3xl" />
-        <div className="animate-float-slower absolute right-0 bottom-10 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-sm rounded-3xl glass-light p-8 shadow-2xl animate-scale-in">
+      <div className="w-full max-w-sm rounded-xl border border-[#E8E8EC] bg-[#FFFFFF] p-8 dark:border-white/10 dark:bg-[#19191C]">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600">
-            <LayoutTemplate className="h-7 w-7 text-white" />
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-lg bg-[#F5F5F7] dark:bg-white/5">
+            <LayoutTemplate className="h-7 w-7 text-[#6B6B6B] dark:text-[#A7A7AE]" />
           </div>
           <h1 className="font-heading text-xl font-bold text-slate-900">CMS Landing Page</h1>
           <p className="mt-1 text-sm text-slate-500">Kelola konten beranda & PPDB</p>
@@ -58,7 +52,7 @@ export default function CmsLoginPage() {
             </div>
           </div>
           {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
-          <Button type="submit" className="w-full rounded-full bg-blue-600 hover:bg-blue-700" disabled={pending}>
+          <Button type="submit" className="h-11 w-full rounded-md bg-brand font-semibold text-white hover:bg-brand-strong hover:shadow-[0_4px_12px_rgba(99,102,241,0.35)]" disabled={pending}>
             {pending ? "Memproses..." : "Masuk CMS"}
           </Button>
         </form>

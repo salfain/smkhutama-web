@@ -17,6 +17,7 @@ import {
 } from "@/lib/piket-schedule";
 import { badRequest, forbidden, unauthorized } from "@/server/http";
 import type { ApiActor } from "@/server/auth";
+import { hasActiveAssignment } from "@/lib/assignment-access";
 
 export type LoginInput = {
   username?: string | null;
@@ -65,6 +66,8 @@ export async function checkCredentials(input: LoginInput): Promise<CredentialRes
   if (!passwordOk) return { ok: false, reason: "INVALID_CREDENTIALS" };
 
   if (input.system === "PIKET") {
+    const assignedPiket = user.role === "PIKET" || await hasActiveAssignment(user.id, "PIKET");
+    if (assignedPiket) return { ok: true, user };
     if (user.role !== "TEACHER" || !user.teacher) {
       return { ok: false, reason: "PIKET_REQUIRES_TEACHER" };
     }

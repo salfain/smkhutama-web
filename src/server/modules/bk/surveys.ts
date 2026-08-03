@@ -6,18 +6,19 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { requireCurrentAcademicYearId } from "@/lib/academic-year";
 
 // ─── Sisi guru BK ───────────────────────────────────────────────────────────
 
 export async function listSurveys() {
-  return prisma.survey.findMany({
+  return await prisma.survey.findMany({
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { questions: true, responses: true } } },
   });
 }
 
 export async function getSurvey(id: string) {
-  return prisma.survey.findUnique({
+  return await prisma.survey.findUnique({
     where: { id },
     include: { questions: { orderBy: { orderNumber: "asc" } } },
   });
@@ -36,8 +37,9 @@ export async function saveSurvey(input: SaveSurveyInput) {
     description: input.description || null,
     isActive: input.isActive,
   };
-  if (input.id) return prisma.survey.update({ where: { id: input.id }, data });
-  return prisma.survey.create({ data });
+  if (input.id) return await prisma.survey.update({ where: { id: input.id }, data });
+  const academicYearId = await requireCurrentAcademicYearId();
+  return await prisma.survey.create({ data: { ...data, academicYearId } });
 }
 
 export async function deleteSurvey(id: string) {
@@ -98,7 +100,7 @@ export async function deleteQuestion(id: string) {
  * menarik identitas setiap responden.
  */
 export async function getSurveyAnswers(id: string) {
-  return prisma.survey.findUnique({
+  return await prisma.survey.findUnique({
     where: { id },
     include: {
       questions: { orderBy: { orderNumber: "asc" } },
@@ -109,7 +111,7 @@ export async function getSurveyAnswers(id: string) {
 
 /** Sama seperti `getSurveyAnswers`, ditambah identitas responden. */
 export async function getSurveyWithResponses(id: string) {
-  return prisma.survey.findUnique({
+  return await prisma.survey.findUnique({
     where: { id },
     include: {
       questions: { orderBy: { orderNumber: "asc" } },
@@ -176,7 +178,7 @@ export function summarizeSurvey(survey: SurveyForSummary) {
 
 /** Angket aktif yang punya minimal satu pertanyaan, plus tanda sudah diisi. */
 export async function listSurveysForStudent(studentId: string) {
-  return prisma.survey.findMany({
+  return await prisma.survey.findMany({
     where: { isActive: true, questions: { some: {} } },
     orderBy: { createdAt: "desc" },
     include: {
@@ -219,7 +221,7 @@ export async function submitSurveyResponse(
   studentId: string,
   answers: SurveyAnswerInput[]
 ) {
-  return prisma.surveyResponse.create({
+  return await prisma.surveyResponse.create({
     data: {
       surveyId,
       studentId,
@@ -231,7 +233,7 @@ export async function submitSurveyResponse(
 
 /** Daftar id pertanyaan sebuah angket, urut nomor. */
 export async function listQuestionIds(surveyId: string) {
-  return prisma.surveyQuestion.findMany({
+  return await prisma.surveyQuestion.findMany({
     where: { surveyId },
     orderBy: { orderNumber: "asc" },
     select: { id: true },

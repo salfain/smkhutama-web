@@ -7,6 +7,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireCounselorAuth } from "@/lib/session";
+import { requirePermission } from "@/lib/permissions";
+import { logSensitiveAccess } from "@/lib/sensitive-access";
 import * as bk from "@/server/modules/bk/service";
 import * as followUp from "@/server/modules/bk/follow-up";
 import { toStudentBook, toStudentWithPoints } from "@/server/modules/bk/dto";
@@ -31,8 +33,10 @@ export async function listStudentsWithPoints() {
 
 export async function getStudentBook(studentId: string) {
   await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.view");
   const student = await bk.getStudentBook(studentId);
   if (!student) return null;
+  await logSensitiveAccess({ userId: user.id, resourceType: "student_bk_book", resourceId: studentId, purpose: "Membuka buku siswa BK" });
   return toStudentBook(student);
 }
 
@@ -83,8 +87,11 @@ export async function deleteHomeVisit(id: string) {
 
 export async function getHomeVisitDetail(id: string) {
   await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.print");
   const h = await followUp.getHomeVisit(id);
   if (!h) return null;
+
+  await logSensitiveAccess({ userId: user.id, action: "PRINT", resourceType: "home_visit", resourceId: id, purpose: "Membuka dokumen cetak kunjungan rumah" });
 
   return {
     id: h.id,

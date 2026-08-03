@@ -45,8 +45,8 @@ export function ConfirmStart({
 
   return (
     <div className="mx-auto max-w-xl p-4 md:p-6">
-      <div className="mb-4 rounded-xl border-2 border-blue-200 bg-blue-50 p-4 text-center">
-        <ClipboardList className="mx-auto mb-2 h-8 w-8 text-blue-600" />
+      <div className="mb-4 rounded-xl border-2 border-brand-soft bg-brand-soft p-4 text-center">
+        <ClipboardList className="mx-auto mb-2 h-8 w-8 text-brand-text" />
         <h1 className="font-heading text-xl font-bold text-gray-900">{title}</h1>
         <p className="text-sm text-gray-500">{subjectName}</p>
       </div>
@@ -109,7 +109,7 @@ export function ConfirmStart({
       <Button
         onClick={handleStart}
         disabled={pending}
-        className="w-full h-12 bg-blue-500 hover:bg-blue-600 font-semibold text-base gap-2"
+        className="w-full h-12 bg-brand hover:bg-brand-strong font-semibold text-base gap-2"
       >
         {pending ? "Memuat..." : (
           <>

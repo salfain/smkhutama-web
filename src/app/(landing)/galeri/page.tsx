@@ -18,15 +18,15 @@ export default async function GaleriPage() {
         subtitle="Dokumentasi kegiatan belajar, prestasi, dan momen kebersamaan di SMK Hutama."
       />
 
-      <section className="bg-slate-50 dark:bg-slate-900">
+      <section className="bg-canvas">
         <div className="mx-auto max-w-6xl px-4 py-16">
           {photos.length === 0 ? (
-            <p className="text-center text-slate-400">Belum ada foto galeri.</p>
+            <p className="text-center text-ink-soft">Belum ada foto galeri.</p>
           ) : (
             <RevealContainer className="columns-2 gap-4 md:columns-3 lg:columns-4 [&>*]:mb-4">
               {photos.map((p) => (
                 <RevealCard key={p.id}>
-                  <figure className="group relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm break-inside-avoid">
+                  <figure className="group relative overflow-hidden rounded-2xl border border-hairline bg-surface shadow-sm break-inside-avoid">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={p.imageUrl} alt={p.caption ?? "Galeri SMK Hutama"} className="w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
                     {p.caption && (

@@ -57,7 +57,7 @@ export function MajorTable({ majors }: { majors: Major[] }) {
   return (
     <>
       <div className="mb-4 flex justify-end">
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={openCreate}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Jurusan
         </Button>
       </div>
@@ -70,13 +70,13 @@ export function MajorTable({ majors }: { majors: Major[] }) {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {majors.map((m) => (
-            <div key={m.id} className="rounded-xl border bg-white p-4 shadow-sm hover:border-blue-200 transition-colors">
+            <div key={m.id} className="rounded-xl border bg-white p-4 shadow-sm hover:border-brand-soft transition-colors">
               <div className="mb-3 flex items-start justify-between">
                 <div>
                   <Badge variant="secondary" className="font-mono text-xs">{m.code}</Badge>
                   <p className="mt-2 font-semibold text-gray-900">{m.name}</p>
                 </div>
-                <Building2 className="h-5 w-5 text-blue-500/40" />
+                <Building2 className="h-5 w-5 text-brand-text/40" />
               </div>
               <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
                 <div className="rounded-lg bg-gray-50 p-2 text-center">
@@ -118,7 +118,7 @@ export function MajorTable({ majors }: { majors: Major[] }) {
             {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                 {pending ? "Menyimpan..." : editing ? "Simpan Perubahan" : "Tambah Jurusan"}
               </Button>
             </div>

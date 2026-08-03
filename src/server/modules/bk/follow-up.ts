@@ -8,6 +8,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { requireCurrentAcademicYearId } from "@/lib/academic-year";
 import { recommendedLevel } from "@/lib/bk-points";
 
 export type SummonStatus = "PENDING" | "SENT" | "DONE";
@@ -57,8 +58,9 @@ export async function saveHomeVisit(input: SaveHomeVisitInput) {
   };
 
   if (input.id) return prisma.homeVisit.update({ where: { id: input.id }, data });
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.homeVisit.create({
-    data: { ...data, studentId: input.studentId, counselorId: input.counselorId },
+    data: { ...data, studentId: input.studentId, counselorId: input.counselorId, academicYearId },
   });
 }
 
@@ -96,9 +98,11 @@ export type CreateSummonInput = {
 };
 
 export async function createSummon(input: CreateSummonInput) {
+  const academicYearId = await requireCurrentAcademicYearId();
   return prisma.parentSummon.create({
     data: {
       studentId: input.studentId,
+      academicYearId,
       counselorId: input.counselorId,
       level: input.level,
       reason: input.reason,
@@ -121,15 +125,15 @@ export async function deleteSummon(id: string) {
 
 // ─── Agenda ─────────────────────────────────────────────────────────────────
 
-/** Sesi, permohonan, dan pemanggilan yang jatuh mulai hari ini, urut waktu. */
+/** Tindak lanjut kasus, permohonan, dan pemanggilan mulai hari ini, urut waktu. */
 export async function getAgenda() {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   const [cases, requests, summons] = await Promise.all([
     prisma.counselingCase.findMany({
-      where: { status: { in: ["OPEN", "IN_PROGRESS"] }, sessionDate: { gte: start } },
-      orderBy: { sessionDate: "asc" },
+      where: { status: { in: ["OPEN", "IN_PROGRESS", "REFERRED"] }, nextFollowUpAt: { gte: start } },
+      orderBy: { nextFollowUpAt: "asc" },
       include: { student: { include: STUDENT_WITH_CLASS } },
     }),
     prisma.counselingRequest.findMany({
@@ -145,11 +149,11 @@ export async function getAgenda() {
   ]);
 
   const items = [
-    ...cases.map((c) => ({
+    ...cases.filter((c) => c.nextFollowUpAt).map((c) => ({
       id: c.id,
       kind: "Konseling",
       title: c.title,
-      date: c.sessionDate,
+      date: c.nextFollowUpAt as Date,
       studentName: c.student.user.name,
       className: c.student.class?.name ?? "-",
     })),

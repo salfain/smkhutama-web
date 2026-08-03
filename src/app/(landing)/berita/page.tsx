@@ -18,10 +18,10 @@ export default async function BeritaPage() {
         subtitle="Informasi terbaru seputar kegiatan belajar, prestasi, dan acara SMK Hutama."
       />
 
-      <section className="bg-white dark:bg-slate-900 py-16">
+      <section className="bg-canvas-alt py-16">
         <div className="mx-auto max-w-6xl px-4">
           {news.length === 0 ? (
-            <p className="text-center text-slate-400">Belum ada berita.</p>
+            <p className="text-center text-ink-soft">Belum ada berita.</p>
           ) : (
             <NewsGrid news={news} />
           )}

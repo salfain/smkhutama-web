@@ -54,7 +54,7 @@ export default async function KontakPage() {
         subtitle="Jangan ragu untuk menghubungi kami terkait informasi sekolah, pendaftaran, atau kerja sama."
       />
 
-      <section className="bg-slate-50 dark:bg-slate-900">
+      <section className="bg-canvas">
         <div className="mx-auto max-w-4xl px-4 py-16">
           <RevealContainer className="grid gap-5 md:grid-cols-2">
             {contacts.map((c, i) => (
@@ -63,15 +63,15 @@ export default async function KontakPage() {
                   href={c.href ?? "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-4 rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-sky-300 cursor-pointer"
+                  className="group flex items-start gap-4 rounded-3xl border border-hairline bg-surface p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-brand cursor-pointer"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 shadow transition-transform group-hover:scale-110">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-strong shadow transition-transform group-hover:scale-110">
                     <c.icon className="h-5 w-5 text-slate-900" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{c.label}</p>
-                    <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-200">{c.value}</p>
-                    <p className="mt-2 text-xs font-semibold text-sky-600 dark:text-sky-400 opacity-0 transition-opacity group-hover:opacity-100">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{c.label}</p>
+                    <p className="mt-1 text-sm font-medium text-ink">{c.value}</p>
+                    <p className="mt-2 text-xs font-semibold text-brand-text opacity-0 transition-opacity group-hover:opacity-100">
                       {c.action} →
                     </p>
                   </div>
@@ -82,7 +82,7 @@ export default async function KontakPage() {
 
           <RevealContainer className="mt-12 text-center">
             <RevealItem>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-ink-soft">
                 Jam operasional: Senin – Jumat, 07:00 – 15:00 WIB
               </p>
             </RevealItem>

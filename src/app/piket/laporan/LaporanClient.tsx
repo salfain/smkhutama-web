@@ -26,7 +26,7 @@ const attendanceStyle: Record<string, { label: string; className: string }> = {
   HADIR:       { label: "Hadir",        className: "bg-green-100 text-green-700 border-green-200" },
   TIDAK_HADIR: { label: "Tidak Hadir",  className: "bg-red-100 text-red-700 border-red-200" },
   DIGANTIKAN:  { label: "Digantikan",   className: "bg-amber-100 text-amber-700 border-amber-200" },
-  TUGAS_LUAR:  { label: "Tugas Luar",   className: "bg-blue-100 text-blue-700 border-blue-200" },
+  TUGAS_LUAR:  { label: "Tugas Luar",   className: "bg-brand-soft text-brand-text border-brand-soft" },
 };
 
 function fmtTime(d: Date | null) {
@@ -78,7 +78,7 @@ export function LaporanClient({ summary, tardiness, permits, teacherAttendances,
   const summaryCards = [
     { label: "Terlambat",   value: summary.totalTardiness, icon: AlarmClock,      color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-900/20" },
     { label: "Izin Keluar", value: summary.totalPermits,   icon: LogOut,          color: "text-red-600 dark:text-red-400",    bg: "bg-red-50 dark:bg-red-900/20" },
-    { label: "Guru Absen",  value: summary.totalAbsences,  icon: Users,           color: "text-blue-600 dark:text-blue-400",  bg: "bg-blue-50 dark:bg-blue-900/20" },
+    { label: "Guru Absen",  value: summary.totalAbsences,  icon: Users,           color: "text-brand-text dark:text-brand-text",  bg: "bg-brand-soft dark:bg-brand/15" },
     { label: "Blm Kembali", value: summary.notReturned,    icon: AlertTriangle,   color: "text-rose-600 dark:text-rose-400",  bg: "bg-rose-50 dark:bg-rose-900/20" },
   ];
 
@@ -127,7 +127,7 @@ export function LaporanClient({ summary, tardiness, permits, teacherAttendances,
               <div className="space-y-0.5">
                 <TrendBar value={d.tardiness} max={trendMax} color="bg-orange-400" />
                 <TrendBar value={d.permits}   max={trendMax} color="bg-red-400" />
-                <TrendBar value={d.absences}  max={trendMax} color="bg-blue-400" />
+                <TrendBar value={d.absences}  max={trendMax} color="bg-brand" />
               </div>
             </div>
           ))}
@@ -135,7 +135,7 @@ export function LaporanClient({ summary, tardiness, permits, teacherAttendances,
         <div className="mt-3 flex gap-4 text-[10px] text-gray-400">
           <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-orange-400" /> Terlambat</span>
           <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-red-400" /> Izin</span>
-          <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-blue-400" /> Guru Absen</span>
+          <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-brand" /> Guru Absen</span>
         </div>
       </div>
 

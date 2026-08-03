@@ -46,6 +46,7 @@ next-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
+.env.docker.local
 
 # Prisma generated client (di-generate saat build, bukan source code)
 /src/generated/
