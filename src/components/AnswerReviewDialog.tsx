@@ -55,7 +55,7 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
     setLoading(true);
     setCurrentQ(0);
     fetch(`/api/answers/${attemptId}`)
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : null))
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false));

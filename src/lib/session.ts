@@ -26,7 +26,7 @@ async function createSessionToken(userId: string) {
     .sign(getSessionSecret());
 }
 
-async function verifySessionToken(token: string) {
+export async function verifySessionToken(token: string) {
   try {
     const { payload } = await jwtVerify(token, getSessionSecret(), {
       issuer: SESSION_ISSUER,

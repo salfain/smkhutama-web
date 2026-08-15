@@ -101,8 +101,8 @@ export function StudentResultsClient({
                     )}
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between border-t pt-3">
-                  <div className="flex gap-4 text-center text-xs text-gray-500">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3">
+                  <div className="flex flex-wrap gap-4 text-center text-xs text-gray-500">
                     <div><span className="font-semibold text-green-600">{a.correct}</span> Benar</div>
                     <div><span className="font-semibold text-red-500">{a.wrong}</span> Salah</div>
                     <div><span className="font-semibold text-gray-500">{a.empty}</span> Belum Dinilai</div>

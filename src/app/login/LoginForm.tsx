@@ -135,15 +135,15 @@ export function LoginForm({ portal }: { portal: Portal }) {
       <main className="relative flex flex-col lg:items-center lg:justify-center lg:px-8 lg:py-10">
         {/* Header gradien — hanya mobile, supaya identitas warna sistem tetap terlihat
             walau panel kiri (desktop) disembunyikan. */}
-        <div className={`bg-gradient-to-br ${def.theme.panel} px-5 pb-8 pt-6 text-white lg:hidden`}>
+        <div className={`flex flex-col bg-gradient-to-br ${def.theme.panel} px-5 pb-8 pt-6 text-white lg:hidden`}>
           <Link
             href="/login"
-            className="mb-5 inline-flex items-center gap-1.5 text-sm text-white/80 transition-colors hover:text-white"
+            className="mb-5 inline-flex items-center gap-1.5 self-start text-sm text-white/80 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             Pilih halaman login lain
           </Link>
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/25 bg-white/10">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/25 bg-white/10">
             <Icon className="h-5 w-5" />
           </span>
           <h1 className="genesis-heading mt-3 text-xl font-bold">{def.title}</h1>

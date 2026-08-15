@@ -12,6 +12,7 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
+import { verifySessionToken } from "@/lib/session";
 import { isTeacherScheduledForPiket } from "@/lib/piket-schedule";
 import { forbidden, unauthorized } from "./http";
 
@@ -66,8 +67,11 @@ export async function getActor(req: NextRequest) {
     return null;
   }
 
-  const cookieUserId = req.cookies.get(SESSION_COOKIE)?.value;
-  if (cookieUserId) return findActor(cookieUserId);
+  const cookieToken = req.cookies.get(SESSION_COOKIE)?.value;
+  if (cookieToken) {
+    const userId = await verifySessionToken(cookieToken);
+    if (userId) return findActor(userId);
+  }
 
   return null;
 }

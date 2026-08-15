@@ -93,7 +93,7 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
 
       {/* Tabs + tombol ajukan */}
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex gap-1 rounded-xl bg-gray-100 p-1">
+        <div className="flex flex-wrap gap-1 rounded-xl bg-gray-100 p-1">
           {tabs.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${

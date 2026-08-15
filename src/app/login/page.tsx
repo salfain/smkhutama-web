@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from "lucide-react";
+import { getSchoolProfile } from "@/server/modules/shared/school";
 import { PORTAL_GROUPS, portalPath, portals } from "./portals";
 import { getStudentWebLoginEnabled } from "./actions";
 
@@ -19,7 +20,10 @@ export const dynamic = "force-dynamic";
  * server — sekaligus bisa membaca saklar login siswa tanpa perlu efek klien.
  */
 export default async function LoginChooserPage() {
-  const studentLoginEnabled = await getStudentWebLoginEnabled().catch(() => true);
+  const [studentLoginEnabled, profile] = await Promise.all([
+    getStudentWebLoginEnabled().catch(() => true),
+    getSchoolProfile().catch(() => null),
+  ]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA] px-5 py-12 dark:bg-[#111113]">
@@ -34,8 +38,12 @@ export default async function LoginChooserPage() {
 
         <div className="mb-9 flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-[#E8E8EC] bg-[#FFFFFF] dark:border-white/10 dark:bg-[#19191C]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/api/school/logo" alt="Logo SMK Hutama" className="h-10 w-10 object-contain" />
+            {profile?.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src="/api/school/logo" alt="Logo SMK Hutama" className="h-10 w-10 object-contain" />
+            ) : (
+              <ShieldCheck className="h-7 w-7 text-slate-300 dark:text-slate-600" />
+            )}
           </div>
           <div>
             <h1 className="genesis-heading text-3xl font-bold text-[#0A0A0A] dark:text-[#F5F5F7]">
