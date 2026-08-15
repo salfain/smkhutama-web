@@ -5,11 +5,9 @@ import { ArrowRight, BarChart3, CheckSquare, ClipboardList, FileText, MonitorChe
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   DashboardEmpty,
-  DashboardHeader,
   DashboardMetric,
   DashboardPanel,
   DashboardPanelHeader,
-  DashboardPill,
   DashboardSectionHeading,
   GenesisDashboard,
 } from "@/components/dashboard/GenesisDashboard";
@@ -73,13 +71,14 @@ export function TeacherDashboardClient({ teacherName, subjectName, data }: { tea
 
   return (
     <GenesisDashboard>
-      <DashboardHeader
-        eyebrow="Ruang kerja guru"
-        title="Dashboard Guru"
-        description={<>Selamat datang, {teacherName}. Kelola bank soal, ujian, dan evaluasi kelas Anda.</>}
-        meta={<DashboardPill>{subjectName}</DashboardPill>}
-        status={actions}
-      />
+      <div className="mb-10 flex flex-col gap-4 rounded-[20px] bg-gradient-to-br from-[#3B82F6] to-[#1D4ED8] p-6 text-white shadow-[0_16px_40px_-20px_rgba(29,78,216,0.55)] sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[13px] text-white/80">Selamat datang,</p>
+          <h1 className="genesis-heading mt-1 text-[23px] font-extrabold leading-tight">{teacherName}</h1>
+          <span className="mt-3 inline-flex items-center rounded-full bg-white/[0.18] px-3 py-1.5 text-xs font-medium">{subjectName}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      </div>
 
       {dashboard.pendingEssays > 0 && (
         <Link href="/teacher/essay-grading" className="mb-8 flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 text-sm text-amber-900 transition-all hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(245,158,11,0.18)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500/15 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">

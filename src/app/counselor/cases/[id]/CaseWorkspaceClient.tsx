@@ -107,23 +107,23 @@ export function CaseWorkspaceClient({ record }: { record: RecordData }) {
     <div className="p-4 md:p-6 lg:p-8">
       <Link href="/counselor/cases" className="mb-5 inline-flex items-center gap-2 text-sm text-gray-500 hover:text-brand-text dark:text-gray-400"><ArrowLeft className="h-4 w-4" /> Kembali ke daftar kasus</Link>
 
-      <header className="rounded-xl border border-[#E8E8EC] bg-white p-5 dark:border-white/10 dark:bg-[#19191C]">
+      <header className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#6D28D9] to-[#9333EA] p-5 text-white shadow-[0_16px_40px_-20px_rgba(109,40,217,0.55)]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-brand-text dark:bg-brand/10 dark:text-brand-text">Kasus BK</span>
+              <span className="rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide">Kasus BK</span>
               <StatusBadge value={record.status} />
               <RiskBadge value={record.riskLevel} />
             </div>
-            <h1 className="mt-3 font-heading text-2xl font-bold text-gray-900 dark:text-white">{record.title}</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-gray-500 dark:text-gray-400">{record.description || "Belum ada uraian permasalahan."}</p>
+            <h1 className="mt-3 font-heading text-2xl font-bold leading-snug">{record.title}</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/80">{record.description || "Belum ada uraian permasalahan."}</p>
           </div>
           <div className="flex shrink-0 gap-2">
-            <Button variant="outline" asChild><a href={`/counselor/cases/${record.id}/print`} target="_blank" rel="noopener noreferrer"><FileText /> Cetak</a></Button>
-            <Button onClick={() => setSessionOpen(true)} className="bg-brand text-white hover:bg-brand-strong"><MessageSquarePlus /> Catat Pertemuan</Button>
+            <Button variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white" asChild><a href={`/counselor/cases/${record.id}/print`} target="_blank" rel="noopener noreferrer"><FileText /> Cetak</a></Button>
+            <Button onClick={() => setSessionOpen(true)} className="bg-white text-[#6D28D9] hover:bg-white/90"><MessageSquarePlus /> Catat Pertemuan</Button>
           </div>
         </div>
-        <div className="mt-5 grid gap-3 border-t border-[#E8E8EC] pt-5 sm:grid-cols-2 xl:grid-cols-4 dark:border-white/10">
+        <div className="mt-5 grid gap-3 border-t border-white/20 pt-5 sm:grid-cols-2 xl:grid-cols-4">
           <Info icon={UserRound} label="Siswa" value={`${record.student.user.name} · ${record.student.class?.name ?? "Tanpa kelas"}`} />
           <Info icon={Building2} label="Jurusan" value={record.student.major ? `${record.student.major.code} · ${record.student.major.name}` : "–"} />
           <Info icon={MessagesSquare} label="Guru BK" value={record.counselor.user.name} />
@@ -215,7 +215,7 @@ export function CaseWorkspaceClient({ record }: { record: RecordData }) {
 
 function StatusBadge({ value }: { value: string }) { return <span className="rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 dark:bg-white/5 dark:text-gray-300">{statusLabels[value] ?? value}</span>; }
 function RiskBadge({ value }: { value: string }) { const urgent = value === "HIGH" || value === "CRITICAL"; return <span className={cn("rounded-full px-2.5 py-1 text-[10px] font-semibold", urgent ? "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300" : "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300")}>Risiko {riskLabels[value] ?? value}</span>; }
-function Info({ icon: Icon, label, value }: { icon: typeof UserRound; label: string; value: string }) { return <div className="flex items-center gap-3"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F7F7F9] text-brand-text dark:bg-white/5 dark:text-brand-text"><Icon className="h-4 w-4" /></div><div className="min-w-0"><p className="text-[10px] uppercase tracking-wide text-gray-400">{label}</p><p className="mt-0.5 truncate text-xs font-medium text-gray-700 dark:text-gray-300">{value}</p></div></div>; }
+function Info({ icon: Icon, label, value }: { icon: typeof UserRound; label: string; value: string }) { return <div className="flex items-center gap-3"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white"><Icon className="h-4 w-4" /></div><div className="min-w-0"><p className="text-[10px] uppercase tracking-wide text-white/60">{label}</p><p className="mt-0.5 truncate text-xs font-medium text-white/95">{value}</p></div></div>; }
 function TabButton({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count: number | null }) { return <button type="button" onClick={onClick} className={cn("flex min-h-10 items-center justify-center gap-2 rounded-lg px-2 text-xs font-semibold transition-colors sm:text-sm", active ? "bg-brand-soft text-brand-text dark:bg-brand/10 dark:text-brand-text" : "text-gray-500 hover:bg-[#F7F7F9] dark:text-gray-400 dark:hover:bg-white/5")}>{label}{count !== null && <span className="rounded-full bg-white px-1.5 py-0.5 text-[9px] text-gray-500 shadow-sm dark:bg-white/10 dark:text-gray-300">{count}</span>}</button>; }
 function FormSelect({ name, label, defaultValue, children }: { name: string; label: string; defaultValue: string; children: React.ReactNode }) { const [value, setValue] = useState(defaultValue); return <div className="space-y-1.5"><Label>{label}</Label><input type="hidden" name={name} value={value} /><Select value={value} onValueChange={setValue}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{children}</SelectContent></Select></div>; }
 function Empty({ icon: Icon, text }: { icon: typeof MessagesSquare; text: string }) { return <div className="rounded-lg border border-dashed border-[#DADAE0] px-4 py-10 text-center dark:border-white/10"><Icon className="mx-auto h-7 w-7 text-gray-300 dark:text-gray-600" /><p className="mt-2 text-sm text-gray-400">{text}</p></div>; }

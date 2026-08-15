@@ -6,7 +6,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   const user = await requireAuth("TEACHER");
 
   return (
-    <div className="genesis-app flex h-screen overflow-hidden bg-[#FAFAFA] dark:bg-[#111113]">
+    <div className="genesis-app cbt-scope flex h-screen overflow-hidden bg-[#FAFAFA] dark:bg-[#111113]">
       <TeacherSidebar user={{
         name: user.name,
         subjectName: user.teacher?.subject?.name ?? null,
