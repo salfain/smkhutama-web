@@ -10,12 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Flag, ChevronLeft, ChevronRight, Send, Grid3X3,
-  Clock, CheckCircle, AlertCircle, ShieldAlert,
+  Clock, CheckCircle, AlertCircle, ShieldAlert, Lock,
 } from "lucide-react";
-import { saveAnswer, submitExam } from "../actions";
+import { saveAnswer, submitExam, reportViolation, checkAttemptLock } from "../actions";
 import { MathText } from "@/components/MathText";
-
-const MAX_VIOLATIONS = 5; // setelah ini, ujian otomatis di-submit
+import { LOCK_THRESHOLD } from "@/lib/exam-lock";
 
 type Option = { id: string; label: string; text: string };
 type Question = {
@@ -39,10 +38,14 @@ type Props = {
   initialAnswers: Record<string, AnswerState>;
   expiresAt: string;
   randomizeOptions: boolean;
+  initialLocked: boolean;
+  initialViolationCount: number;
+  initialLockReason: string | null;
 };
 
 export function TakeExam({
   examId, title, subjectCode, questions: rawQuestions, initialAnswers, expiresAt, randomizeOptions,
+  initialLocked, initialViolationCount, initialLockReason,
 }: Props) {
   const router = useRouter();
 
@@ -64,38 +67,44 @@ export function TakeExam({
   const [showSubmit, setShowSubmit] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [violations, setViolations] = useState(0);
+  const [violations, setViolations] = useState(initialViolationCount);
   const [showWarning, setShowWarning] = useState(false);
+  const [locked, setLocked] = useState(initialLocked);
+  const [lockReason, setLockReason] = useState(initialLockReason);
   const submittedRef = useRef(false);
+  const lockedRef = useRef(initialLocked);
+  const reportingRef = useRef(false);
 
-  // Auto-submit helper
-  const autoSubmit = useRef(async () => {
-    if (submittedRef.current) return;
-    submittedRef.current = true;
-    await submitExam(examId, true);
-    router.push(`/student/exams/${examId}/finish`);
-  });
+  useEffect(() => { lockedRef.current = locked; }, [locked]);
 
   // ===== ANTI-CHEAT =====
+  // Pelanggaran dicatat & dihitung di server — sumber yang sama dengan
+  // aplikasi mobile — supaya ambang batas dan status kunci tidak hilang saat
+  // halaman dimuat ulang, dan pengawas bisa membuka kuncinya dari monitoring.
   useEffect(() => {
-    function registerViolation() {
-      if (submittedRef.current) return;
-      setViolations((v) => {
-        const next = v + 1;
-        if (next >= MAX_VIOLATIONS) {
-          void autoSubmit.current();
+    async function reportAndHandle(reason: string) {
+      if (submittedRef.current || lockedRef.current || reportingRef.current) return;
+      reportingRef.current = true;
+      try {
+        const result = await reportViolation(examId, reason);
+        if ("error" in result || result.finished) return;
+        setViolations(result.violationCount);
+        if (result.locked) {
+          setLocked(true);
+          setLockReason(result.lockReason ?? null);
         } else {
           setShowWarning(true);
         }
-        return next;
-      });
+      } finally {
+        setTimeout(() => { reportingRef.current = false; }, 800);
+      }
     }
     function onVisibility() {
-      if (document.hidden) registerViolation();
+      if (document.hidden) void reportAndHandle("Berpindah tab/aplikasi");
     }
     function onBlur() {
       // pindah ke aplikasi/jendela lain
-      registerViolation();
+      void reportAndHandle("Berpindah jendela/aplikasi");
     }
     function blockContext(e: Event) { e.preventDefault(); }
     function blockCopy(e: Event) { e.preventDefault(); }
@@ -120,7 +129,23 @@ export function TakeExam({
       document.removeEventListener("cut", blockCopy);
       document.removeEventListener("keydown", blockKeys);
     };
-  }, []);
+  }, [examId]);
+
+  // Selagi terkunci, tanya server tiap 5 detik apakah pengawas sudah membuka kuncinya.
+  useEffect(() => {
+    if (!locked) return;
+    const t = setInterval(async () => {
+      if (submittedRef.current) return;
+      const result = await checkAttemptLock(examId);
+      if ("error" in result || result.finished) return;
+      if (!result.locked) {
+        setLocked(false);
+        setLockReason(null);
+        setViolations(0);
+      }
+    }, 5000);
+    return () => clearInterval(t);
+  }, [locked, examId]);
 
   // Timer + auto submit
   useEffect(() => {
@@ -268,9 +293,9 @@ export function TakeExam({
           <Clock className="h-4 w-4" />{formatTime(timeLeft)}
         </div>
         <div className="flex items-center gap-2">
-          {violations > 0 && (
+          {violations > 0 && !locked && (
             <span className="hidden sm:inline-flex items-center gap-1 rounded-lg bg-red-100 px-2 py-1 text-xs font-bold text-red-700">
-              <ShieldAlert className="h-3.5 w-3.5" />{violations}/{MAX_VIOLATIONS}
+              <ShieldAlert className="h-3.5 w-3.5" />{violations}/{LOCK_THRESHOLD}
             </span>
           )}
           <Progress value={progress} className="hidden w-24 sm:block h-2" />
@@ -378,7 +403,7 @@ export function TakeExam({
               Anda terdeteksi meninggalkan halaman ujian (pindah tab/aplikasi). Tetap berada di halaman ujian hingga selesai.
             </p>
             <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-              Pelanggaran ke-<b>{violations}</b> dari {MAX_VIOLATIONS}. Setelah {MAX_VIOLATIONS} kali, ujian akan otomatis dikumpulkan.
+              Pelanggaran ke-<b>{violations}</b> dari {LOCK_THRESHOLD}. Setelah {LOCK_THRESHOLD} kali, ujian akan otomatis <b>dikunci</b> dan hanya bisa dibuka oleh guru pengawas atau Admin CBT.
             </div>
             <Button className="w-full bg-brand hover:bg-brand-strong" onClick={() => setShowWarning(false)}>
               Saya Mengerti
@@ -415,6 +440,27 @@ export function TakeExam({
           </div>
         </DialogContent>
       </Dialog>
+
+      {locked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 text-center shadow-xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <Lock className="h-7 w-7" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">Ujian Terkunci</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Anda meninggalkan halaman ujian sebanyak {LOCK_THRESHOLD} kali. Ujian dikunci untuk mencegah kecurangan.
+            </p>
+            {lockReason && <p className="mt-1 text-xs text-gray-400">Alasan: {lockReason}</p>}
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
+              Minta guru pengawas atau Admin CBT membuka kunci ujian Anda dari halaman monitoring. Jangan tutup halaman ini — ujian akan lanjut otomatis begitu dibuka.
+            </div>
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />Menunggu guru membuka kunci...
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
