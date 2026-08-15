@@ -26,7 +26,7 @@ export default async function HomeVisitPrintPage({ params }: { params: Promise<{
   const nomorSurat = `KR-${new Date(visit.visitDate).getFullYear()}-${id.slice(-4).toUpperCase()}`;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
+    <div className="min-h-screen bg-[#F5F3FF] py-8 print:bg-white print:py-0">
       <PrintButtonsPurple />
 
       <div className="mx-auto max-w-2xl bg-white p-12 shadow-lg print:max-w-none print:shadow-none print:p-8">
