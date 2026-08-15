@@ -356,7 +356,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               <Input id="title" name="title" defaultValue={editing?.title ?? ""} placeholder="cth: UTS Matematika XII TKJ 1" required />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Jenis Ujian *</Label>
                 <Select value={examType} onValueChange={(v) => {
@@ -448,7 +448,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                 )}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                 <div className="space-y-1.5">
                   <Label htmlFor="requestedMultipleChoiceCount">Jumlah PG</Label>
                   <Input
@@ -527,7 +527,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="startAt">Waktu Mulai *</Label>
                 <Input
@@ -546,7 +546,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <Label htmlFor="durationMinutes">Durasi (menit) *</Label>
                 <Input id="durationMinutes" name="durationMinutes" type="number" min="1" defaultValue={editing?.durationMinutes ?? 90} required />
@@ -585,9 +585,9 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
 
             <div className="space-y-1.5">
               <Label>Kelas Peserta</Label>
-              <div className="rounded-lg border bg-gray-50 p-3 grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+              <div className="rounded-lg border bg-gray-50 p-3 grid grid-cols-1 gap-2 sm:grid-cols-2 max-h-40 overflow-y-auto">
                 {opts.classes.length === 0 ? (
-                  <p className="col-span-2 text-xs text-gray-400">Belum ada kelas. <a href="/admin/classes" className="underline">Buat kelas dulu</a></p>
+                  <p className="sm:col-span-2 text-xs text-gray-400">Belum ada kelas. <a href="/admin/classes" className="underline">Buat kelas dulu</a></p>
                 ) : opts.classes.map((c) => (
                   <label key={c.id} className="flex items-center gap-2 cursor-pointer text-sm">
                     <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-brand-text"

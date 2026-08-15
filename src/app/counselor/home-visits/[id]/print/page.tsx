@@ -83,16 +83,17 @@ export default async function HomeVisitPrintPage({ params }: { params: Promise<{
 
         {/* TTD */}
         <div className="mt-10 flex justify-between text-sm">
-          <div className="text-center w-52">
+          <div className="w-56 text-center">
+            <p className="invisible">.</p>
             <p>Orang Tua / Wali,</p>
-            <div className="h-20" />
-            <p className="font-semibold">( ________________________ )</p>
+            <div className="mt-16 border-b border-gray-400" />
+            <p className="mt-1 whitespace-nowrap">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</p>
           </div>
-          <div className="text-center w-52">
-            <p>{school?.address ? school.address.split(",").slice(-1)[0]?.trim() : "Bekasi"}, {fmtDate(visit.visitDate)}</p>
+          <div className="w-56 text-center">
+            <p className="whitespace-nowrap">{school?.address ? school.address.split(",").slice(-1)[0]?.trim() : "Bekasi"}, {fmtDate(visit.visitDate)}</p>
             <p className="mt-1">Guru Bimbingan Konseling,</p>
-            <div className="h-16" />
-            <p className="font-semibold underline">{visit.counselor.user.name}</p>
+            <div className="mt-12 border-b border-gray-400" />
+            <p className="mt-1 font-semibold whitespace-nowrap">{visit.counselor.user.name}</p>
             <p className="text-xs text-gray-500">Guru BK</p>
           </div>
         </div>

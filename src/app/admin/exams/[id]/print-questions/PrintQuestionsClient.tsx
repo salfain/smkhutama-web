@@ -207,17 +207,17 @@ export function PrintQuestionsClient({
           {/* Tanda tangan */}
           <div className="mt-12 pt-4 border-t border-gray-300">
             <div className="flex justify-between text-xs text-gray-600">
-              <div className="text-center w-40">
+              <div className="w-48 text-center">
                 <p>Mengetahui,</p>
                 <p>Kepala Sekolah</p>
                 <div className="mt-10 border-b border-gray-400" />
-                <p className="mt-1">( ____________________ )</p>
+                <p className="mt-1 whitespace-nowrap">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</p>
               </div>
-              <div className="text-center w-40">
+              <div className="w-48 text-center">
                 <p>Guru Mata Pelajaran</p>
                 <p className="text-gray-400">({exam.subject.code})</p>
                 <div className="mt-10 border-b border-gray-400" />
-                <p className="mt-1">{exam.teacherName}</p>
+                <p className="mt-1 whitespace-nowrap">{exam.teacherName}</p>
               </div>
             </div>
           </div>
