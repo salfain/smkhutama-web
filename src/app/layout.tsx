@@ -1,9 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ConfirmProvider } from "@/components/ConfirmDialog";
+import { PWARegister } from "@/components/PWARegister";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  themeColor: "#003a9e",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://smkhutama.web.id"),
@@ -20,6 +26,11 @@ export const metadata: Metadata = {
     ],
     shortcut: "/uploads/school/logo.png",
     apple: "/uploads/school/logo.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SMK Hutama",
   },
   openGraph: {
     type: "website",
@@ -61,6 +72,8 @@ export default function RootLayout({
           <ConfirmProvider>
             {children}
           </ConfirmProvider>
+          <PWARegister />
+          <PWAInstallPrompt />
         </ThemeProvider>
       </body>
     </html>
