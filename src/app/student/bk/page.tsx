@@ -20,9 +20,10 @@ export default async function StudentBkPage() {
   }
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6">
-      <div className="mb-6">
-        <h1 className="font-heading text-xl font-bold text-gray-900">Bimbingan Konseling</h1>
-        <p className="text-sm text-gray-500">Poin, riwayat konseling, angket, dan ajukan permohonan konseling.</p>
+      <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#6D28D9] to-[#9333EA] p-5 text-white shadow-[0_16px_40px_-20px_rgba(109,40,217,0.55)]">
+        <p className="font-heading text-sm font-bold tracking-wide">SIBIKONS</p>
+        <h1 className="genesis-heading mt-1 text-[22px] font-extrabold leading-tight">Bimbingan Konseling</h1>
+        <p className="mt-1 text-[13px] text-white/80">Poin, riwayat konseling, angket, dan ajukan permohonan konseling.</p>
       </div>
       <StudentBkClient data={data} surveys={surveys} />
     </div>

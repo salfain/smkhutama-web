@@ -496,6 +496,24 @@
   --brand-soft: rgba(59, 130, 246, 0.14);
 }
 
+/* Area SIBIKONS (BK) — siswa & guru BK — memakai ungu khas sistem, sesuai
+   tema "purple" di portals.ts. */
+.genesis-app.bk-scope {
+  --brand: #7c3aed;
+  --brand-strong: #6d28d9;
+  --brand-ink: #ffffff;
+  --brand-text: #6d28d9;
+  --brand-soft: #ede9fe;
+}
+
+.dark .genesis-app.bk-scope {
+  --brand: #8b5cf6;
+  --brand-strong: #a78bfa;
+  --brand-ink: #ffffff;
+  --brand-text: #c4b5fd;
+  --brand-soft: rgba(139, 92, 246, 0.14);
+}
+
 /* ============================================
    LANDING PAGE — Liquid Glass & Visual Effects
    ============================================ */

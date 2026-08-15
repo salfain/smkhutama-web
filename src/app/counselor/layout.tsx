@@ -5,7 +5,7 @@ import { PageTransition } from "@/components/PageTransition";
 export default async function CounselorLayout({ children }: { children: React.ReactNode }) {
   const user = await requireCounselorAuth();
   return (
-    <div className="genesis-app flex h-screen overflow-hidden bg-[#FAFAFA] dark:bg-[#111113]">
+    <div className="genesis-app bk-scope flex h-screen overflow-hidden bg-[#FAFAFA] dark:bg-[#111113]">
       <CounselorSidebar user={{ name: user.name }} />
       <main className="flex-1 overflow-y-auto flex flex-col pb-24 lg:pb-0">
         <PageTransition>

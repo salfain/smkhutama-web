@@ -46,11 +46,11 @@ export default async function CounselorDashboard() {
 
   return (
     <GenesisDashboard>
-      <DashboardHeader
-        eyebrow="Bimbingan konseling"
-        title="Dashboard BK"
-        description="Pantau kegiatan konseling, permohonan layanan, pelanggaran, dan prestasi siswa."
-      />
+      <div className="mb-10 rounded-[24px] bg-gradient-to-br from-[#6D28D9] to-[#9333EA] p-[22px] text-white shadow-[0_16px_40px_-20px_rgba(109,40,217,0.55)]">
+        <p className="text-[13px] text-white/75">Selamat datang,</p>
+        <h1 className="genesis-heading mt-1 text-[23px] font-extrabold leading-tight">Guru BK</h1>
+        <p className="mt-1 text-[12.5px] text-white/80">Pantau kegiatan konseling, permohonan layanan, pelanggaran, dan prestasi siswa.</p>
+      </div>
 
       <section className="mb-10" aria-labelledby="bk-summary">
         <DashboardSectionHeading title="Ringkasan layanan" description="Indikator utama pendampingan siswa." />
