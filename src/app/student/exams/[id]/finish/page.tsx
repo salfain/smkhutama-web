@@ -23,18 +23,19 @@ export default async function FinishPage({ params }: { params: Promise<{ id: str
   const score = attempt.score;
 
   const showResult = attempt.exam.showResult;
+  const isAutoSubmit = attempt.status === "AUTO_SUBMITTED";
 
   return (
     <div className="mx-auto max-w-lg p-4 md:p-6">
       <div className={`mb-5 rounded-2xl p-6 text-center text-white ${
         isWaiting ? "bg-gradient-to-br from-gray-500 to-gray-600"
         : passed ? "bg-gradient-to-br from-green-500 to-emerald-600"
-        : "bg-gradient-to-br from-brand to-red-500"
+        : "bg-gradient-to-br from-red-500 to-rose-600"
       }`}>
         <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
           {isWaiting ? <Hourglass className="h-8 w-8" /> : passed ? <Trophy className="h-8 w-8" /> : <CheckCircle className="h-8 w-8" />}
         </div>
-        <h1 className="font-heading text-2xl font-bold">Ujian Selesai!</h1>
+        <h1 className="font-heading text-2xl font-bold">{isAutoSubmit ? "Waktu Habis" : "Ujian Selesai!"}</h1>
         <p className="mt-1 text-white/80 text-sm">{attempt.exam.title} · {attempt.exam.subject.name}</p>
         {isWaiting ? (
           <>

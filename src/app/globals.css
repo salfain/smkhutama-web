@@ -477,6 +477,25 @@
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
 }
 
+/* Area CBT siswa (dashboard + alur ujian) memakai biru khas sistem CBT,
+   bukan amber generik genesis — lihat portals.ts tema "blue". Diaktifkan
+   di student/layout.tsx hanya saat system === "CBT", jadi BK tetap amber. */
+.genesis-app.cbt-scope {
+  --brand: #1d4ed8;
+  --brand-strong: #3b82f6;
+  --brand-ink: #ffffff;
+  --brand-text: #1d4ed8;
+  --brand-soft: #dbeafe;
+}
+
+.dark .genesis-app.cbt-scope {
+  --brand: #3b82f6;
+  --brand-strong: #60a5fa;
+  --brand-ink: #ffffff;
+  --brand-text: #93c5fd;
+  --brand-soft: rgba(59, 130, 246, 0.14);
+}
+
 /* ============================================
    LANDING PAGE — Liquid Glass & Visual Effects
    ============================================ */

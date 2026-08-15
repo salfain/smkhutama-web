@@ -10,7 +10,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   const system = cookieStore.get("student-system")?.value === "SIBIKONS" ? "SIBIKONS" : "CBT";
 
   return (
-    <div className="genesis-app min-h-screen bg-[#FAFAFA] dark:bg-[#111113]">
+    <div className={`genesis-app ${system === "CBT" ? "cbt-scope" : ""} min-h-screen bg-[#FAFAFA] dark:bg-[#111113]`}>
       {/* Header tampil di semua halaman siswa kecuali halaman test (sudah punya top-bar sendiri) */}
       <StudentHeaderWrapper user={{
         name: user.name,

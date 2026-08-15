@@ -5,7 +5,6 @@ import { AlertCircle, ArrowRight, CalendarDays, ClipboardCheck, Clock, Trophy } 
 import { Badge } from "@/components/ui/badge";
 import {
   DashboardEmpty,
-  DashboardHeader,
   DashboardPanel,
   DashboardPanelHeader,
   DashboardPill,
@@ -34,18 +33,15 @@ export default async function StudentDashboard() {
 
   return (
     <GenesisDashboard className="max-w-6xl">
-      <DashboardHeader
-        eyebrow="Portal siswa"
-        title="Dashboard Siswa"
-        description={<>Selamat datang, {user.name}. Lihat jadwal ujian dan perkembangan hasil belajar Anda.</>}
-        meta={
-          <>
-            <DashboardPill>{user.student.class?.name ?? "Kelas belum ditentukan"}</DashboardPill>
-            {user.student.nis && <DashboardPill>NIS {user.student.nis}</DashboardPill>}
-          </>
-        }
-        status={<DashboardPill>{today}</DashboardPill>}
-      />
+      <div className="mb-10 rounded-[20px] bg-gradient-to-br from-[#1D4ED8] to-[#3B82F6] p-[22px] text-white shadow-[0_16px_40px_-20px_rgba(29,78,216,0.55)]">
+        <p className="text-[13px] text-white/80">Selamat datang kembali</p>
+        <h1 className="genesis-heading mt-1 text-[24px] font-extrabold leading-tight">{user.name}</h1>
+        <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/[0.18] px-3 py-1.5 font-mono text-[11px]">
+          {user.student.class?.name ?? "Kelas belum ditentukan"}
+          {user.student.nis && <>· NIS: {user.student.nis}</>}
+        </span>
+        <p className="mt-4 text-xs text-white/70">{today}</p>
+      </div>
 
       <section className="mb-10" aria-labelledby="today-exams">
         <DashboardSectionHeading title="Ujian hari ini" description="Ujian yang tersedia sesuai jadwal kelas Anda." action={todayExams.length > 0 ? <DashboardPill tone="success">{todayExams.length} tersedia</DashboardPill> : undefined} />
@@ -70,7 +66,9 @@ export default async function StudentDashboard() {
                       <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-[#9C9C9C]" /> {formatTime(exam.startAt)}–{formatTime(exam.endAt)}</span>
                       <span className="flex items-center gap-2"><ClipboardCheck className="h-3.5 w-3.5 text-[#9C9C9C]" /> {exam._count.questions} soal · {exam.durationMinutes} menit</span>
                     </div>
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-text group-hover:text-brand-text">Masuk ujian <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+                    <span className="mt-5 flex items-center justify-center gap-1.5 rounded-[10px] bg-brand py-[13px] text-sm font-semibold text-white transition-colors group-hover:bg-brand-strong">
+                      Masuk Ujian <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
                   </Link>
                 );
               })}
@@ -127,8 +125,14 @@ export default async function StudentDashboard() {
                         <p className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A7A7AE]">{attempt.exam.subject.code}{attempt.submittedAt ? ` · ${formatDate(attempt.submittedAt)}` : ""}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className={`genesis-heading text-xl font-semibold ${attempt.score === null ? "text-[#9C9C9C]" : passed ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>{attempt.score ?? "—"}</p>
-                        {attempt.exam.passingScore !== null && <p className="text-[11px] text-[#9C9C9C]">KKM {attempt.exam.passingScore}</p>}
+                        <span className={`genesis-heading inline-block rounded-[9px] px-3 py-1 text-sm font-bold ${
+                          attempt.score === null
+                            ? "bg-[#F5F5F7] text-[#6B6B6B] dark:bg-white/5 dark:text-[#A7A7AE]"
+                            : passed
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                            : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
+                        }`}>{attempt.score ?? "—"}</span>
+                        {attempt.exam.passingScore !== null && <p className="mt-1 text-[11px] text-[#9C9C9C]">KKM {attempt.exam.passingScore}</p>}
                       </div>
                     </div>
                   );

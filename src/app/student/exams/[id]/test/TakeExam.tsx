@@ -283,13 +283,13 @@ export function TakeExam({
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
-      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-brand" : "bg-white"}`}>
+      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-orange-600" : "bg-white"}`}>
         <div className={`text-sm font-medium ${isCritical || isWarning ? "text-white" : "text-gray-700"}`}>
           <span className="font-semibold">{subjectCode}</span>
           <span className="mx-2 opacity-40">·</span>
           <span className="text-xs opacity-75 truncate max-w-[200px] inline-block align-bottom">{title}</span>
         </div>
-        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-brand text-white" : "bg-gray-100 text-gray-800"}`}>
+        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-orange-700 text-white" : "bg-gray-100 text-gray-800"}`}>
           <Clock className="h-4 w-4" />{formatTime(timeLeft)}
         </div>
         <div className="flex items-center gap-2">
@@ -343,8 +343,8 @@ export function TakeExam({
                     <button
                       key={opt.id}
                       onClick={() => selectOption(q.id, opt.id)}
-                      className={`group flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-                        selected ? "border-brand bg-brand-soft shadow-sm" : "border-gray-200 bg-white hover:border-brand-soft hover:bg-brand-soft"
+                      className={`group flex w-full items-center gap-3 rounded-xl p-4 text-left transition-all ${
+                        selected ? "border-2 border-brand bg-brand-soft shadow-sm" : "border border-gray-200 bg-white hover:border-brand-soft hover:bg-brand-soft"
                       }`}
                     >
                       <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors ${

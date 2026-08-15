@@ -87,10 +87,10 @@ export function LoginForm({ portal }: { portal: Portal }) {
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#111113] lg:grid lg:grid-cols-[1.05fr_1fr]">
       {redirecting && <FullScreenLoader message="Mengarahkan ke dashboard..." accent={def.system === "SIBIKONS" ? "purple" : "blue"} />}
 
-      {/* ── Panel kiri: identitas portal ── */}
-      <aside className="hidden bg-[#0A0A0A] p-12 text-white lg:flex lg:flex-col lg:justify-between">
+      {/* ── Panel kiri: identitas portal (desktop) ── */}
+      <aside className={`hidden bg-gradient-to-br ${def.theme.panel} p-12 text-white lg:flex lg:flex-col lg:justify-between`}>
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-white/15 bg-white/5">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-white/25 bg-white/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/api/school/logo"
@@ -106,17 +106,17 @@ export function LoginForm({ portal }: { portal: Portal }) {
         </div>
 
         <div className="max-w-md">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium">
             <Icon className="h-3.5 w-3.5" />
             {def.audience}
           </span>
           <h2 className="genesis-heading mt-5 text-4xl font-bold leading-tight">{def.title}</h2>
-          <p className="mt-4 text-sm leading-relaxed text-white/75">{def.tagline}</p>
+          <p className="mt-4 text-sm leading-relaxed text-white/80">{def.tagline}</p>
 
           <ul className="mt-9 space-y-3.5">
             {def.features.map((t) => (
               <li key={t} className="flex items-center gap-3 text-sm text-white/90">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10">
                   <Check className="h-3 w-3" strokeWidth={3} />
                 </span>
                 {t}
@@ -125,18 +125,35 @@ export function LoginForm({ portal }: { portal: Portal }) {
           </ul>
         </div>
 
-        <p className="flex items-center gap-2 text-xs text-white/60">
+        <p className="flex items-center gap-2 text-xs text-white/65">
           <ShieldCheck className="h-3.5 w-3.5" />
           Akses terbatas untuk civitas SMK Hutama
         </p>
       </aside>
 
       {/* ── Panel kanan: formulir ── */}
-      <main className="relative flex items-center justify-center px-5 py-10 sm:px-8">
-        <div className="w-full max-w-md">
+      <main className="relative flex flex-col lg:items-center lg:justify-center lg:px-8 lg:py-10">
+        {/* Header gradien — hanya mobile, supaya identitas warna sistem tetap terlihat
+            walau panel kiri (desktop) disembunyikan. */}
+        <div className={`bg-gradient-to-br ${def.theme.panel} px-5 pb-8 pt-6 text-white lg:hidden`}>
           <Link
             href="/login"
-            className="mb-7 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            className="mb-5 inline-flex items-center gap-1.5 text-sm text-white/80 transition-colors hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Pilih halaman login lain
+          </Link>
+          <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/25 bg-white/10">
+            <Icon className="h-5 w-5" />
+          </span>
+          <h1 className="genesis-heading mt-3 text-xl font-bold">{def.title}</h1>
+          <p className="mt-0.5 text-sm text-white/80">{def.subtitle}</p>
+        </div>
+
+        <div className="w-full max-w-md px-5 py-8 sm:px-8">
+          <Link
+            href="/login"
+            className="mb-7 hidden items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-900 lg:inline-flex dark:text-slate-400 dark:hover:text-slate-100"
           >
             <ArrowLeft className="h-4 w-4" />
             Pilih halaman login lain
@@ -144,7 +161,7 @@ export function LoginForm({ portal }: { portal: Portal }) {
 
           <div className="overflow-hidden rounded-xl border border-[#E8E8EC] bg-[#FFFFFF] dark:border-white/10 dark:bg-[#19191C]">
             <div className="p-7 sm:p-8">
-              <div className="mb-6 flex items-start gap-3.5">
+              <div className="mb-6 hidden items-start gap-3.5 lg:flex">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#F5F5F7] text-[#6B6B6B] dark:bg-white/5 dark:text-[#A7A7AE]">
                   <Icon className="h-5 w-5" />
                 </span>
@@ -168,7 +185,7 @@ export function LoginForm({ portal }: { portal: Portal }) {
                   <Label htmlFor="username" className="text-slate-700 dark:text-slate-300">
                     {identityLabel}
                   </Label>
-                  <div className="login-field-shell flex h-11 items-center overflow-hidden rounded-md border border-[#E8E8EC] bg-[#FFFFFF] pl-3.5 transition-all focus-within:border-brand focus-within:ring-[3px] focus-within:ring-brand/15 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className={`login-field-shell flex h-11 items-center overflow-hidden rounded-md border border-[#E8E8EC] bg-[#FFFFFF] pl-3.5 transition-all ${def.theme.field} dark:border-white/10 dark:bg-white/[0.03]`}>
                     <User className="h-4 w-4 shrink-0 text-slate-400" />
                     <Input
                       id="username"
@@ -184,7 +201,7 @@ export function LoginForm({ portal }: { portal: Portal }) {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-slate-700 dark:text-slate-300">Password</Label>
-                  <div className="login-field-shell flex h-11 items-center overflow-hidden rounded-md border border-[#E8E8EC] bg-[#FFFFFF] pl-3.5 pr-1.5 transition-all focus-within:border-brand focus-within:ring-[3px] focus-within:ring-brand/15 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className={`login-field-shell flex h-11 items-center overflow-hidden rounded-md border border-[#E8E8EC] bg-[#FFFFFF] pl-3.5 pr-1.5 transition-all ${def.theme.field} dark:border-white/10 dark:bg-white/[0.03]`}>
                     <Lock className="h-4 w-4 shrink-0 text-slate-400" />
                     <Input
                       id="password"
@@ -218,7 +235,7 @@ export function LoginForm({ portal }: { portal: Portal }) {
 
                 <Button
                   type="submit"
-                  className="h-11 w-full rounded-md bg-brand text-[15px] font-semibold text-white transition-all hover:bg-brand-strong hover:shadow-[0_4px_12px_rgba(99,102,241,0.35)] active:scale-[0.99]"
+                  className={`h-11 w-full rounded-md text-[15px] font-semibold text-white shadow-none transition-all active:scale-[0.99] ${def.theme.button}`}
                   disabled={pending}
                 >
                   {pending ? (

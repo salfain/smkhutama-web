@@ -5,17 +5,19 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   ClipboardList, Clock, BookOpen, User, School, AlertTriangle, ArrowRight,
+  Wifi, Save, DoorClosed, Timer,
 } from "lucide-react";
 import { startAttempt } from "../actions";
+import { LOCK_THRESHOLD } from "@/lib/exam-lock";
 
-const rules = [
-  "Pastikan koneksi internet stabil selama ujian berlangsung.",
-  "Jawaban tersimpan otomatis setiap kali memilih jawaban.",
-  "Jangan menutup browser atau tab selama ujian.",
-  "Tandai soal yang ragu-ragu untuk ditinjau kembali.",
-  "Klik tombol Selesai Ujian untuk mengakhiri ujian.",
-  "Jika waktu habis, jawaban akan tersubmit otomatis.",
-  "Tidak diperkenankan membuka tab/aplikasi lain.",
+const rules: { icon: typeof Wifi; bg: string; text: string }[] = [
+  { icon: Wifi, bg: "bg-blue-50", text: "Pastikan koneksi internet stabil selama ujian berlangsung." },
+  { icon: Save, bg: "bg-emerald-50", text: "Jawaban tersimpan otomatis setiap kali memilih jawaban." },
+  { icon: DoorClosed, bg: "bg-red-50", text: `Keluar dari halaman ujian ${LOCK_THRESHOLD}× membuat ujian terkunci.` },
+  { icon: Timer, bg: "bg-indigo-50", text: "Waktu habis? Jawaban otomatis dikumpulkan." },
+  { icon: AlertTriangle, bg: "bg-amber-50", text: "Tandai soal yang ragu-ragu untuk ditinjau kembali." },
+  { icon: ClipboardList, bg: "bg-amber-50", text: "Klik tombol Selesai Ujian untuk mengakhiri ujian." },
+  { icon: AlertTriangle, bg: "bg-amber-50", text: "Tidak diperkenankan membuka tab/aplikasi lain." },
 ];
 
 type Props = {
@@ -45,10 +47,16 @@ export function ConfirmStart({
 
   return (
     <div className="mx-auto max-w-xl p-4 md:p-6">
-      <div className="mb-4 rounded-xl border-2 border-brand-soft bg-brand-soft p-4 text-center">
-        <ClipboardList className="mx-auto mb-2 h-8 w-8 text-brand-text" />
-        <h1 className="font-heading text-xl font-bold text-gray-900">{title}</h1>
-        <p className="text-sm text-gray-500">{subjectName}</p>
+      <div className="mb-4 rounded-2xl bg-gradient-to-br from-[#1D4ED8] to-[#3B82F6] p-5 text-center text-white shadow-[0_16px_40px_-20px_rgba(29,78,216,0.55)]">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-white/75">Token Terverifikasi</p>
+        <h1 className="font-heading mt-1 text-xl font-bold">{title}</h1>
+        <div className="mt-4 flex items-center justify-center gap-4 font-mono text-[17px]">
+          <span>{duration} menit</span>
+          <span className="h-4 w-px bg-white/30" />
+          <span>{questions} soal</span>
+          <span className="h-4 w-px bg-white/30" />
+          <span>Batas keluar {LOCK_THRESHOLD}×</span>
+        </div>
       </div>
 
       <div className="mb-4 rounded-xl border bg-white p-5 shadow-sm">
@@ -71,8 +79,8 @@ export function ConfirmStart({
           <div className="flex items-center gap-2 text-gray-600">
             <BookOpen className="h-4 w-4 text-gray-400" />
             <div>
-              <p className="text-xs text-gray-400">Jumlah Soal</p>
-              <p className="font-medium text-gray-800">{questions} soal</p>
+              <p className="text-xs text-gray-400">Mapel</p>
+              <p className="font-medium text-gray-800">{subjectName}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-gray-600">
@@ -92,18 +100,18 @@ export function ConfirmStart({
         </div>
       </div>
 
-      <div className="mb-5 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <p className="text-sm font-semibold text-yellow-800">Tata Tertib Ujian</p>
-        </div>
-        <ol className="space-y-1.5">
-          {rules.map((r, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs text-yellow-800">
-              <span className="shrink-0 font-bold">{i + 1}.</span>{r}
-            </li>
+      <div className="mb-5 rounded-xl border bg-white p-4 shadow-sm">
+        <p className="mb-3 text-sm font-semibold text-gray-700">Tata Tertib Ujian</p>
+        <div className="space-y-2.5">
+          {rules.map((rule, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <span className={`flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[10px] ${rule.bg}`}>
+                <rule.icon className="h-4 w-4 text-gray-600" />
+              </span>
+              <p className="text-[13px] text-gray-700">{rule.text}</p>
+            </div>
           ))}
-        </ol>
+        </div>
       </div>
 
       <Button
