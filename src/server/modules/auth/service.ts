@@ -84,6 +84,20 @@ export async function checkCredentials(input: LoginInput): Promise<CredentialRes
   return { ok: true, user };
 }
 
+/**
+ * Saklar "izinkan siswa login lewat aplikasi mobile", diatur di
+ * /admin/student-access. Default aktif: sebelum saklar ini ada login mobile
+ * siswa selalu diizinkan, jadi baris setting yang belum pernah dibuat tidak
+ * boleh mengunci siswa.
+ */
+export async function getStudentMobileLoginEnabled() {
+  const setting = await prisma.systemSetting.findUnique({
+    where: { key: "allow_student_mobile_login" },
+    select: { value: true },
+  });
+  return setting?.value !== "false";
+}
+
 export async function login(input: LoginInput) {
   const result = await checkCredentials(input);
 
@@ -108,6 +122,14 @@ export async function login(input: LoginInput) {
   }
 
   const user = result.user!;
+
+  if (user.role === "STUDENT" && !(await getStudentMobileLoginEnabled())) {
+    throw forbidden(
+      "Login siswa melalui aplikasi mobile sedang dinonaktifkan. Hubungi admin.",
+      "STUDENT_MOBILE_LOGIN_DISABLED"
+    );
+  }
+
   const token = await createToken(user.id, user.role);
 
   await logAudit({

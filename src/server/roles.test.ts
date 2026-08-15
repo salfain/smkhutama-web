@@ -37,6 +37,7 @@ const OWNED_PAGES: Record<AdminRole, readonly string[]> = {
     "question-sets",
     "question-sets/[id]",
     "reports",
+    "student-access",
     "tokens",
   ],
 };
@@ -47,7 +48,15 @@ const ADMIN_ROLES = Object.keys(OWNED_PAGES) as AdminRole[];
 const OWNED_ACTIONS: Record<Exclude<AdminRole, "KESISWAAN">, readonly string[]> = {
   ADMIN: ["access-control", "majors", "school-profile", "settings", "students", "teachers"],
   KURIKULUM: ["academic-years", "classes", "lesson-schedules", "piket-schedules", "subjects", "teaching-assignments"],
-  ADMIN_CBT: ["exams", "monitoring", "print", "question-sets", "reports", "tokens"],
+  ADMIN_CBT: [
+    "exams",
+    "monitoring",
+    "print",
+    "question-sets",
+    "reports",
+    "student-access",
+    "tokens",
+  ],
 };
 
 function normalize(path: string) {

@@ -16,7 +16,6 @@ export type Settings = {
   allow_free_navigation: string;
   auto_submit_on_timeout: string;
   show_result_default: string;
-  allow_student_web_login: string;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -30,7 +29,6 @@ const DEFAULT_SETTINGS: Settings = {
   allow_free_navigation: "true",
   auto_submit_on_timeout: "true",
   show_result_default: "false",
-  allow_student_web_login: "false",
 };
 
 export async function getSettings(): Promise<Settings> {
@@ -54,7 +52,6 @@ export async function saveSettings(formData: FormData) {
     "allow_free_navigation",
     "auto_submit_on_timeout",
     "show_result_default",
-    "allow_student_web_login",
   ];
 
   try {
