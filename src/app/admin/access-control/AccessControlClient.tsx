@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   BellRing,
   CalendarRange,
@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Info,
   KeyRound,
+  Loader2,
   MailPlus,
   Plus,
   ShieldCheck,
@@ -40,8 +41,16 @@ import {
 } from "./actions";
 
 type Data = Awaited<ReturnType<typeof getAccessControlData>>;
-type Tab = "assignments" | "permissions" | "notifications";
 type ActionResult = { success?: boolean; error?: string };
+
+const SECTIONS = [
+  { id: "assignments", icon: UserRoundCog, label: "Penugasan" },
+  { id: "permissions", icon: KeyRound, label: "Izin khusus" },
+  { id: "notifications", icon: BellRing, label: "Kirim pesan" },
+] as const;
+
+/** Berapa lama efek loading tampil setelah ganti pengguna, sekadar penanda visual bahwa panel di bawah sudah dimuat ulang untuk pengguna baru. */
+const USER_SWITCH_FEEDBACK_MS = 400;
 
 const roleLabels: Record<string, string> = {
   ADMIN: "Administrator",
@@ -65,11 +74,28 @@ function dateLabel(value: Date | string | null) {
 
 export function AccessControlClient({ data }: { data: Data }) {
   const [selectedUserId, setSelectedUserId] = useState(data.users[0]?.id ?? "");
-  const [tab, setTab] = useState<Tab>("assignments");
+  const [switching, setSwitching] = useState(false);
+  const switchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedUser = useMemo(
     () => data.users.find((user) => user.id === selectedUserId) ?? data.users[0],
     [data.users, selectedUserId],
   );
+
+  useEffect(() => () => {
+    if (switchTimeout.current) clearTimeout(switchTimeout.current);
+  }, []);
+
+  function handleSelectUser(id: string) {
+    if (id === selectedUserId) return;
+    setSelectedUserId(id);
+    setSwitching(true);
+    if (switchTimeout.current) clearTimeout(switchTimeout.current);
+    switchTimeout.current = setTimeout(() => setSwitching(false), USER_SWITCH_FEEDBACK_MS);
+  }
+
+  function jumpTo(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   if (!selectedUser) {
     return (
@@ -85,7 +111,7 @@ export function AccessControlClient({ data }: { data: Data }) {
       <aside className="self-start rounded-xl border border-[#E8E8EC] bg-white p-3 dark:border-white/10 dark:bg-[#19191C] lg:sticky lg:top-6">
         <div className="px-2 pb-3 pt-1">
           <Label htmlFor="access-user">1. Pilih pengguna</Label>
-          <Select value={selectedUser.id} onValueChange={setSelectedUserId}>
+          <Select value={selectedUser.id} onValueChange={handleSelectUser}>
             <SelectTrigger id="access-user" className="mt-2 w-full"><SelectValue /></SelectTrigger>
             <SelectContent>
               {data.users.map((user) => (
@@ -95,7 +121,7 @@ export function AccessControlClient({ data }: { data: Data }) {
           </Select>
         </div>
 
-        <div className="rounded-lg border border-[#E8E8EC] bg-[#FAFAFA] p-3 dark:border-white/10 dark:bg-white/[0.03]">
+        <div className="relative rounded-lg border border-[#E8E8EC] bg-[#FAFAFA] p-3 dark:border-white/10 dark:bg-white/[0.03]">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-semibold text-brand-text dark:bg-brand/10 dark:text-brand-text">
               {selectedUser.name.split(" ").filter(Boolean).map((item) => item[0]).slice(0, 2).join("").toUpperCase()}
@@ -109,32 +135,45 @@ export function AccessControlClient({ data }: { data: Data }) {
             <span className="rounded-full bg-brand-soft px-2 py-1 text-[10px] font-semibold text-brand-text dark:bg-brand/10 dark:text-brand-text">{roleLabels[selectedUser.role] ?? selectedUser.role}</span>
             <span className={cn("rounded-full px-2 py-1 text-[10px] font-semibold", selectedUser.isActive ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300" : "bg-gray-100 text-gray-500 dark:bg-white/5")}>{selectedUser.isActive ? "Aktif" : "Nonaktif"}</span>
           </div>
+          {switching && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-[1px] dark:bg-[#19191C]/70">
+              <Loader2 className="h-5 w-5 animate-spin text-brand-text" />
+            </div>
+          )}
         </div>
 
         <p className="px-2 pt-4 pb-2 text-sm font-medium text-gray-900 dark:text-white">2. Pilih yang mau diatur</p>
-        <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0" aria-label="Pengaturan akses">
-          <TabButton active={tab === "assignments"} onClick={() => setTab("assignments")} icon={UserRoundCog} label="Penugasan" count={selectedUser.assignments.filter((item) => item.isActive).length} />
-          <TabButton active={tab === "permissions"} onClick={() => setTab("permissions")} icon={KeyRound} label="Izin khusus" count={selectedUser.permissionOverrides.length} />
-          <TabButton active={tab === "notifications"} onClick={() => setTab("notifications")} icon={BellRing} label="Kirim pesan" />
+        <nav className="flex flex-wrap gap-1 lg:flex-col" aria-label="Lompat ke bagian">
+          {SECTIONS.map(({ id, icon: Icon, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => jumpTo(id)}
+              className="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap text-gray-600 transition-colors hover:bg-[#F5F5F7] lg:w-full lg:gap-3 dark:text-gray-300 dark:hover:bg-white/5"
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="lg:flex-1">{label}</span>
+              {id === "assignments" && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500 dark:bg-white/5 dark:text-gray-400">{selectedUser.assignments.filter((item) => item.isActive).length}</span>}
+              {id === "permissions" && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500 dark:bg-white/5 dark:text-gray-400">{selectedUser.permissionOverrides.length}</span>}
+            </button>
+          ))}
         </nav>
       </aside>
 
-      <main className="min-w-0">
-        {tab === "assignments" && <AssignmentsPanel key={selectedUser.id} data={data} user={selectedUser} />}
-        {tab === "permissions" && <PermissionsPanel key={selectedUser.id} permissions={data.permissions} user={selectedUser} />}
-        {tab === "notifications" && <NotificationPanel key={selectedUser.id} user={selectedUser} />}
+      <main className="min-w-0 space-y-5">
+        <div key={selectedUser.id} className={cn("space-y-5 transition-opacity duration-200", switching ? "opacity-60" : "animate-in fade-in opacity-100")}>
+          <section id="assignments" className="scroll-mt-6">
+            <AssignmentsPanel data={data} user={selectedUser} />
+          </section>
+          <section id="permissions" className="scroll-mt-6">
+            <PermissionsPanel permissions={data.permissions} user={selectedUser} />
+          </section>
+          <section id="notifications" className="scroll-mt-6">
+            <NotificationPanel user={selectedUser} />
+          </section>
+        </div>
       </main>
     </div>
-  );
-}
-
-function TabButton({ active, onClick, icon: Icon, label, count }: { active: boolean; onClick: () => void; icon: typeof UserRoundCog; label: string; count?: number }) {
-  return (
-    <button type="button" onClick={onClick} className={cn("flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium whitespace-nowrap transition-colors lg:w-full lg:gap-3", active ? "bg-brand text-white" : "text-gray-600 hover:bg-[#F5F5F7] dark:text-gray-300 dark:hover:bg-white/5")}>
-      <Icon className="h-4 w-4 shrink-0" />
-      <span className="lg:flex-1">{label}</span>
-      {count !== undefined && <span className={cn("rounded-full px-2 py-0.5 text-[10px]", active ? "bg-white/15 text-white" : "bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400")}>{count}</span>}
-    </button>
   );
 }
 
