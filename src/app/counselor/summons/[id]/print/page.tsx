@@ -33,7 +33,7 @@ export default async function SummonPrintPage({ params }: { params: Promise<{ id
   const nomorSurat = `${summon.level}/${new Date(summon.createdAt).getFullYear()}/${id.slice(-4).toUpperCase()}`;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
+    <div className="min-h-screen bg-[#F5F3FF] py-8 print:bg-white print:py-0">
       <PrintButtonsRed />
 
       <div className="mx-auto max-w-2xl bg-white p-12 shadow-lg print:max-w-none print:shadow-none print:p-8">
