@@ -514,6 +514,24 @@
   --brand-soft: rgba(139, 92, 246, 0.14);
 }
 
+/* Area Piket — amber terang khas sistem, sesuai tema "amber" di portals.ts
+   (beda dari amber-coklat default genesis). */
+.genesis-app.piket-scope {
+  --brand: #f59e0b;
+  --brand-strong: #d97706;
+  --brand-ink: #ffffff;
+  --brand-text: #b45309;
+  --brand-soft: #fef3c7;
+}
+
+.dark .genesis-app.piket-scope {
+  --brand: #f59e0b;
+  --brand-strong: #fbbf24;
+  --brand-ink: #1c1917;
+  --brand-text: #fcd34d;
+  --brand-soft: rgba(245, 158, 11, 0.14);
+}
+
 /* ============================================
    LANDING PAGE — Liquid Glass & Visual Effects
    ============================================ */

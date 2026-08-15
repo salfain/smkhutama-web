@@ -1,7 +1,6 @@
 import { AlertCircle, Clock, LogOut, UserX } from "lucide-react";
 import {
   DashboardEmpty,
-  DashboardHeader,
   DashboardMetric,
   DashboardPanel,
   DashboardPanelHeader,
@@ -22,12 +21,10 @@ export default async function PiketDashboardPage() {
 
   return (
     <GenesisDashboard>
-      <DashboardHeader
-        eyebrow="Ketertiban harian"
-        title="Dashboard Guru Piket"
-        description={<>Selamat bertugas, {user.name}. Pantau kejadian dan perizinan siswa hari ini.</>}
-        meta={<DashboardPill>{today}</DashboardPill>}
-      />
+      <div className="mb-10 rounded-b-[26px] bg-gradient-to-br from-[#F59E0B] to-[#FCD34D] p-6 text-white shadow-[0_16px_40px_-20px_rgba(245,158,11,0.55)]">
+        <h1 className="genesis-heading text-[22px] font-extrabold leading-tight">Dashboard Piket</h1>
+        <p className="mt-1 text-[13px] text-white/85">{today} · {user.name}</p>
+      </div>
 
       <section className="mb-10" aria-labelledby="piket-summary">
         <DashboardSectionHeading title="Ringkasan hari ini" description="Data kedisiplinan dan kehadiran yang tercatat." />
