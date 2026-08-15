@@ -18,7 +18,7 @@ export default async function AccessControlPage() {
         </div>
         <div>
           <h1 className="font-heading text-2xl font-bold text-gray-900 dark:text-white">Akses & Penugasan</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola jabatan tambahan, capability khusus, dan notifikasi pengguna.</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Pilih satu pengguna, lalu beri tanggung jawab tambahan, atur pengecualian izin, atau kirim pesan.</p>
         </div>
       </div>
       <AccessControlClient data={data} />
