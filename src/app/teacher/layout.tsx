@@ -11,7 +11,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
         name: user.name,
         subjectName: user.teacher?.subject?.name ?? null,
       }} />
-      <main className="flex-1 overflow-y-auto flex flex-col pb-24 lg:pb-0">
+      <main className="flex-1 min-w-0 overflow-y-auto flex flex-col pb-24 lg:pb-0">
         <PageTransition>
           {children}
         </PageTransition>

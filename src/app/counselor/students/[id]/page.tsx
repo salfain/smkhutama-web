@@ -26,13 +26,13 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
       </div>
 
       {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-purple-600 to-fuchsia-600 p-5 text-white">
-        <h1 className="font-heading text-xl font-bold">{s.name}</h1>
-        <p className="text-sm text-purple-100">{s.className} · {s.major}{s.nis && ` · NIS: ${s.nis}`}</p>
+      <div className="rounded-2xl bg-gradient-to-r from-purple-600 to-fuchsia-600 p-4 text-white sm:p-5">
+        <h1 className="font-heading text-lg font-bold break-words sm:text-xl">{s.name}</h1>
+        <p className="text-xs text-purple-100 break-words sm:text-sm">{s.className} · {s.major}{s.nis && ` · NIS: ${s.nis}`}</p>
       </div>
 
       {/* Poin */}
-      <div className="mt-4 grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-3 gap-3 sm:gap-4">
         <Stat icon={ShieldAlert} color="bg-red-500" value={s.violationPoints} label="Poin Pelanggaran" />
         <Stat icon={Award} color="bg-emerald-500" value={s.achievementPoints} label="Poin Prestasi" />
         <Stat icon={Scale} color="bg-brand" value={s.netPoints} label="Poin Bersih" />
@@ -122,10 +122,10 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
 
 function Stat({ icon: Icon, color, value, label }: { icon: typeof ShieldAlert; color: string; value: number; label: string }) {
   return (
-    <div className="rounded-2xl border bg-white p-4 shadow-sm">
-      <div className={`mb-2 flex h-9 w-9 items-center justify-center rounded-lg ${color}`}><Icon className="h-5 w-5 text-white" /></div>
-      <p className="text-xl font-bold text-gray-900">{value}</p>
-      <p className="text-xs text-gray-500">{label}</p>
+    <div className="rounded-2xl border bg-white p-3 shadow-sm sm:p-4">
+      <div className={`mb-2 flex h-8 w-8 items-center justify-center rounded-lg sm:h-9 sm:w-9 ${color}`}><Icon className="h-4 w-4 text-white sm:h-5 sm:w-5" /></div>
+      <p className="text-lg font-bold text-gray-900 sm:text-xl">{value}</p>
+      <p className="text-[11px] leading-tight text-gray-500 sm:text-xs">{label}</p>
     </div>
   );
 }
@@ -134,7 +134,7 @@ function Panel({ title, icon: Icon, children, badge }: {
   badge?: { label: string; cls: string };
 }) {
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+    <div className="min-w-0 rounded-2xl border bg-white p-4 shadow-sm sm:p-5 dark:bg-slate-900 dark:border-slate-800">
       <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
         <Icon className="h-4 w-4 text-gray-400" />{title}
         {badge && (

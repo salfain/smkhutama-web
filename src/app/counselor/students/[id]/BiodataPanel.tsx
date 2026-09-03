@@ -56,7 +56,7 @@ export function BiodataPanel({ data }: { data: Biodata }) {
   }
 
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
+    <div className="min-w-0 rounded-2xl border bg-white p-4 shadow-sm sm:p-5 lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
       <h2 className="mb-3 flex flex-wrap items-center gap-2 font-semibold text-gray-900 dark:text-white">
         <IdCard className="h-4 w-4 text-gray-400" /> Biodata Siswa
         <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${badge.cls}`}>{badge.label}</span>
@@ -74,7 +74,7 @@ export function BiodataPanel({ data }: { data: Biodata }) {
       {mode === "view" ? (
         <>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="h-28 w-28 shrink-0 overflow-hidden rounded-xl border bg-gray-50">
+            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border bg-gray-50 sm:h-28 sm:w-28">
               {data.photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={data.photoUrl} alt="Foto siswa" className="h-full w-full object-cover" />
@@ -82,7 +82,7 @@ export function BiodataPanel({ data }: { data: Biodata }) {
                 <div className="flex h-full w-full items-center justify-center text-gray-300"><User className="h-10 w-10" /></div>
               )}
             </div>
-            <div className="grid flex-1 gap-3 sm:grid-cols-2">
+            <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
               <Row label="NISN" value={data.nisn} />
               <Row label="NIS" value={data.nis} />
               <Row label="Tempat, Tanggal Lahir" value={[data.birthPlace, formatDate(data.birthDate)].filter(Boolean).join(", ")} />
@@ -95,7 +95,7 @@ export function BiodataPanel({ data }: { data: Biodata }) {
             <p className="flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300">
               <HeartPulse className="h-3.5 w-3.5" /> Riwayat Penyakit (rahasia)
             </p>
-            <p className="mt-1 text-sm text-gray-800 dark:text-gray-200">{data.medicalHistory || "Tidak ada."}</p>
+            <p className="mt-1 text-sm break-words whitespace-pre-line text-gray-800 dark:text-gray-200">{data.medicalHistory || "Tidak ada."}</p>
           </div>
 
           {data.status === "REJECTED" && data.note && (
@@ -178,7 +178,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-sm font-medium text-gray-900 dark:text-white">{value || "-"}</p>
+      <p className="text-sm font-medium break-words text-gray-900 dark:text-white">{value || "-"}</p>
     </div>
   );
 }
