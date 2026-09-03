@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2, Clock, Lock, Upload, User } from "lucide-react";
 import { saveMyProfile } from "./actions";
+import { resizeImage } from "@/lib/image-resize";
 
 export type MyProfile = {
   name: string;
@@ -35,6 +36,7 @@ const statusStyle: Record<MyProfile["status"], { label: string; cls: string; ico
 export function ProfileForm({ profile }: { profile: MyProfile }) {
   const locked = profile.status === "VERIFIED";
   const [preview, setPreview] = useState(profile.photoUrl);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -44,6 +46,7 @@ export function ProfileForm({ profile }: { profile: MyProfile }) {
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    if (photo) fd.set("photo", photo); // versi yang sudah diperkecil
     setMsg(null);
     startTransition(async () => {
       const res = await saveMyProfile(fd);
@@ -109,13 +112,16 @@ export function ProfileForm({ profile }: { profile: MyProfile }) {
                 accept="image/jpeg,image/png,image/webp"
                 className="hidden"
                 disabled={locked}
-                onChange={(e) => {
+                onChange={async (e) => {
                   const f = e.target.files?.[0];
-                  if (f) setPreview(URL.createObjectURL(f));
+                  if (!f) return;
+                  const kecil = await resizeImage(f);
+                  setPhoto(kecil);
+                  setPreview(URL.createObjectURL(kecil));
                 }}
               />
             </label>
-            <p className="mt-1 text-xs text-gray-400">JPG/PNG/WebP, maks 2 MB.</p>
+            <p className="mt-1 text-xs text-gray-400">JPG/PNG/WebP. Foto besar otomatis diperkecil.</p>
           </div>
         </div>
 

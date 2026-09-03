@@ -17,10 +17,10 @@ export default async function AchievementsPage() {
         </span>
         <div>
           <h1 className="font-heading text-2xl font-bold text-gray-900 dark:text-white">Prestasi Siswa</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Daftar prestasi dan poin positif siswa (baca saja).</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Catat prestasi dan poin positif siswa.</p>
         </div>
       </div>
-      <AchievementsClient achievements={achievements} students={students} readOnly />
+      <AchievementsClient achievements={achievements} students={students} readOnly={false} />
     </div>
   );
 }

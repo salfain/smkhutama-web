@@ -9,6 +9,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/session";
 import { saveUploadedFile } from "@/lib/upload";
+import { notifyRole } from "@/lib/notifications";
 import * as profile from "@/server/modules/bk/profile";
 
 const PROFILE_PATH = "/student/profile";
@@ -53,6 +54,13 @@ export async function saveMyProfile(fd: FormData) {
   }
 
   await profile.submitProfile(current.id, input);
+  // Tanpa ini antrean verifikasi tidak pernah dilihat guru BK.
+  await notifyRole("COUNSELOR", {
+    type: "INFO",
+    title: "Biodata siswa perlu diverifikasi",
+    message: `${current.user.name} (${current.class?.name ?? "tanpa kelas"}) mengirim biodata untuk diverifikasi.`,
+    href: `/counselor/students/${current.id}`,
+  });
   revalidatePath(PROFILE_PATH);
   return { success: "Biodata terkirim. Menunggu verifikasi guru BK." };
 }

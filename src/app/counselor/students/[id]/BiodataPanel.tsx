@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, HeartPulse, IdCard, Pencil, RotateCcw, User } from "lucide-react";
-import { rejectStudentProfile, saveStudentProfile, verifyStudentProfile } from "../../bk-actions";
+import { CheckCircle2, HeartPulse, IdCard, Pencil, RotateCcw, Trash2, Upload, User } from "lucide-react";
+import { deleteStudentPhoto, rejectStudentProfile, saveStudentProfile, verifyStudentProfile } from "../../bk-actions";
+import { resizeImage } from "@/lib/image-resize";
 
 export type Biodata = {
   studentId: string;
@@ -32,6 +33,8 @@ const statusStyle: Record<Biodata["status"], { label: string; cls: string }> = {
 
 export function BiodataPanel({ data }: { data: Biodata }) {
   const [mode, setMode] = useState<"view" | "edit" | "reject">("view");
+  const [photoName, setPhotoName] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
   const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const badge = statusStyle[data.status];
@@ -51,7 +54,9 @@ export function BiodataPanel({ data }: { data: Biodata }) {
   function onFormSubmit(action: (fd: FormData) => Promise<{ error?: string; success?: string }>) {
     return (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      run(action, new FormData(e.currentTarget));
+      const fd = new FormData(e.currentTarget);
+      if (photo) fd.set("photo", photo); // versi yang sudah diperkecil
+      run(action, fd);
     };
   }
 
@@ -74,12 +79,28 @@ export function BiodataPanel({ data }: { data: Biodata }) {
       {mode === "view" ? (
         <>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border bg-gray-50 sm:h-28 sm:w-28">
-              {data.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={data.photoUrl} alt="Foto siswa" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-gray-300"><User className="h-10 w-10" /></div>
+            <div className="shrink-0">
+              <div className="h-24 w-24 overflow-hidden rounded-xl border bg-gray-50 sm:h-28 sm:w-28">
+                {data.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={data.photoUrl} alt="Foto siswa" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-gray-300"><User className="h-10 w-10" /></div>
+                )}
+              </div>
+              {data.photoUrl && (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => {
+                    const fd = new FormData();
+                    fd.set("studentId", data.studentId);
+                    run(deleteStudentPhoto, fd);
+                  }}
+                  className="mt-1.5 inline-flex items-center gap-1 text-xs text-red-500 hover:underline print:hidden"
+                >
+                  <Trash2 className="h-3 w-3" /> Hapus foto
+                </button>
               )}
             </div>
             <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
@@ -139,6 +160,27 @@ export function BiodataPanel({ data }: { data: Biodata }) {
       ) : (
         <form onSubmit={onFormSubmit(saveStudentProfile)} className="space-y-3 print:hidden">
           <input type="hidden" name="studentId" value={data.studentId} />
+          <div>
+            <Label htmlFor="photo" className="mb-1 text-xs text-gray-500">Ganti Foto</Label>
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">
+              <Upload className="h-4 w-4 text-gray-500" />
+              <span>{photoName || "Pilih foto"}</span>
+              <input
+                id="photo"
+                name="photo"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  setPhotoName(f.name);
+                  setPhoto(await resizeImage(f));
+                }}
+              />
+            </label>
+            <p className="mt-1 text-xs text-gray-400">Kosongkan bila foto tidak diubah. Foto besar otomatis diperkecil.</p>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Tempat Lahir" name="birthPlace" defaultValue={data.birthPlace} required />
             <Field label="Tanggal Lahir" name="birthDate" type="date" defaultValue={data.birthDate} required />

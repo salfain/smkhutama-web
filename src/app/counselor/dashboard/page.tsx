@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Award, FolderOpen, Inbox, MessagesSquare, ShieldAlert, TriangleAlert, Users } from "lucide-react";
+import { Award, FolderOpen, IdCard, Inbox, MessagesSquare, ShieldAlert, TriangleAlert, Users } from "lucide-react";
 import {
   DashboardEmpty,
   DashboardHeader,
@@ -40,6 +40,7 @@ export default async function CounselorDashboard() {
   const cards = [
     { label: "Kasus Aktif", value: stats.openCases, icon: FolderOpen, tone: "warning" as const },
     { label: "Permohonan Baru", value: stats.pendingRequests, icon: Inbox, tone: "neutral" as const },
+    { label: "Biodata Perlu Verifikasi", value: stats.pendingProfiles, icon: IdCard, tone: "warning" as const },
     { label: "Pelanggaran", value: stats.totalViolations, icon: ShieldAlert, tone: "danger" as const },
     { label: "Prestasi", value: stats.totalAchievements, icon: Award, tone: "success" as const },
   ];
@@ -54,7 +55,7 @@ export default async function CounselorDashboard() {
 
       <section className="mb-10" aria-labelledby="bk-summary">
         <DashboardSectionHeading title="Ringkasan layanan" description="Indikator utama pendampingan siswa." />
-        <div id="bk-summary" className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
+        <div id="bk-summary" className="grid grid-cols-2 gap-4 lg:grid-cols-5 lg:gap-5">
           {cards.map((card) => <DashboardMetric key={card.label} {...card} />)}
         </div>
       </section>

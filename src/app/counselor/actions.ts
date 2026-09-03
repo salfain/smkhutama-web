@@ -14,6 +14,7 @@ import { requireAuth, requireCounselorAuth } from "@/lib/session";
 import { requirePermission } from "@/lib/permissions";
 import { logSensitiveAccess } from "@/lib/sensitive-access";
 import * as bk from "@/server/modules/bk/service";
+import { countPendingProfiles } from "@/server/modules/bk/profile";
 import { getPriorityQueue } from "@/server/modules/bk/case-workspace";
 import { toAchievement, toCase, toDashboard, toRequest, toViolation } from "@/server/modules/bk/dto";
 
@@ -53,13 +54,15 @@ export async function listStudents() {
 // ---------- DASHBOARD ----------
 export async function getDashboardStats() {
   await requireCounselorAuth();
-  const [dashboard, topStudents, priorityCases] = await Promise.all([
+  const [dashboard, topStudents, priorityCases, pendingProfiles] = await Promise.all([
     bk.getCounselorDashboard(),
     bk.getTopViolationStudents(),
     getPriorityQueue(),
+    countPendingProfiles(),
   ]);
   return {
     ...toDashboard(dashboard),
+    pendingProfiles,
     topStudents,
     priorityCases: priorityCases.map((record) => ({
       id: record.id,
@@ -198,7 +201,8 @@ export async function listAchievements() {
 }
 
 export async function saveAchievement(fd: FormData) {
-  const user = await requireAuth("KESISWAAN");
+  // Sejalan dengan pelanggaran: guru BK ikut mencatat poin positif.
+  const user = await requireAuth("KESISWAAN", "COUNSELOR", "ADMIN");
   const studentId = text(fd, "studentId");
   const title = text(fd, "title");
   if (!studentId || !title) return { error: "Siswa dan judul prestasi wajib diisi" };
@@ -224,7 +228,7 @@ export async function saveAchievement(fd: FormData) {
 }
 
 export async function deleteAchievement(id: string) {
-  await requireAuth("KESISWAAN");
+  await requireAuth("KESISWAAN", "COUNSELOR", "ADMIN");
   await bk.deleteAchievement(id);
   revalidatePath(ACHIEVEMENTS_PATH);
   revalidatePath(ADMIN_ACHIEVEMENTS_PATH);

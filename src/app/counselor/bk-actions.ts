@@ -12,6 +12,8 @@ import { logSensitiveAccess } from "@/lib/sensitive-access";
 import * as bk from "@/server/modules/bk/service";
 import * as followUp from "@/server/modules/bk/follow-up";
 import * as profile from "@/server/modules/bk/profile";
+import { notifyUser } from "@/lib/notifications";
+import { saveUploadedFile } from "@/lib/upload";
 import { toStudentBook, toStudentWithPoints } from "@/server/modules/bk/dto";
 
 const HOME_VISITS_PATH = "/counselor/home-visits";
@@ -42,6 +44,17 @@ export async function getStudentBook(studentId: string) {
 }
 
 // ============= BIODATA SISWA =============
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const STUDENT_BK_PATH = "/student/profile";
+
+/** Siswa perlu tahu hasil verifikasinya, jadi setiap keputusan dikabarkan. */
+async function tellStudent(studentId: string, title: string, message: string) {
+  const student = await profile.getProfile(studentId);
+  if (!student) return;
+  await notifyUser({ userId: student.user.id, type: "INFO", title, message, href: STUDENT_BK_PATH });
+}
+
 /**
  * Verifikasi/koreksi biodata yang dikirim siswa. Guru BK boleh mengedit
  * langsung untuk siswa yang tidak kunjung mengisi sendiri.
@@ -53,7 +66,10 @@ export async function verifyStudentProfile(fd: FormData) {
   if (!studentId) return { error: "Siswa tidak valid" };
 
   await profile.verifyProfile(studentId, user.id);
+  await tellStudent(studentId, "Biodata terverifikasi", "Guru BK telah memverifikasi biodata Anda.");
   revalidatePath(`/counselor/students/${studentId}`);
+  revalidatePath("/counselor/students");
+  revalidatePath("/counselor/dashboard");
   return { success: "Biodata diverifikasi" };
 }
 
@@ -66,7 +82,10 @@ export async function rejectStudentProfile(fd: FormData) {
   if (!note) return { error: "Catatan perbaikan wajib diisi" };
 
   await profile.rejectProfile(studentId, user.id, note);
+  await tellStudent(studentId, "Biodata perlu diperbaiki", `Catatan guru BK: ${note}`);
   revalidatePath(`/counselor/students/${studentId}`);
+  revalidatePath("/counselor/students");
+  revalidatePath("/counselor/dashboard");
   return { success: "Biodata dikembalikan ke siswa" };
 }
 
@@ -86,9 +105,69 @@ export async function saveStudentProfile(fd: FormData) {
   const invalid = profile.validateProfile(input);
   if (invalid) return { error: invalid };
 
+  const photo = fd.get("photo");
+  if (photo instanceof File && photo.size > 0) {
+    if (!PHOTO_TYPES.includes(photo.type)) return { error: "Foto harus JPG, PNG, atau WebP" };
+    if (photo.size > MAX_PHOTO_BYTES) return { error: "Ukuran foto maksimal 2 MB" };
+    input.photoUrl = await saveUploadedFile(photo, "students", studentId);
+  }
+
   await profile.saveProfileByCounselor(studentId, user.id, input);
+  await tellStudent(studentId, "Biodata diperbarui guru BK", "Guru BK memperbarui dan memverifikasi biodata Anda.");
   revalidatePath(`/counselor/students/${studentId}`);
+  revalidatePath("/counselor/students");
+  revalidatePath("/counselor/dashboard");
   return { success: "Biodata tersimpan & terverifikasi" };
+}
+
+/** Menghapus foto yang keliru atau tidak pantas tanpa menyentuh data lain. */
+export async function deleteStudentPhoto(fd: FormData) {
+  await requireCounselorAuth();
+  await requirePermission("bk.sensitive.view");
+  const studentId = text(fd, "studentId");
+  if (!studentId) return { error: "Siswa tidak valid" };
+
+  await profile.clearPhoto(studentId);
+  revalidatePath(`/counselor/students/${studentId}`);
+  return { success: "Foto dihapus" };
+}
+
+/**
+ * Data untuk Export CSV Buku Siswa. Ikut memuat biodata, jadi butuh izin
+ * ekspor tersendiri dan dicatat sebagai akses data sensitif.
+ * Riwayat penyakit sengaja tidak diikutkan.
+ */
+export async function exportStudentsBook() {
+  await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.export");
+  const students = await bk.listStudentsWithPoints();
+  await logSensitiveAccess({
+    userId: user.id,
+    action: "EXPORT",
+    resourceType: "student_bk_book",
+    purpose: "Export CSV Buku Siswa",
+  });
+  return students.map((student) => ({
+    nis: student.nis ?? "",
+    nisn: student.nisn ?? "",
+    name: student.user.name,
+    className: student.class?.name ?? "-",
+    birthPlace: student.birthPlace ?? "",
+    birthDate: student.birthDate ? student.birthDate.toISOString().slice(0, 10) : "",
+    address: student.address ?? "",
+    parentPhone: student.parentPhone ?? "",
+    profileStatus: student.profileStatus,
+    violationPoints: bk.sumPoints(student.violationRecords),
+    achievementPoints: bk.sumPoints(student.achievementRecords),
+    cases: student.counselingCases.length,
+  }));
+}
+
+export async function listPendingProfiles() {
+  await requireCounselorAuth();
+  await requirePermission("bk.sensitive.view");
+  const rows = await profile.listPendingProfiles();
+  return rows.map(profile.toProfileDto);
 }
 
 // ============= KUNJUNGAN RUMAH =============

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { Search, BookUser, ChevronRight } from "lucide-react";
+import { Search, BookUser, ChevronRight, Download } from "lucide-react";
+import { exportStudentsBook } from "../bk-actions";
 
 type ProfileStatus = "DRAFT" | "PENDING" | "VERIFIED" | "REJECTED";
 type Row = { id: string; name: string; nis: string; className: string; violationPoints: number; achievementPoints: number; cases: number; profileStatus: ProfileStatus };
@@ -15,51 +16,112 @@ const profileBadge: Partial<Record<ProfileStatus, { label: string; cls: string }
   REJECTED: { label: "Dikembalikan", cls: "bg-red-100 text-red-700" },
 };
 
+const FILTERS = [
+  { key: "ALL", label: "Semua" },
+  { key: "PENDING", label: "Perlu verifikasi" },
+  { key: "DRAFT", label: "Biodata kosong" },
+  { key: "REJECTED", label: "Dikembalikan" },
+  { key: "VERIFIED", label: "Terverifikasi" },
+] as const;
+
+const BOM = "﻿"; // supaya Excel membaca huruf beraksen dengan benar
+const NEWLINE = "\r\n";
+
+function csvCell(value: string | number) {
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
 export function StudentsBookClient({ students }: { students: Row[] }) {
   const [q, setQ] = useState("");
-  const filtered = students.filter((s) =>
-    s.name.toLowerCase().includes(q.toLowerCase()) ||
-    s.className.toLowerCase().includes(q.toLowerCase()) ||
-    s.nis.includes(q)
-  );
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("ALL");
+  const [exporting, startExport] = useTransition();
+  const [exportError, setExportError] = useState("");
+
+  const counts = students.reduce<Record<string, number>>((acc, s) => {
+    acc[s.profileStatus] = (acc[s.profileStatus] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const filtered = students.filter((s) => {
+    const cocok =
+      s.name.toLowerCase().includes(q.toLowerCase()) ||
+      s.className.toLowerCase().includes(q.toLowerCase()) ||
+      s.nis.includes(q);
+    return cocok && (filter === "ALL" || s.profileStatus === filter);
+  });
+
+  /** Biodata hanya diambil saat ekspor, lewat action berizin `bk.sensitive.export`. */
+  function unduhCsv() {
+    setExportError("");
+    startExport(async () => {
+      try {
+        const rows = await exportStudentsBook();
+        const headers = [
+          "NIS", "NISN", "Nama", "Kelas", "Tempat Lahir", "Tanggal Lahir", "Alamat",
+          "Nomor Orang Tua", "Status Biodata", "Poin Pelanggaran", "Poin Prestasi", "Sesi Konseling",
+        ];
+        const isi = rows.map((r) => [
+          r.nis, r.nisn, r.name, r.className, r.birthPlace, r.birthDate, r.address,
+          r.parentPhone, r.profileStatus, r.violationPoints, r.achievementPoints, r.cases,
+        ].map(csvCell).join(","));
+        const blob = new Blob([BOM, [headers.join(","), ...isi].join(NEWLINE)], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `Buku_Siswa_${new Date().toISOString().split("T")[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch {
+        setExportError("Gagal mengekspor. Pastikan Anda punya izin ekspor data BK.");
+      }
+    });
+  }
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-        <div className="relative w-full max-w-sm">
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / kelas / NIS..." className="pl-9" />
         </div>
         <button
-          onClick={() => {
-            if (filtered.length === 0) return;
-            const headers = ["NIS", "Nama", "Kelas", "Poin Pelanggaran", "Poin Prestasi", "Sesi Konseling"];
-            const csvContent = [
-              headers.join(","),
-              ...filtered.map(s => `"${s.nis}","${s.name}","${s.className}",${s.violationPoints},${s.achievementPoints},${s.cases}`)
-            ].join("\n");
-            
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", `Buku_Siswa_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }}
-          disabled={filtered.length === 0}
-          className="w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          onClick={unduhCsv}
+          disabled={exporting || students.length === 0}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
-          <svg className="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Export CSV
+          <Download className="h-4 w-4 text-gray-500" />
+          {exporting ? "Menyiapkan..." : "Export CSV"}
         </button>
       </div>
+
+      {/* Antrean verifikasi biodata gampang tenggelam di daftar panjang. */}
+      <div className="mb-4 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+        {FILTERS.map((f) => {
+          const jumlah = f.key === "ALL" ? students.length : counts[f.key] ?? 0;
+          return (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                filter === f.key
+                  ? "border-purple-600 bg-purple-600 text-white"
+                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {f.label} ({jumlah})
+            </button>
+          );
+        })}
+      </div>
+
+      {exportError && <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{exportError}</p>}
 
       {filtered.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
           <BookUser className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-          <p className="text-sm text-gray-500">Tidak ada siswa.</p>
+          <p className="text-sm text-gray-500">Tidak ada siswa pada filter ini.</p>
         </div>
       ) : (
         <>

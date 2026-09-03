@@ -31,7 +31,7 @@ const profileSelect = {
   profileSubmittedAt: true,
   profileVerifiedAt: true,
   profileNote: true,
-  user: { select: { name: true } },
+  user: { select: { id: true, name: true } },
   class: { select: { name: true } },
   major: { select: { name: true } },
   profileVerifiedBy: { select: { name: true } },
@@ -129,4 +129,41 @@ export async function rejectProfile(studentId: string, counselorUserId: string, 
 
 export async function countPendingProfiles() {
   return prisma.student.count({ where: { profileStatus: "PENDING" } });
+}
+
+/** Bentuk JSON biodata untuk halaman web maupun `/api/v1`. */
+export function toProfileDto(student: NonNullable<Awaited<ReturnType<typeof getProfile>>>) {
+  return {
+    studentId: student.id,
+    name: student.user.name,
+    className: student.class?.name ?? "-",
+    major: student.major?.name ?? "-",
+    nis: student.nis ?? "",
+    nisn: student.nisn ?? "",
+    birthPlace: student.birthPlace ?? "",
+    birthDate: student.birthDate ? student.birthDate.toISOString().slice(0, 10) : "",
+    address: student.address ?? "",
+    parentPhone: student.parentPhone ?? "",
+    medicalHistory: student.medicalHistory ?? "",
+    photoUrl: student.photoUrl ?? "",
+    status: student.profileStatus,
+    note: student.profileNote ?? "",
+    submittedAt: student.profileSubmittedAt,
+    verifiedAt: student.profileVerifiedAt,
+    verifiedBy: student.profileVerifiedBy?.name ?? "",
+  };
+}
+
+/** Antrean verifikasi untuk guru BK. */
+export async function listPendingProfiles() {
+  return prisma.student.findMany({
+    where: { profileStatus: "PENDING" },
+    select: profileSelect,
+    orderBy: { profileSubmittedAt: "asc" },
+  });
+}
+
+/** Foto dilepas dari biodata; berkasnya sendiri dibiarkan di penyimpanan. */
+export async function clearPhoto(studentId: string) {
+  return prisma.student.update({ where: { id: studentId }, data: { photoUrl: null } });
 }
