@@ -54,6 +54,9 @@ export default async function TestPage({ params }: { params: Promise<{ id: strin
       initialAnswers={answersMap}
       expiresAt={expiresAt.toISOString()}
       randomizeOptions={exam.randomizeOptions}
+      initialLocked={exam.attempt.isLocked}
+      initialViolationCount={exam.attempt.violationCount}
+      initialLockReason={exam.attempt.lockReason}
     />
   );
 }

@@ -117,7 +117,7 @@ export function SchoolProfileForm({ profile }: { profile: Profile }) {
         </div>
       )}
 
-      <Button type="submit" className="gap-2 bg-blue-600 hover:bg-blue-700" disabled={pending}>
+      <Button type="submit" className="gap-2 bg-brand hover:bg-brand-strong" disabled={pending}>
         <Save className="h-4 w-4" />
         {pending ? "Menyimpan..." : "Simpan Profil Sekolah"}
       </Button>

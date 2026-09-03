@@ -74,7 +74,7 @@ export function PrintQuestionsClient({
         </Button>
         <Button
           size="sm"
-          className="gap-1.5 bg-blue-600 hover:bg-blue-700"
+          className="gap-1.5 bg-brand hover:bg-brand-strong"
           onClick={() => window.print()}
         >
           <Printer className="h-4 w-4" />Cetak / Simpan PDF
@@ -207,17 +207,17 @@ export function PrintQuestionsClient({
           {/* Tanda tangan */}
           <div className="mt-12 pt-4 border-t border-gray-300">
             <div className="flex justify-between text-xs text-gray-600">
-              <div className="text-center w-40">
+              <div className="w-48 text-center">
                 <p>Mengetahui,</p>
                 <p>Kepala Sekolah</p>
                 <div className="mt-10 border-b border-gray-400" />
-                <p className="mt-1">( ____________________ )</p>
+                <p className="mt-1 whitespace-nowrap">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</p>
               </div>
-              <div className="text-center w-40">
+              <div className="w-48 text-center">
                 <p>Guru Mata Pelajaran</p>
                 <p className="text-gray-400">({exam.subject.code})</p>
                 <div className="mt-10 border-b border-gray-400" />
-                <p className="mt-1">{exam.teacherName}</p>
+                <p className="mt-1 whitespace-nowrap">{exam.teacherName}</p>
               </div>
             </div>
           </div>
@@ -238,7 +238,7 @@ export function PrintQuestionsClient({
                     return (
                       <div key={q.id} className="flex gap-1.5 items-center">
                         <span className="font-semibold text-gray-700 w-6 text-right">{q.no}.</span>
-                        <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                        <span className="font-bold text-brand-text bg-brand-soft px-2 py-0.5 rounded">
                           {correctLabels || "—"}
                         </span>
                       </div>
@@ -303,14 +303,14 @@ function QuestionBlock({ q, showKey, isMc }: { q: Question; showKey: boolean; is
                 return (
                   <div
                     key={opt.id}
-                    className={`flex gap-2 items-start ${isCorrect ? "text-blue-700 font-semibold" : "text-gray-800"}`}
+                    className={`flex gap-2 items-start ${isCorrect ? "text-brand-text font-semibold" : "text-gray-800"}`}
                   >
-                    <span className={`shrink-0 w-5 text-right ${isCorrect ? "text-blue-700" : "text-gray-600"}`}>
+                    <span className={`shrink-0 w-5 text-right ${isCorrect ? "text-brand-text" : "text-gray-600"}`}>
                       {opt.optionLabel}.
                     </span>
                     <span className="leading-snug">{opt.optionText}</span>
                     {isCorrect && (
-                      <span className="ml-1 text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded shrink-0">✓ Kunci</span>
+                      <span className="ml-1 text-[10px] text-brand-text bg-brand-soft px-1.5 py-0.5 rounded shrink-0">✓ Kunci</span>
                     )}
                   </div>
                 );

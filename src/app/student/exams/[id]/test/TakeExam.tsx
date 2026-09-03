@@ -10,12 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Flag, ChevronLeft, ChevronRight, Send, Grid3X3,
-  Clock, CheckCircle, AlertCircle, ShieldAlert,
+  Clock, CheckCircle, AlertCircle, ShieldAlert, Lock,
 } from "lucide-react";
-import { saveAnswer, submitExam } from "../actions";
+import { saveAnswer, submitExam, reportViolation, checkAttemptLock } from "../actions";
 import { MathText } from "@/components/MathText";
-
-const MAX_VIOLATIONS = 5; // setelah ini, ujian otomatis di-submit
+import { LOCK_THRESHOLD } from "@/lib/exam-lock";
 
 type Option = { id: string; label: string; text: string };
 type Question = {
@@ -39,10 +38,14 @@ type Props = {
   initialAnswers: Record<string, AnswerState>;
   expiresAt: string;
   randomizeOptions: boolean;
+  initialLocked: boolean;
+  initialViolationCount: number;
+  initialLockReason: string | null;
 };
 
 export function TakeExam({
   examId, title, subjectCode, questions: rawQuestions, initialAnswers, expiresAt, randomizeOptions,
+  initialLocked, initialViolationCount, initialLockReason,
 }: Props) {
   const router = useRouter();
 
@@ -64,38 +67,44 @@ export function TakeExam({
   const [showSubmit, setShowSubmit] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [violations, setViolations] = useState(0);
+  const [violations, setViolations] = useState(initialViolationCount);
   const [showWarning, setShowWarning] = useState(false);
+  const [locked, setLocked] = useState(initialLocked);
+  const [lockReason, setLockReason] = useState(initialLockReason);
   const submittedRef = useRef(false);
+  const lockedRef = useRef(initialLocked);
+  const reportingRef = useRef(false);
 
-  // Auto-submit helper
-  const autoSubmit = useRef(async () => {
-    if (submittedRef.current) return;
-    submittedRef.current = true;
-    await submitExam(examId, true);
-    router.push(`/student/exams/${examId}/finish`);
-  });
+  useEffect(() => { lockedRef.current = locked; }, [locked]);
 
   // ===== ANTI-CHEAT =====
+  // Pelanggaran dicatat & dihitung di server — sumber yang sama dengan
+  // aplikasi mobile — supaya ambang batas dan status kunci tidak hilang saat
+  // halaman dimuat ulang, dan pengawas bisa membuka kuncinya dari monitoring.
   useEffect(() => {
-    function registerViolation() {
-      if (submittedRef.current) return;
-      setViolations((v) => {
-        const next = v + 1;
-        if (next >= MAX_VIOLATIONS) {
-          void autoSubmit.current();
+    async function reportAndHandle(reason: string) {
+      if (submittedRef.current || lockedRef.current || reportingRef.current) return;
+      reportingRef.current = true;
+      try {
+        const result = await reportViolation(examId, reason);
+        if ("error" in result || result.finished) return;
+        setViolations(result.violationCount);
+        if (result.locked) {
+          setLocked(true);
+          setLockReason(result.lockReason ?? null);
         } else {
           setShowWarning(true);
         }
-        return next;
-      });
+      } finally {
+        setTimeout(() => { reportingRef.current = false; }, 800);
+      }
     }
     function onVisibility() {
-      if (document.hidden) registerViolation();
+      if (document.hidden) void reportAndHandle("Berpindah tab/aplikasi");
     }
     function onBlur() {
       // pindah ke aplikasi/jendela lain
-      registerViolation();
+      void reportAndHandle("Berpindah jendela/aplikasi");
     }
     function blockContext(e: Event) { e.preventDefault(); }
     function blockCopy(e: Event) { e.preventDefault(); }
@@ -120,7 +129,23 @@ export function TakeExam({
       document.removeEventListener("cut", blockCopy);
       document.removeEventListener("keydown", blockKeys);
     };
-  }, []);
+  }, [examId]);
+
+  // Selagi terkunci, tanya server tiap 5 detik apakah pengawas sudah membuka kuncinya.
+  useEffect(() => {
+    if (!locked) return;
+    const t = setInterval(async () => {
+      if (submittedRef.current) return;
+      const result = await checkAttemptLock(examId);
+      if ("error" in result || result.finished) return;
+      if (!result.locked) {
+        setLocked(false);
+        setLockReason(null);
+        setViolations(0);
+      }
+    }, 5000);
+    return () => clearInterval(t);
+  }, [locked, examId]);
 
   // Timer + auto submit
   useEffect(() => {
@@ -198,7 +223,7 @@ export function TakeExam({
   function getNumColor(idx: number): string {
     const q = questions[idx];
     const a = answers[q.id];
-    if (idx === currentQ) return "bg-blue-600 text-white border-blue-600";
+    if (idx === currentQ) return "bg-brand text-white border-brand";
     if (a?.isDoubtful) return "bg-yellow-400 text-white border-yellow-400";
     if (a && (a.selectedOptionId || a.answerText)) return "bg-green-500 text-white border-green-500";
     return "bg-white text-gray-600 border-gray-300";
@@ -226,7 +251,7 @@ export function TakeExam({
       <p className="mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Navigasi Soal</p>
       <div className="mb-3 flex flex-wrap gap-1.5 text-xs">
         {[
-          { color: "bg-blue-600", label: "Sedang dibuka" },
+          { color: "bg-brand", label: "Sedang dibuka" },
           { color: "bg-green-500", label: "Sudah dijawab" },
           { color: "bg-yellow-400", label: "Ragu-ragu" },
           { color: "bg-white border border-gray-300", label: "Belum dijawab" },
@@ -258,19 +283,19 @@ export function TakeExam({
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
-      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-blue-500" : "bg-white"}`}>
+      <header className={`z-20 flex items-center justify-between border-b px-3 py-2 shadow-sm transition-colors ${isCritical ? "bg-red-600" : isWarning ? "bg-orange-600" : "bg-white"}`}>
         <div className={`text-sm font-medium ${isCritical || isWarning ? "text-white" : "text-gray-700"}`}>
           <span className="font-semibold">{subjectCode}</span>
           <span className="mx-2 opacity-40">·</span>
           <span className="text-xs opacity-75 truncate max-w-[200px] inline-block align-bottom">{title}</span>
         </div>
-        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}`}>
+        <div className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${isCritical ? "bg-red-700 text-white" : isWarning ? "bg-orange-700 text-white" : "bg-gray-100 text-gray-800"}`}>
           <Clock className="h-4 w-4" />{formatTime(timeLeft)}
         </div>
         <div className="flex items-center gap-2">
-          {violations > 0 && (
+          {violations > 0 && !locked && (
             <span className="hidden sm:inline-flex items-center gap-1 rounded-lg bg-red-100 px-2 py-1 text-xs font-bold text-red-700">
-              <ShieldAlert className="h-3.5 w-3.5" />{violations}/{MAX_VIOLATIONS}
+              <ShieldAlert className="h-3.5 w-3.5" />{violations}/{LOCK_THRESHOLD}
             </span>
           )}
           <Progress value={progress} className="hidden w-24 sm:block h-2" />
@@ -318,16 +343,16 @@ export function TakeExam({
                     <button
                       key={opt.id}
                       onClick={() => selectOption(q.id, opt.id)}
-                      className={`group flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-                        selected ? "border-blue-500 bg-blue-50 shadow-sm" : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/30"
+                      className={`group flex w-full items-center gap-3 rounded-xl p-4 text-left transition-all ${
+                        selected ? "border-2 border-brand bg-brand-soft shadow-sm" : "border border-gray-200 bg-white hover:border-brand-soft hover:bg-brand-soft"
                       }`}
                     >
                       <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors ${
-                        selected ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 text-gray-500 group-hover:border-blue-400"
+                        selected ? "border-brand bg-brand text-white" : "border-gray-300 text-gray-500 group-hover:border-brand"
                       }`}>
                         {selected ? <CheckCircle className="h-4 w-4" /> : opt.label}
                       </div>
-                      <MathText text={opt.text} className={`text-sm ${selected ? "font-medium text-blue-800" : "text-gray-700"}`} />
+                      <MathText text={opt.text} className={`text-sm ${selected ? "font-medium text-brand-text" : "text-gray-700"}`} />
                     </button>
                   );
                 })}
@@ -349,7 +374,7 @@ export function TakeExam({
                 <ChevronLeft className="h-4 w-4" />Sebelumnya
               </Button>
               {currentQ < questions.length - 1 ? (
-                <Button className="gap-2 bg-blue-600 hover:bg-blue-700" onClick={() => setCurrentQ((p) => p + 1)}>
+                <Button className="gap-2 bg-brand hover:bg-brand-strong" onClick={() => setCurrentQ((p) => p + 1)}>
                   Selanjutnya<ChevronRight className="h-4 w-4" />
                 </Button>
               ) : (
@@ -378,9 +403,9 @@ export function TakeExam({
               Anda terdeteksi meninggalkan halaman ujian (pindah tab/aplikasi). Tetap berada di halaman ujian hingga selesai.
             </p>
             <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-              Pelanggaran ke-<b>{violations}</b> dari {MAX_VIOLATIONS}. Setelah {MAX_VIOLATIONS} kali, ujian akan otomatis dikumpulkan.
+              Pelanggaran ke-<b>{violations}</b> dari {LOCK_THRESHOLD}. Setelah {LOCK_THRESHOLD} kali, ujian akan otomatis <b>dikunci</b> dan hanya bisa dibuka oleh guru pengawas atau Admin CBT.
             </div>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setShowWarning(false)}>
+            <Button className="w-full bg-brand hover:bg-brand-strong" onClick={() => setShowWarning(false)}>
               Saya Mengerti
             </Button>
           </div>
@@ -391,7 +416,7 @@ export function TakeExam({
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-500" />Konfirmasi Submit Ujian
+              <AlertCircle className="h-5 w-5 text-brand-text" />Konfirmasi Submit Ujian
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -402,7 +427,7 @@ export function TakeExam({
               <div className="flex justify-between"><span className="text-gray-500">Belum dijawab</span><span className="font-semibold text-red-500">{unanswered}</span></div>
             </div>
             {unanswered > 0 && (
-              <p className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg p-2.5">
+              <p className="text-xs text-brand-text bg-brand-soft border border-brand-soft rounded-lg p-2.5">
                 Masih ada {unanswered} soal yang belum dijawab. Yakin ingin submit?
               </p>
             )}
@@ -415,6 +440,27 @@ export function TakeExam({
           </div>
         </DialogContent>
       </Dialog>
+
+      {locked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 text-center shadow-xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <Lock className="h-7 w-7" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">Ujian Terkunci</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Anda meninggalkan halaman ujian sebanyak {LOCK_THRESHOLD} kali. Ujian dikunci untuk mencegah kecurangan.
+            </p>
+            {lockReason && <p className="mt-1 text-xs text-gray-400">Alasan: {lockReason}</p>}
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
+              Minta guru pengawas atau Admin CBT membuka kunci ujian Anda dari halaman monitoring. Jangan tutup halaman ini — ujian akan lanjut otomatis begitu dibuka.
+            </div>
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />Menunggu guru membuka kunci...
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

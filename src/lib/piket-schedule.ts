@@ -30,6 +30,7 @@ export async function getActivePiketScheduleForTeacher(teacherId: string, date =
       teacherId,
       dayOfWeek: getJakartaDayOfWeek(date),
       isActive: true,
+      academicYear: { isActive: true },
     },
   });
 }

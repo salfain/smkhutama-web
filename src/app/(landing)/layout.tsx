@@ -7,7 +7,11 @@ export default async function LandingLayout({ children }: { children: React.Reac
   const p = profile as Record<string, unknown> | null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    // Ruang untuk bar bawah mengambang TIDAK dipasang di sini: padding pada
+    // pembungkus berada di luar footer, sehingga tampil sebagai pita kosong
+    // di bawahnya. Jaraknya diberikan di dalam footer agar tertutup
+    // latar footer sendiri.
+    <div className="landing-app min-h-screen flex flex-col bg-canvas">
       <LandingNavbar logoUrl={p?.logoUrl as string | null} shortName={(p?.shortName as string) ?? "SMK Hutama"} />
       <main className="flex-1">
         {children}

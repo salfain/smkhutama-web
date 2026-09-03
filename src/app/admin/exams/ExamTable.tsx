@@ -256,7 +256,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
             ))}
           </SelectContent>
         </Select>
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700 sm:ml-auto"
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong sm:ml-auto"
           disabled={opts.subjects.length === 0 || opts.teachers.length === 0}
           onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Jadwal
@@ -279,7 +279,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
           {filtered.map((e) => {
             const typeInfo = getExamTypeInfo(e.examType);
             return (
-            <div key={e.id} className="rounded-xl border bg-white p-4 shadow-sm hover:border-blue-200 transition-colors">
+            <div key={e.id} className="rounded-xl border bg-white p-4 shadow-sm hover:border-brand-soft transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center gap-2 flex-wrap">
@@ -321,7 +321,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                       <StopCircle className="h-3.5 w-3.5" />Tutup
                     </Button>
                   )}
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => openEdit(e)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" onClick={() => openEdit(e)}>
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <a
@@ -356,7 +356,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               <Input id="title" name="title" defaultValue={editing?.title ?? ""} placeholder="cth: UTS Matematika XII TKJ 1" required />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Jenis Ujian *</Label>
                 <Select value={examType} onValueChange={(v) => {
@@ -413,7 +413,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               </div>
             </div>
 
-            <div className="space-y-3 rounded-lg border bg-blue-50/40 p-3">
+            <div className="space-y-3 rounded-lg border bg-brand-soft p-3">
               <div>
                 <Label>Paket Bank Soal</Label>
                 <Select value={questionSetId} onValueChange={(value) => {
@@ -442,13 +442,13 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                   </SelectContent>
                 </Select>
                 {filteredQuestionSets.length === 0 && (
-                  <p className="mt-1 text-xs text-blue-700">
+                  <p className="mt-1 text-xs text-brand-text">
                     Belum ada paket disetujui untuk jenis ujian, mapel, dan guru ini.
                   </p>
                 )}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                 <div className="space-y-1.5">
                   <Label htmlFor="requestedMultipleChoiceCount">Jumlah PG</Label>
                   <Input
@@ -527,7 +527,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="startAt">Waktu Mulai *</Label>
                 <Input
@@ -546,7 +546,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <Label htmlFor="durationMinutes">Durasi (menit) *</Label>
                 <Input id="durationMinutes" name="durationMinutes" type="number" min="1" defaultValue={editing?.durationMinutes ?? 90} required />
@@ -585,12 +585,12 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
 
             <div className="space-y-1.5">
               <Label>Kelas Peserta</Label>
-              <div className="rounded-lg border bg-gray-50 p-3 grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+              <div className="rounded-lg border bg-gray-50 p-3 grid grid-cols-1 gap-2 sm:grid-cols-2 max-h-40 overflow-y-auto">
                 {opts.classes.length === 0 ? (
-                  <p className="col-span-2 text-xs text-gray-400">Belum ada kelas. <a href="/admin/classes" className="underline">Buat kelas dulu</a></p>
+                  <p className="sm:col-span-2 text-xs text-gray-400">Belum ada kelas. <a href="/admin/classes" className="underline">Buat kelas dulu</a></p>
                 ) : opts.classes.map((c) => (
                   <label key={c.id} className="flex items-center gap-2 cursor-pointer text-sm">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-brand-text"
                       checked={classIds.includes(c.id)} onChange={() => toggleClass(c.id)} />
                     {c.name}
                   </label>
@@ -602,15 +602,15 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
             <div className="space-y-2 rounded-lg border p-3 bg-gray-50">
               <p className="text-xs font-semibold text-gray-600">Opsi Ujian</p>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" name="randomizeQuestions" defaultChecked={editing?.randomizeQuestions ?? false} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                <input type="checkbox" name="randomizeQuestions" defaultChecked={editing?.randomizeQuestions ?? false} className="h-4 w-4 rounded border-gray-300 text-brand-text" />
                 Acak urutan soal
               </label>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" name="randomizeOptions" defaultChecked={editing?.randomizeOptions ?? false} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                <input type="checkbox" name="randomizeOptions" defaultChecked={editing?.randomizeOptions ?? false} className="h-4 w-4 rounded border-gray-300 text-brand-text" />
                 Acak urutan pilihan jawaban
               </label>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" name="showResult" defaultChecked={editing?.showResult ?? false} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                <input type="checkbox" name="showResult" defaultChecked={editing?.showResult ?? false} className="h-4 w-4 rounded border-gray-300 text-brand-text" />
                 Tampilkan nilai langsung setelah submit
               </label>
             </div>
@@ -619,7 +619,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
 
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                 {pending ? "Menyimpan..." : editing ? "Simpan Perubahan" : "Buat Jadwal"}
               </Button>
             </div>

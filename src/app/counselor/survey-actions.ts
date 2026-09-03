@@ -7,6 +7,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireCounselorAuth } from "@/lib/session";
+import { requirePermission } from "@/lib/permissions";
+import { logSensitiveAccess } from "@/lib/sensitive-access";
 import * as surveys from "@/server/modules/bk/surveys";
 
 const SURVEYS_PATH = "/counselor/surveys";
@@ -96,8 +98,11 @@ export async function deleteQuestion(id: string, surveyId: string) {
 
 export async function getSurveyResults(id: string) {
   await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.view");
   const survey = await surveys.getSurveyWithResponses(id);
   if (!survey) return null;
+
+  await logSensitiveAccess({ userId: user.id, resourceType: "bk_survey_results", resourceId: id, purpose: "Membuka hasil angket BK" });
 
   const { perQuestion, priorities } = surveys.summarizeSurvey(survey);
   const toRow = (q: surveys.QuestionSummary) => ({

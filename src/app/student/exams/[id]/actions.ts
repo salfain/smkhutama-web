@@ -89,6 +89,39 @@ export async function saveAnswer(input: {
   return { success: true };
 }
 
+export async function reportViolation(examId: string, reason?: string) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) return { error: "Tidak diizinkan" };
+
+  const result = await cbt.recordViolation({
+    examId,
+    studentId: user.student.id,
+    userId: user.id,
+    reason,
+  });
+
+  if (result.state === "NO_ATTEMPT") return { error: "Attempt tidak ditemukan" };
+  if (result.state === "FINISHED") {
+    return { finished: true, locked: false, violationCount: result.violationCount, lockReason: null };
+  }
+  if (result.state === "LOCKED") {
+    return { finished: false, locked: true, violationCount: result.violationCount, lockReason: result.lockReason };
+  }
+  return { finished: false, locked: result.locked, violationCount: result.violationCount, lockReason: result.lockReason };
+}
+
+/** Dipanggil berkala saat ujian terkunci, untuk mendeteksi kapan pengawas membuka kuncinya. */
+export async function checkAttemptLock(examId: string) {
+  const user = await requireAuth("STUDENT");
+  if (!user.student) return { error: "Tidak diizinkan" };
+
+  const result = await cbt.recordHeartbeat(examId, user.student.id);
+  if (result.state === "NO_ATTEMPT") return { error: "Attempt tidak ditemukan" };
+  if (result.state === "FINISHED") return { finished: true, locked: false };
+  if (result.state === "LOCKED") return { finished: false, locked: true, lockReason: result.lockReason };
+  return { finished: false, locked: false };
+}
+
 export async function submitExam(examId: string, isAuto = false) {
   const user = await requireAuth("STUDENT");
   if (!user.student) return { error: "Tidak diizinkan" };

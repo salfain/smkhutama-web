@@ -103,7 +103,7 @@ export function TeacherResultsClient({ exams }: { exams: Exam[] }) {
                                   </td>
                                 )}
                                 <td className="py-2 text-center">
-                                  <Button variant="ghost" size="sm" className="gap-1 text-xs text-blue-600 hover:bg-blue-50 h-7"
+                                  <Button variant="ghost" size="sm" className="gap-1 text-xs text-brand-text hover:bg-brand-soft h-7"
                                     onClick={() => openReview(a.id)}>
                                     <Eye className="h-3 w-3" />Jawaban
                                   </Button>

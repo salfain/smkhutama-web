@@ -78,7 +78,7 @@ export default async function AdminPermitsPage({
                 <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{record.reason}</td>
                 <td className="px-4 py-3">{timeLabel(record.exitTime)}</td>
                 <td className="px-4 py-3">{timeLabel(record.returnTime)}</td>
-                <td className="px-4 py-3"><span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">{record.status.replaceAll("_", " ")}</span></td>
+                <td className="px-4 py-3"><span className="rounded-full bg-brand-soft px-2 py-1 text-xs font-semibold text-brand-text">{record.status.replaceAll("_", " ")}</span></td>
               </tr>
             ))}
           </tbody>

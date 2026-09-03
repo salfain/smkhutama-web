@@ -1,8 +1,8 @@
 "use client";
 
 export function FullScreenLoader({ message = "Memuat...", accent = "blue" }: { message?: string; accent?: "blue" | "purple" }) {
-  const ring = accent === "purple" ? "border-t-purple-600" : "border-t-blue-600";
-  const text = accent === "purple" ? "text-purple-600" : "text-blue-600";
+  const ring = accent === "purple" ? "border-t-purple-600" : "border-t-brand";
+  const text = accent === "purple" ? "text-purple-600" : "text-brand-text";
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-slate-900/80 animate-in fade-in duration-200">
       <div className="flex flex-col items-center gap-5">

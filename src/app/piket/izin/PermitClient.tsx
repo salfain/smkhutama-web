@@ -86,7 +86,7 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                   <CheckCircle2 className="h-3.5 w-3.5" />Kembali
                 </Button>
                 <a href={`/piket/izin/${r.id}/print`} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" variant="outline" className="shrink-0 gap-1 text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-800 dark:hover:bg-blue-900/20" title="Cetak Surat Izin">
+                  <Button size="sm" variant="outline" className="shrink-0 gap-1 text-brand-text border-brand-soft hover:bg-brand-soft dark:border-brand dark:hover:bg-brand/15" title="Cetak Surat Izin">
                     <Printer className="h-3.5 w-3.5" />Cetak Surat
                   </Button>
                 </a>
@@ -137,7 +137,7 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <a href={`/piket/izin/${r.id}/print`} target="_blank" rel="noopener noreferrer">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Cetak Surat">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft dark:hover:bg-brand/15" title="Cetak Surat">
                             <Printer className="h-3.5 w-3.5" />
                           </Button>
                         </a>

@@ -17,6 +17,7 @@ import {
 } from "@/lib/piket-schedule";
 import { badRequest, forbidden, unauthorized } from "@/server/http";
 import type { ApiActor } from "@/server/auth";
+import { hasActiveAssignment } from "@/lib/assignment-access";
 
 export type LoginInput = {
   username?: string | null;
@@ -65,6 +66,8 @@ export async function checkCredentials(input: LoginInput): Promise<CredentialRes
   if (!passwordOk) return { ok: false, reason: "INVALID_CREDENTIALS" };
 
   if (input.system === "PIKET") {
+    const assignedPiket = user.role === "PIKET" || await hasActiveAssignment(user.id, "PIKET");
+    if (assignedPiket) return { ok: true, user };
     if (user.role !== "TEACHER" || !user.teacher) {
       return { ok: false, reason: "PIKET_REQUIRES_TEACHER" };
     }
@@ -79,6 +82,20 @@ export async function checkCredentials(input: LoginInput): Promise<CredentialRes
   }
 
   return { ok: true, user };
+}
+
+/**
+ * Saklar "izinkan siswa login lewat aplikasi mobile", diatur di
+ * /admin/student-access. Default aktif: sebelum saklar ini ada login mobile
+ * siswa selalu diizinkan, jadi baris setting yang belum pernah dibuat tidak
+ * boleh mengunci siswa.
+ */
+export async function getStudentMobileLoginEnabled() {
+  const setting = await prisma.systemSetting.findUnique({
+    where: { key: "allow_student_mobile_login" },
+    select: { value: true },
+  });
+  return setting?.value !== "false";
 }
 
 export async function login(input: LoginInput) {
@@ -105,6 +122,14 @@ export async function login(input: LoginInput) {
   }
 
   const user = result.user!;
+
+  if (user.role === "STUDENT" && !(await getStudentMobileLoginEnabled())) {
+    throw forbidden(
+      "Login siswa melalui aplikasi mobile sedang dinonaktifkan. Hubungi admin.",
+      "STUDENT_MOBILE_LOGIN_DISABLED"
+    );
+  }
+
   const token = await createToken(user.id, user.role);
 
   await logAudit({

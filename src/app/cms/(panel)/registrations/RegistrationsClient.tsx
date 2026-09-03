@@ -20,7 +20,7 @@ type Reg = {
 
 const statusStyle: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  VERIFIED: "bg-blue-100 text-blue-700 border-blue-200",
+  VERIFIED: "bg-brand-soft text-brand-text border-brand-soft",
   ACCEPTED: "bg-green-100 text-green-700 border-green-200",
   REJECTED: "bg-red-100 text-red-700 border-red-200",
 };
@@ -101,7 +101,7 @@ export function RegistrationsClient({ registrations }: { registrations: Reg[] })
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-600 hover:bg-blue-50" onClick={() => setDetail(r)} title="Detail">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-brand-text hover:bg-brand-soft" onClick={() => setDetail(r)} title="Detail">
                           <Eye className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500 hover:bg-red-50" onClick={() => remove(r.id)} title="Hapus">
@@ -144,7 +144,7 @@ export function RegistrationsClient({ registrations }: { registrations: Reg[] })
                 <div className="flex flex-wrap gap-2">
                   {(["PENDING", "VERIFIED", "ACCEPTED", "REJECTED"] as const).map((s) => (
                     <Button key={s} size="sm" variant={detail.status === s ? "default" : "outline"}
-                      className={detail.status === s ? "bg-blue-600 hover:bg-blue-700" : ""}
+                      className={detail.status === s ? "bg-brand hover:bg-brand-strong" : ""}
                       onClick={() => { setStatus(detail.id, s); setDetail({ ...detail, status: s }); }}>
                       {statusLabel[s]}
                     </Button>

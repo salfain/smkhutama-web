@@ -33,9 +33,9 @@ export function TeachersClient({ teachers }: { teachers: Teacher[] }) {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div className="w-full">
       <div className="mb-4 flex justify-end">
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={() => { setEditing(null); setErr(""); setOpen(true); }}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={() => { setEditing(null); setErr(""); setOpen(true); }}>
           <Plus className="h-4 w-4" />Tambah Guru
         </Button>
       </div>
@@ -53,18 +53,18 @@ export function TeachersClient({ teachers }: { teachers: Teacher[] }) {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={t.photoUrl} alt={t.name} className="h-12 w-12 rounded-full object-cover" />
                 ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-text">
                     {t.name.charAt(0)}
                   </div>
                 )}
                 <div className="min-w-0">
                   <p className="font-semibold text-gray-900 truncate">{t.name}</p>
-                  <Badge className="mt-1 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100">{t.position}</Badge>
+                  <Badge className="mt-1 bg-brand-soft text-brand-text border-brand-soft hover:bg-brand-soft">{t.position}</Badge>
                   {t.subject && <p className="mt-1 text-xs text-gray-500">{t.subject}</p>}
                 </div>
               </div>
               <div className="flex shrink-0 gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => { setEditing(t); setErr(""); setOpen(true); }}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" onClick={() => { setEditing(t); setErr(""); setOpen(true); }}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(t.id)}>
@@ -87,7 +87,7 @@ export function TeachersClient({ teachers }: { teachers: Teacher[] }) {
             {err && <p className="text-sm text-red-600">{err}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>Simpan</Button>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>Simpan</Button>
             </div>
           </form>
         </DialogContent>

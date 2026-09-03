@@ -34,9 +34,9 @@ export function MajorsClient({ majors }: { majors: Major[] }) {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full">
       <div className="mb-4 flex justify-end">
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={() => { setEditing(null); setErr(""); setOpen(true); }}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={() => { setEditing(null); setErr(""); setOpen(true); }}>
           <Plus className="h-4 w-4" />Tambah Jurusan
         </Button>
       </div>
@@ -51,13 +51,13 @@ export function MajorsClient({ majors }: { majors: Major[] }) {
             <div key={m.id} className="flex items-start justify-between gap-3 rounded-xl border bg-white p-4 shadow-sm">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100">{m.code}</Badge>
+                  <Badge className="bg-brand-soft text-brand-text border-brand-soft hover:bg-brand-soft">{m.code}</Badge>
                   <p className="font-semibold text-gray-900">{m.name}</p>
                 </div>
                 <p className="mt-1 text-sm text-gray-500">{m.description}</p>
               </div>
               <div className="flex shrink-0 gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => { setEditing(m); setErr(""); setOpen(true); }}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" onClick={() => { setEditing(m); setErr(""); setOpen(true); }}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(m.id)}>
@@ -79,7 +79,7 @@ export function MajorsClient({ majors }: { majors: Major[] }) {
             {err && <p className="text-sm text-red-600">{err}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>Simpan</Button>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>Simpan</Button>
             </div>
           </form>
         </DialogContent>

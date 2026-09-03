@@ -98,7 +98,7 @@ export function ClassTable({ classes, majors, teachers }: { classes: Class[]; ma
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input placeholder="Cari kelas..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700 sm:ml-auto" onClick={openCreate} disabled={majors.length === 0}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong sm:ml-auto" onClick={openCreate} disabled={majors.length === 0}>
           <Plus className="h-4 w-4" />Tambah Kelas
         </Button>
       </div>
@@ -121,13 +121,13 @@ export function ClassTable({ classes, majors, teachers }: { classes: Class[]; ma
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Tingkat {grade}</p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {list.map((c) => (
-                  <div key={c.id} className="rounded-xl border bg-white p-4 shadow-sm hover:border-blue-200 transition-colors">
+                  <div key={c.id} className="rounded-xl border bg-white p-4 shadow-sm hover:border-brand-soft transition-colors">
                     <div className="mb-2 flex items-start justify-between">
                       <div>
                         <p className="font-semibold text-gray-900">{c.name}</p>
                         <Badge variant="secondary" className="mt-1 font-mono text-xs">{c.major.code}</Badge>
                       </div>
-                      <div className="flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                      <div className="flex items-center gap-1 rounded-lg bg-brand-soft px-2 py-1 text-xs font-medium text-brand-text">
                         <Users className="h-3 w-3" />{c._count.students}
                       </div>
                     </div>
@@ -201,7 +201,7 @@ export function ClassTable({ classes, majors, teachers }: { classes: Class[]; ma
             {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                 {pending ? "Menyimpan..." : editing ? "Simpan Perubahan" : "Tambah Kelas"}
               </Button>
             </div>

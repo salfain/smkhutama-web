@@ -83,7 +83,7 @@ export function AcademicYearTable({ years }: { years: AcademicYear[] }) {
   return (
     <>
       <div className="mb-4 flex justify-end">
-        <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={openCreate}>
+        <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={openCreate}>
           <Plus className="h-4 w-4" />Tambah Tahun Ajaran
         </Button>
       </div>
@@ -96,11 +96,11 @@ export function AcademicYearTable({ years }: { years: AcademicYear[] }) {
       ) : (
         <div className="space-y-3">
           {years.map((y) => (
-            <div key={y.id} className={`rounded-xl border p-4 shadow-sm transition-colors ${y.isActive ? "border-green-300 bg-green-50/50" : "bg-white hover:border-blue-200"}`}>
+            <div key={y.id} className={`rounded-xl border p-4 shadow-sm transition-colors ${y.isActive ? "border-green-300 bg-green-50/50" : "bg-white hover:border-brand-soft"}`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${y.isActive ? "bg-green-100" : "bg-blue-50"}`}>
-                    <CalendarDays className={`h-5 w-5 ${y.isActive ? "text-green-600" : "text-blue-600"}`} />
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${y.isActive ? "bg-green-100" : "bg-brand-soft"}`}>
+                    <CalendarDays className={`h-5 w-5 ${y.isActive ? "text-green-600" : "text-brand-text"}`} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
@@ -161,7 +161,7 @@ export function AcademicYearTable({ years }: { years: AcademicYear[] }) {
                 type="checkbox"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600"
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-text"
               />
               <div>
                 <p className="text-sm font-medium text-gray-700">Set sebagai tahun ajaran aktif</p>
@@ -171,7 +171,7 @@ export function AcademicYearTable({ years }: { years: AcademicYear[] }) {
             {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                 {pending ? "Menyimpan..." : editing ? "Simpan Perubahan" : "Tambah"}
               </Button>
             </div>

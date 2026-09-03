@@ -13,7 +13,6 @@ const checkboxOptions: { key: keyof Settings; label: string }[] = [
   { key: "allow_free_navigation", label: "Izinkan navigasi soal bebas" },
   { key: "auto_submit_on_timeout", label: "Auto submit saat waktu habis" },
   { key: "show_result_default", label: "Tampilkan nilai langsung setelah ujian (default)" },
-  { key: "allow_student_web_login", label: "Izinkan siswa login melalui website" },
 ];
 
 export function SettingsForm({ settings }: { settings: Settings }) {
@@ -78,7 +77,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         <div className="space-y-3">
           {checkboxOptions.map((opt) => (
             <label key={opt.key} className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" name={opt.key} defaultChecked={settings[opt.key] === "true"} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+              <input type="checkbox" name={opt.key} defaultChecked={settings[opt.key] === "true"} className="h-4 w-4 rounded border-gray-300 text-brand-text" />
               <span className="text-sm text-gray-700">{opt.label}</span>
             </label>
           ))}
@@ -88,7 +87,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       {/* Backup */}
       <div className="rounded-xl border bg-white p-5 shadow-sm space-y-4">
         <p className="font-semibold text-gray-700 flex items-center gap-2">
-          <Database className="h-4 w-4 text-blue-600" />Status Database
+          <Database className="h-4 w-4 text-brand-text" />Status Database
         </p>
         {backupResult && (
           <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-700">
@@ -114,7 +113,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         </div>
       )}
 
-      <Button type="submit" className="gap-2 bg-blue-600 hover:bg-blue-700" disabled={pending}>
+      <Button type="submit" className="gap-2 bg-brand hover:bg-brand-strong" disabled={pending}>
         <Save className="h-4 w-4" />{pending ? "Menyimpan..." : "Simpan Pengaturan"}
       </Button>
     </form>

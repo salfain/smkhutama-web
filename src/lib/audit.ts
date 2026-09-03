@@ -1,8 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { prisma } from "./prisma";
-
-const COOKIE_NAME = "cbt-session";
+import { getSessionUserId } from "./session";
 
 type AuditDetails =
   | string
@@ -39,8 +38,7 @@ async function getRequestIp(): Promise<string | null> {
 
 export async function logAudit(input: AuditInput) {
   try {
-    const c = await cookies();
-    const userId = input.userId ?? c.get(COOKIE_NAME)?.value ?? null;
+    const userId = input.userId ?? (await getSessionUserId());
     const ipAddress = input.ipAddress ?? (await getRequestIp());
 
     await prisma.auditLog.create({

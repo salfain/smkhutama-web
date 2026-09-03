@@ -45,7 +45,7 @@ const statusLabel: Record<string, string> = {
 
 const statusStyle: Record<string, string> = {
   DRAFT: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
-  SUBMITTED: "bg-blue-100 text-blue-700 hover:bg-blue-100",
+  SUBMITTED: "bg-brand-soft text-brand-text hover:bg-brand-soft",
   APPROVED: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
   USED: "bg-purple-100 text-purple-700 hover:bg-purple-100",
 };
@@ -112,8 +112,8 @@ export function QuestionSetsAdminClient({
         <CardContent className="p-5">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-blue-50 p-2">
-                <Upload className="h-5 w-5 text-blue-600" />
+              <div className="rounded-lg bg-brand-soft p-2">
+                <Upload className="h-5 w-5 text-brand-text" />
               </div>
               <div>
                 <p className="font-semibold text-gray-900">Import Paket Soal untuk Guru</p>
@@ -181,7 +181,7 @@ export function QuestionSetsAdminClient({
               <Input id="file" name="file" type="file" accept=".xls,.xlsx" required />
             </div>
             <div className="flex items-end">
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={pending || !teacherId}>
+              <Button type="submit" className="w-full bg-brand hover:bg-brand-strong" disabled={pending || !teacherId}>
                 {pending ? "Mengimport..." : "Import Paket"}
               </Button>
             </div>

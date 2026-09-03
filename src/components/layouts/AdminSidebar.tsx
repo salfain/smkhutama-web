@@ -1,39 +1,55 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  School,
-  Users,
-  GraduationCap,
-  UserCog,
+  Award,
+  BarChart3,
   BookOpen,
-  ClipboardList,
   Building2,
   CalendarDays,
-  KeyRound,
-  MonitorCheck,
-  BarChart3,
-  Printer,
-  Award,
+  ClipboardList,
   Clock3,
-  ShieldAlert,
-  Settings,
+  GraduationCap,
+  KeyRound,
+  LayoutDashboard,
+  LogIn,
+  MonitorCheck,
+  Printer,
+  School,
   ScrollText,
-  Menu,
-  ChevronRight,
+  Settings,
+  ShieldAlert,
+  ShieldCheck,
+  UserCog,
+  Users,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LogoutButton } from "@/components/LogoutButton";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { GenesisSidebar } from "@/components/layouts/GenesisSidebar";
 
 type UserInfo = {
   name: string;
   username: string;
   email: string | null;
   role: "ADMIN" | "KURIKULUM" | "KESISWAAN" | "ADMIN_CBT";
+};
+
+const roleLabels: Record<UserInfo["role"], string> = {
+  ADMIN: "Administrator",
+  KURIKULUM: "Kurikulum",
+  KESISWAAN: "Kesiswaan",
+  ADMIN_CBT: "Admin CBT",
+};
+
+const roleTitles: Record<UserInfo["role"], string> = {
+  ADMIN: "ADMIN SMK HUTAMA",
+  KURIKULUM: "KURIKULUM SMK HUTAMA",
+  KESISWAAN: "KESISWAAN SMK HUTAMA",
+  ADMIN_CBT: "ADMIN CBT SMK HUTAMA",
+};
+
+const roleAbbr: Record<UserInfo["role"], string> = {
+  ADMIN: "AD",
+  KURIKULUM: "KU",
+  KESISWAAN: "KS",
+  ADMIN_CBT: "CB",
 };
 
 const navItems = [
@@ -43,9 +59,12 @@ const navItems = [
   { href: "/admin/teachers", icon: GraduationCap, label: "Data Guru", roles: ["ADMIN"] },
   { href: "/admin/majors", icon: Building2, label: "Jurusan", roles: ["ADMIN"] },
   { href: "/admin/audit-logs", icon: ScrollText, label: "Audit Log", roles: ["ADMIN"] },
+  { href: "/admin/access-control", icon: ShieldCheck, label: "Akses & Penugasan", roles: ["ADMIN"] },
   { href: "/admin/settings", icon: Settings, label: "Pengaturan", roles: ["ADMIN"] },
   { href: "/admin/classes", icon: Building2, label: "Kelas", roles: ["KURIKULUM"] },
   { href: "/admin/subjects", icon: BookOpen, label: "Mata Pelajaran", roles: ["KURIKULUM"] },
+  { href: "/admin/teaching-assignments", icon: ClipboardList, label: "Pembagian Mengajar", roles: ["KURIKULUM"] },
+  { href: "/admin/lesson-schedules", icon: CalendarDays, label: "Jadwal Pelajaran", roles: ["KURIKULUM"] },
   { href: "/admin/academic-years", icon: CalendarDays, label: "Tahun Ajaran", roles: ["KURIKULUM"] },
   { href: "/admin/piket-schedules", icon: CalendarDays, label: "Jadwal Piket", roles: ["KURIKULUM"] },
   { href: "/admin/exams", icon: UserCog, label: "Jadwal Ujian", roles: ["ADMIN_CBT"] },
@@ -54,101 +73,23 @@ const navItems = [
   { href: "/admin/monitoring", icon: MonitorCheck, label: "Monitoring", roles: ["ADMIN_CBT"] },
   { href: "/admin/reports", icon: BarChart3, label: "Laporan", roles: ["ADMIN_CBT"] },
   { href: "/admin/print", icon: Printer, label: "Cetak Dokumen", roles: ["ADMIN_CBT"] },
+  { href: "/admin/student-access", icon: LogIn, label: "Akses Login Siswa", roles: ["ADMIN_CBT"] },
   { href: "/admin/violations", icon: ShieldAlert, label: "Pelanggaran", roles: ["KESISWAAN"] },
   { href: "/admin/achievements", icon: Award, label: "Prestasi", roles: ["KESISWAAN"] },
   { href: "/admin/tardiness", icon: Clock3, label: "Rekap Terlambat", roles: ["KESISWAAN"] },
   { href: "/admin/permits", icon: ClipboardList, label: "Rekap Izin", roles: ["KESISWAAN"] },
 ];
 
-function SidebarContent({ user }: { user: UserInfo }) {
-  const pathname = usePathname();
-
-  return (
-    <div className="flex h-full flex-col">
-      {/* Logo */}
-      <div className="border-b px-4 py-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 font-bold text-white text-sm shrink-0">
-            CB
-          </div>
-          <div>
-            <p className="text-sm font-bold leading-tight text-gray-900">
-              CBT SMK HUTAMA
-            </p>
-            <p className="text-xs text-blue-600 font-medium">Administrator</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        {navItems.filter((item) => item.roles.includes(user.role)).map((item) => {
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
-                active
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <item.icon
-                className={`h-4 w-4 shrink-0 ${active ? "text-white" : "text-gray-400 group-hover:text-gray-600"}`}
-              />
-              {item.label}
-              {active && <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-60" />}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Footer */}
-      <div className="border-t p-3">
-        <div className="mb-2 flex items-center gap-2.5 rounded-lg bg-gray-50 px-3 py-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-bold shrink-0">
-            {user.name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-gray-900">{user.name}</p>
-            <p className="truncate text-xs text-gray-400">{user.email ?? user.username}</p>
-          </div>
-        </div>
-        <Link
-          href="/admin/change-password"
-          className="mb-2 flex items-center gap-2.5 rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-        >
-          <KeyRound className="h-3.5 w-3.5 text-amber-500" />
-          Ganti Password
-        </Link>
-        <LogoutButton />
-        <ThemeToggle className="w-full justify-start gap-2 h-9" />
-      </div>
-    </div>
-  );
-}
-
 export function AdminSidebar({ user }: { user: UserInfo }) {
   return (
-    <>
-      <aside className="hidden w-60 shrink-0 border-r bg-white lg:flex lg:flex-col">
-        <SidebarContent user={user} />
-      </aside>
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden fixed top-3 left-3 z-40 bg-white shadow-md border"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-60 p-0">
-          <SidebarContent user={user} />
-        </SheetContent>
-      </Sheet>
-    </>
+    <GenesisSidebar
+      brandAbbr={roleAbbr[user.role]}
+      brandTitle={roleTitles[user.role]}
+      brandSubtitle={roleLabels[user.role]}
+      navItems={navItems.filter((item) => item.roles.includes(user.role))}
+      userName={user.name}
+      userDetail={user.email ?? user.username}
+      changePasswordHref="/admin/change-password"
+    />
   );
 }

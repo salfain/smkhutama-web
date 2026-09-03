@@ -3,14 +3,17 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { requireCurrentAcademicYearId } from "@/lib/academic-year";
 
 const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
 export async function getPiketScheduleData() {
   await requireAuth("KURIKULUM");
+  const academicYearId = await requireCurrentAcademicYearId();
 
   const [schedules, teachers] = await Promise.all([
     prisma.piketSchedule.findMany({
+      where: { academicYearId },
       include: { teacher: { include: { user: { select: { name: true } } } } },
       orderBy: [{ dayOfWeek: "asc" }, { createdAt: "asc" }],
     }),
@@ -25,6 +28,7 @@ export async function getPiketScheduleData() {
 
 export async function upsertPiketSchedule(formData: FormData) {
   await requireAuth("KURIKULUM");
+  const academicYearId = await requireCurrentAcademicYearId();
 
   const teacherId = String(formData.get("teacherId") ?? "").trim();
   const dayOfWeek = Number(formData.get("dayOfWeek") ?? -1);
@@ -35,9 +39,9 @@ export async function upsertPiketSchedule(formData: FormData) {
 
   try {
     await prisma.piketSchedule.upsert({
-      where: { teacherId_dayOfWeek: { teacherId, dayOfWeek } },
+      where: { academicYearId_teacherId_dayOfWeek: { academicYearId, teacherId, dayOfWeek } },
       update: { isActive: true, note: note || null },
-      create: { teacherId, dayOfWeek, note: note || null, isActive: true },
+      create: { academicYearId, teacherId, dayOfWeek, note: note || null, isActive: true },
     });
     revalidatePath("/admin/piket-schedule");
     return { success: true };

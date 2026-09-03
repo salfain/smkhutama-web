@@ -28,7 +28,7 @@ export default async function MonitoringPage({
           <MonitorCheck className="mx-auto mb-2 h-10 w-10 text-gray-300" />
           <p className="text-sm font-semibold text-gray-700">Belum ada ujian aktif</p>
           <p className="mt-1 text-xs text-gray-500">
-            Aktifkan ujian di <a href="/admin/exams" className="underline text-blue-600">Jadwal Ujian</a> untuk mulai monitoring.
+            Aktifkan ujian di <a href="/admin/exams" className="underline text-brand-text">Jadwal Ujian</a> untuk mulai monitoring.
           </p>
         </div>
       </div>

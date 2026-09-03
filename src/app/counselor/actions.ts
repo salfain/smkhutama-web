@@ -11,7 +11,10 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAuth, requireCounselorAuth } from "@/lib/session";
+import { requirePermission } from "@/lib/permissions";
+import { logSensitiveAccess } from "@/lib/sensitive-access";
 import * as bk from "@/server/modules/bk/service";
+import { getPriorityQueue } from "@/server/modules/bk/case-workspace";
 import { toAchievement, toCase, toDashboard, toRequest, toViolation } from "@/server/modules/bk/dto";
 
 const CASES_PATH = "/counselor/cases";
@@ -50,17 +53,33 @@ export async function listStudents() {
 // ---------- DASHBOARD ----------
 export async function getDashboardStats() {
   await requireCounselorAuth();
-  const [dashboard, topStudents] = await Promise.all([
+  const [dashboard, topStudents, priorityCases] = await Promise.all([
     bk.getCounselorDashboard(),
     bk.getTopViolationStudents(),
+    getPriorityQueue(),
   ]);
-  return { ...toDashboard(dashboard), topStudents };
+  return {
+    ...toDashboard(dashboard),
+    topStudents,
+    priorityCases: priorityCases.map((record) => ({
+      id: record.id,
+      title: record.title,
+      studentName: record.student.user.name,
+      className: record.student.class?.name ?? "-",
+      priority: record.priority,
+      riskLevel: record.riskLevel,
+      nextFollowUpAt: record.nextFollowUpAt,
+      sessionCount: record._count.sessions,
+    })),
+  };
 }
 
 // ---------- CASES ----------
 export async function listCases() {
   await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.view");
   const cases = await bk.listCases();
+  await logSensitiveAccess({ userId: user.id, resourceType: "counseling_case", purpose: "Membuka daftar sesi konseling" });
   return cases.map((c) => ({ ...toCase(c), studentId: c.studentId }));
 }
 
@@ -250,8 +269,11 @@ export async function convertRequestToCase(id: string) {
 /** Ambil detail sesi konseling untuk cetak/PDF. */
 export async function getCaseDetail(id: string) {
   await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.print");
   const c = await bk.getCase(id);
   if (!c) return null;
+
+  await logSensitiveAccess({ userId: user.id, action: "PRINT", resourceType: "counseling_case", resourceId: id, purpose: "Membuka dokumen cetak sesi konseling" });
 
   return {
     id: c.id,

@@ -37,7 +37,7 @@ export function ReportsClient({ data }: { data: Data }) {
     { label: "Total Konseling", value: data.totalCases, icon: MessagesSquare, color: "bg-purple-500" },
     { label: "Total Pelanggaran", value: data.totalViolations, icon: ShieldAlert, color: "bg-red-500" },
     { label: "Total Prestasi", value: data.totalAchievements, icon: Award, color: "bg-emerald-500" },
-    { label: "Kunjungan Rumah", value: data.totalHomeVisits, icon: HomeIcon, color: "bg-blue-500" },
+    { label: "Kunjungan Rumah", value: data.totalHomeVisits, icon: HomeIcon, color: "bg-brand" },
   ];
 
   return (

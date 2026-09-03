@@ -18,11 +18,11 @@ type Summon = { id: string; studentName: string; className: string; level: strin
 
 const statusCls: Record<string, { label: string; cls: string }> = {
   PENDING: { label: "Belum dikirim", cls: "bg-gray-100 text-gray-700" },
-  SENT: { label: "Terkirim", cls: "bg-blue-100 text-blue-700" },
+  SENT: { label: "Terkirim", cls: "bg-brand-soft text-brand-text" },
   DONE: { label: "Selesai", cls: "bg-green-100 text-green-700" },
 };
 const levelCls: Record<string, string> = {
-  SP1: "bg-yellow-100 text-yellow-700", SP2: "bg-blue-100 text-blue-700",
+  SP1: "bg-yellow-100 text-yellow-700", SP2: "bg-brand-soft text-brand-text",
   SP3: "bg-red-100 text-red-700", PANGGILAN: "bg-purple-100 text-purple-700",
 };
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
@@ -131,7 +131,7 @@ export function FollowUpClient({ students, summons }: { students: StudentRow[]; 
                   <a href={`/counselor/summons/${s.id}/print`} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" size="sm" className="gap-1.5"><FileText className="h-3.5 w-3.5" />Cetak Surat</Button>
                   </a>
-                  {s.status === "PENDING" && <Button variant="ghost" size="sm" className="gap-1.5 text-blue-600 hover:bg-blue-50" onClick={() => setStatus(s.id, "SENT")}><Send className="h-3.5 w-3.5" />Tandai Terkirim</Button>}
+                  {s.status === "PENDING" && <Button variant="ghost" size="sm" className="gap-1.5 text-brand-text hover:bg-brand-soft" onClick={() => setStatus(s.id, "SENT")}><Send className="h-3.5 w-3.5" />Tandai Terkirim</Button>}
                   {s.status !== "DONE" && <Button variant="ghost" size="sm" className="gap-1.5 text-green-600 hover:bg-green-50" onClick={() => setStatus(s.id, "DONE")}><CheckCircle2 className="h-3.5 w-3.5" />Selesai</Button>}
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => remove(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>

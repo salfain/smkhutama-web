@@ -17,11 +17,11 @@ type Request = {
 
 const STATUSES = [["PENDING", "Menunggu"], ["APPROVED", "Disetujui"], ["SCHEDULED", "Dijadwalkan"], ["DONE", "Selesai"], ["REJECTED", "Ditolak"]];
 const statusCls: Record<string, string> = {
-  PENDING: "bg-gray-100 text-gray-700", APPROVED: "bg-blue-100 text-blue-700",
-  SCHEDULED: "bg-sky-100 text-sky-700", DONE: "bg-green-100 text-green-700", REJECTED: "bg-red-100 text-red-700",
+  PENDING: "bg-gray-100 text-gray-700", APPROVED: "bg-brand-soft text-brand-text",
+  SCHEDULED: "bg-brand-soft text-brand-text", DONE: "bg-green-100 text-green-700", REJECTED: "bg-red-100 text-red-700",
 };
 const urgencyCls: Record<string, string> = {
-  RENDAH: "bg-slate-100 text-slate-600", SEDANG: "bg-sky-100 text-sky-700", TINGGI: "bg-red-100 text-red-700",
+  RENDAH: "bg-slate-100 text-slate-600", SEDANG: "bg-brand-soft text-brand-text", TINGGI: "bg-red-100 text-red-700",
 };
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
@@ -84,7 +84,7 @@ export function RequestsClient({ requests }: { requests: Request[] }) {
               </div>
               {r.description && <p className="mt-2 text-sm text-gray-600">{r.description}</p>}
               <p className="text-[11px] text-gray-400 mt-1">Diajukan {fmt(r.createdAt)}{r.preferredDate && ` · Preferensi: ${fmt(r.preferredDate)}`}</p>
-              {r.response && <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">Tanggapan: {r.response}</p>}
+              {r.response && <p className="mt-2 rounded-lg bg-brand-soft px-3 py-2 text-xs text-brand-text">Tanggapan: {r.response}</p>}
               <div className="mt-3 flex justify-end gap-2">
                 {(r.status === "PENDING" || r.status === "APPROVED") && (
                   <Button variant="outline" size="sm" className="gap-1.5 text-purple-600 border-purple-200 hover:bg-purple-50" onClick={() => makeSession(r.id)} disabled={pending}>

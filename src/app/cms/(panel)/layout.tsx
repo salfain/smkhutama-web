@@ -4,9 +4,9 @@ import { requireCmsAuth } from "@/lib/session";
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
   const user = await requireCmsAuth();
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="genesis-app flex h-screen overflow-hidden bg-[#FAFAFA] dark:bg-[#111113]">
       <CmsSidebar name={user.name} />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto pb-24 lg:pb-0">{children}</main>
     </div>
   );
 }

@@ -5,7 +5,15 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Search, BookUser, ChevronRight } from "lucide-react";
 
-type Row = { id: string; name: string; nis: string; className: string; violationPoints: number; achievementPoints: number; cases: number };
+type ProfileStatus = "DRAFT" | "PENDING" | "VERIFIED" | "REJECTED";
+type Row = { id: string; name: string; nis: string; className: string; violationPoints: number; achievementPoints: number; cases: number; profileStatus: ProfileStatus };
+
+/** Status biodata; hanya ditandai bila belum beres agar daftar tetap tenang. */
+const profileBadge: Partial<Record<ProfileStatus, { label: string; cls: string }>> = {
+  DRAFT: { label: "Biodata kosong", cls: "bg-gray-100 text-gray-600" },
+  PENDING: { label: "Perlu verifikasi", cls: "bg-amber-100 text-amber-700" },
+  REJECTED: { label: "Dikembalikan", cls: "bg-red-100 text-red-700" },
+};
 
 export function StudentsBookClient({ students }: { students: Row[] }) {
   const [q, setQ] = useState("");
@@ -41,7 +49,7 @@ export function StudentsBookClient({ students }: { students: Row[] }) {
             document.body.removeChild(link);
           }}
           disabled={filtered.length === 0}
-          className="inline-flex items-center gap-2 rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           <svg className="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           Export CSV
@@ -54,37 +62,79 @@ export function StudentsBookClient({ students }: { students: Row[] }) {
           <p className="text-sm text-gray-500">Tidak ada siswa.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs text-gray-500">
-              <tr>
-                <th className="px-4 py-3">Siswa</th>
-                <th className="px-4 py-3 text-center">Pelanggaran</th>
-                <th className="px-4 py-3 text-center">Prestasi</th>
-                <th className="px-4 py-3 text-center">Konseling</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filtered.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{s.name}</p>
-                    <p className="text-xs text-gray-400">{s.className}{s.nis && ` · ${s.nis}`}</p>
-                  </td>
-                  <td className="px-4 py-3 text-center"><span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">{s.violationPoints}</span></td>
-                  <td className="px-4 py-3 text-center"><span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">{s.achievementPoints}</span></td>
-                  <td className="px-4 py-3 text-center text-gray-600">{s.cases}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/counselor/students/${s.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:underline">
-                      Detail <ChevronRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </td>
+        <>
+          {/* Mobile: kartu per siswa */}
+          <ul className="space-y-2 md:hidden">
+            {filtered.map((s) => (
+              <li key={s.id}>
+                <Link
+                  href={`/counselor/students/${s.id}`}
+                  className="flex items-center gap-3 rounded-xl border bg-white p-3 shadow-sm active:bg-gray-50"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-gray-900">{s.name}</p>
+                    <p className="truncate text-xs text-gray-400">{s.className}{s.nis && ` · ${s.nis}`}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
+                        {s.violationPoints} pelanggaran
+                      </span>
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">
+                        {s.achievementPoints} prestasi
+                      </span>
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600">
+                        {s.cases} konseling
+                      </span>
+                      {profileBadge[s.profileStatus] && (
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${profileBadge[s.profileStatus]!.cls}`}>
+                          {profileBadge[s.profileStatus]!.label}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Tablet & desktop: tabel penuh */}
+          <div className="hidden overflow-x-auto rounded-xl border bg-white shadow-sm md:block">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead className="bg-gray-50 text-left text-xs text-gray-500">
+                <tr>
+                  <th className="px-4 py-3">Siswa</th>
+                  <th className="px-4 py-3 text-center">Pelanggaran</th>
+                  <th className="px-4 py-3 text-center">Prestasi</th>
+                  <th className="px-4 py-3 text-center">Konseling</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y">
+                {filtered.map((s) => (
+                  <tr key={s.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-gray-900">{s.name}</p>
+                      <p className="text-xs text-gray-400">{s.className}{s.nis && ` · ${s.nis}`}</p>
+                      {profileBadge[s.profileStatus] && (
+                        <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${profileBadge[s.profileStatus]!.cls}`}>
+                          {profileBadge[s.profileStatus]!.label}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center"><span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">{s.violationPoints}</span></td>
+                    <td className="px-4 py-3 text-center"><span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">{s.achievementPoints}</span></td>
+                    <td className="px-4 py-3 text-center text-gray-600">{s.cases}</td>
+                    <td className="px-4 py-3 text-right">
+                      <Link href={`/counselor/students/${s.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:underline">
+                        Detail <ChevronRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

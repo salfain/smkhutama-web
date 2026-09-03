@@ -32,29 +32,29 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
 
   if (success) {
     return (
-      <div className="rounded-3xl border border-green-200 dark:border-green-800 bg-white dark:bg-slate-800 p-8 md:p-12 text-center shadow-xl animate-scale-in">
+      <div className="rounded-3xl border border-green-200 dark:border-green-800 bg-surface p-8 md:p-12 text-center shadow-xl animate-scale-in">
         <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40">
           <CheckCircle2 className="h-10 w-10 text-green-600 dark:text-green-400" />
         </div>
-        <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+        <h2 className="font-heading text-2xl md:text-3xl font-bold text-ink">
           Pendaftaran Berhasil! 🎉
         </h2>
-        <p className="mt-3 text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-ink-soft">
           Simpan nomor pendaftaran Anda untuk konfirmasi selanjutnya.
         </p>
-        <div className="mt-6 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 px-6 py-4">
-          <span className="font-mono text-2xl md:text-3xl font-bold tracking-wider text-blue-700 dark:text-blue-300">{success}</span>
+        <div className="mt-6 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-soft to-brand-soft dark:from-brand/10 dark:to-brand/10 border border-hairline px-6 py-4">
+          <span className="font-mono text-2xl md:text-3xl font-bold tracking-wider text-brand-text">{success}</span>
           <button onClick={() => { navigator.clipboard.writeText(success); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-            className="rounded-lg p-2 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors text-slate-400 hover:text-blue-600">
+            className="rounded-lg p-2 hover:bg-brand-soft dark:hover:bg-brand/15 transition-colors text-ink-soft hover:text-brand-text">
             {copied ? <Check className="h-5 w-5 text-green-600" /> : <Copy className="h-5 w-5" />}
           </button>
         </div>
-        <div className="mt-8 rounded-xl bg-slate-50 dark:bg-slate-700/50 p-4">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+        <div className="mt-8 rounded-xl bg-canvas p-4">
+          <p className="text-sm text-ink-soft">
             📱 Panitia akan menghubungi Anda via WhatsApp untuk verifikasi dan informasi selanjutnya. Terima kasih telah mendaftar di SMK Hutama!
           </p>
         </div>
-        <a href="/ppdb/status" className="mt-4 inline-block text-sm font-semibold text-sky-600 hover:underline dark:text-sky-400">
+        <a href="/ppdb/status" className="mt-4 inline-block text-sm font-semibold text-brand-text hover:underline dark:text-brand-text">
           Cek status pendaftaran →
         </a>
       </div>
@@ -64,28 +64,28 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
   return (
     <form action={handleSubmit} className="space-y-6">
       {/* Section 1: Data Pribadi */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 shadow-sm transition-shadow hover:shadow-md">
+      <div className="rounded-2xl border border-hairline bg-surface p-6 md:p-8 shadow-sm transition-shadow hover:shadow-md">
         <div className="flex items-center gap-3 mb-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/40">
-            <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft">
+            <User className="h-5 w-5 text-brand-text" />
           </div>
           <div>
-            <h3 className="font-heading text-base font-bold text-slate-900 dark:text-white">Data Calon Siswa</h3>
-            <p className="text-xs text-slate-400">Isi sesuai dokumen resmi</p>
+            <h3 className="font-heading text-base font-bold text-ink">Data Calon Siswa</h3>
+            <p className="text-xs text-ink-soft">Isi sesuai dokumen resmi</p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2 space-y-1.5">
-            <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300">Nama Lengkap <span className="text-red-500">*</span></Label>
+            <Label htmlFor="fullName" className="text-ink">Nama Lengkap <span className="text-red-500">*</span></Label>
             <Input id="fullName" name="fullName" placeholder="Nama sesuai ijazah" required className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="nisn" className="text-slate-700 dark:text-slate-300">NISN</Label>
+            <Label htmlFor="nisn" className="text-ink">NISN</Label>
             <Input id="nisn" name="nisn" placeholder="Nomor Induk Siswa Nasional" className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-slate-700 dark:text-slate-300">Jenis Kelamin</Label>
+            <Label className="text-ink">Jenis Kelamin</Label>
             <Select value={gender} onValueChange={setGender}>
               <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Pilih..." /></SelectTrigger>
               <SelectContent>
@@ -96,39 +96,39 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="birthPlace" className="text-slate-700 dark:text-slate-300">Tempat Lahir</Label>
+            <Label htmlFor="birthPlace" className="text-ink">Tempat Lahir</Label>
             <Input id="birthPlace" name="birthPlace" placeholder="Kota kelahiran" className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="birthDate" className="text-slate-700 dark:text-slate-300">Tanggal Lahir</Label>
+            <Label htmlFor="birthDate" className="text-ink">Tanggal Lahir</Label>
             <Input id="birthDate" name="birthDate" type="date" className="h-11 rounded-xl" />
           </div>
           <div className="sm:col-span-2 space-y-1.5">
-            <Label htmlFor="address" className="text-slate-700 dark:text-slate-300">Alamat Lengkap</Label>
+            <Label htmlFor="address" className="text-ink">Alamat Lengkap</Label>
             <Textarea id="address" name="address" rows={3} placeholder="Jalan, RT/RW, Kelurahan, Kecamatan, Kota" className="rounded-xl" />
           </div>
         </div>
       </div>
 
       {/* Section 2: Pendidikan */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 shadow-sm transition-shadow hover:shadow-md">
+      <div className="rounded-2xl border border-hairline bg-surface p-6 md:p-8 shadow-sm transition-shadow hover:shadow-md">
         <div className="flex items-center gap-3 mb-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/40">
-            <GraduationCap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft">
+            <GraduationCap className="h-5 w-5 text-brand-text" />
           </div>
           <div>
-            <h3 className="font-heading text-base font-bold text-slate-900 dark:text-white">Asal Sekolah & Jurusan</h3>
-            <p className="text-xs text-slate-400">Pilih program keahlian yang diminati</p>
+            <h3 className="font-heading text-base font-bold text-ink">Asal Sekolah & Jurusan</h3>
+            <p className="text-xs text-ink-soft">Pilih program keahlian yang diminati</p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="originSchool" className="text-slate-700 dark:text-slate-300">Asal Sekolah (SMP/MTs)</Label>
+            <Label htmlFor="originSchool" className="text-ink">Asal Sekolah (SMP/MTs)</Label>
             <Input id="originSchool" name="originSchool" placeholder="Nama sekolah asal" className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-slate-700 dark:text-slate-300">Pilihan Jurusan <span className="text-red-500">*</span></Label>
+            <Label className="text-ink">Pilihan Jurusan <span className="text-red-500">*</span></Label>
             <Select value={major} onValueChange={setMajor}>
               <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Pilih jurusan" /></SelectTrigger>
               <SelectContent>
@@ -144,32 +144,32 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
       </div>
 
       {/* Section 3: Kontak */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 shadow-sm transition-shadow hover:shadow-md">
+      <div className="rounded-2xl border border-hairline bg-surface p-6 md:p-8 shadow-sm transition-shadow hover:shadow-md">
         <div className="flex items-center gap-3 mb-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/40">
             <Phone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <h3 className="font-heading text-base font-bold text-slate-900 dark:text-white">Informasi Kontak</h3>
-            <p className="text-xs text-slate-400">Untuk komunikasi selama proses PPDB</p>
+            <h3 className="font-heading text-base font-bold text-ink">Informasi Kontak</h3>
+            <p className="text-xs text-ink-soft">Untuk komunikasi selama proses PPDB</p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300">No. HP / WhatsApp <span className="text-red-500">*</span></Label>
+            <Label htmlFor="phone" className="text-ink">No. HP / WhatsApp <span className="text-red-500">*</span></Label>
             <Input id="phone" name="phone" placeholder="08xxxxxxxxxx" required className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">Email</Label>
+            <Label htmlFor="email" className="text-ink">Email</Label>
             <Input id="email" name="email" type="email" placeholder="email@contoh.com (opsional)" className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="parentName" className="text-slate-700 dark:text-slate-300">Nama Orang Tua / Wali</Label>
+            <Label htmlFor="parentName" className="text-ink">Nama Orang Tua / Wali</Label>
             <Input id="parentName" name="parentName" placeholder="Nama lengkap wali" className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="parentPhone" className="text-slate-700 dark:text-slate-300">No. HP Orang Tua</Label>
+            <Label htmlFor="parentPhone" className="text-ink">No. HP Orang Tua</Label>
             <Input id="parentPhone" name="parentPhone" placeholder="08xxxxxxxxxx" className="h-11 rounded-xl" />
           </div>
         </div>
@@ -184,9 +184,9 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
       )}
 
       {/* Submit */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 shadow-sm">
+      <div className="rounded-2xl border border-hairline bg-surface p-6 md:p-8 shadow-sm">
         <Button type="submit" size="lg"
-          className="w-full h-12 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-900 font-semibold text-base shadow-lg shadow-sky-500/25 transition-all hover:shadow-xl hover:shadow-sky-500/30 hover:-translate-y-0.5"
+          className="w-full h-12 rounded-xl bg-gradient-to-r from-brand to-brand-strong hover:from-brand-strong hover:to-brand text-brand-ink font-semibold text-base shadow-lg shadow-brand/25 transition-all hover:shadow-xl hover:shadow-brand/30 hover:-translate-y-0.5"
           disabled={pending}
         >
           {pending ? (
@@ -201,7 +201,7 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
             </span>
           )}
         </Button>
-        <p className="mt-4 text-center text-xs text-slate-400">
+        <p className="mt-4 text-center text-xs text-ink-soft">
           Dengan mendaftar, Anda menyetujui data digunakan untuk proses Penerimaan Peserta Didik Baru SMK Hutama.
         </p>
       </div>

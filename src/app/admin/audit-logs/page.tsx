@@ -108,7 +108,7 @@ export default async function AuditLogsPage({
           </div>
           <div className="rounded-xl border bg-white px-4 py-3 shadow-sm">
             <p className="text-xs text-gray-500">Ditampilkan</p>
-            <p className="text-xl font-bold text-blue-600">{logs.length}</p>
+            <p className="text-xl font-bold text-brand-text">{logs.length}</p>
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default async function AuditLogsPage({
             ))}
           </select>
           <div className="flex gap-2">
-            <Button type="submit" className="h-10 bg-blue-600 hover:bg-blue-700">Filter</Button>
+            <Button type="submit" className="h-10 bg-brand hover:bg-brand-strong">Filter</Button>
             <Button asChild type="button" variant="outline" className="h-10">
               <a href="/admin/audit-logs">Reset</a>
             </Button>
@@ -170,7 +170,7 @@ export default async function AuditLogsPage({
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
+                      <Badge className="bg-brand-soft text-brand-text hover:bg-brand-soft">
                         {formatAction(log.action)}
                       </Badge>
                       {log.entity && (

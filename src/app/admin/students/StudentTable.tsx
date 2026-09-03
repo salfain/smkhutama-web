@@ -200,7 +200,7 @@ export function StudentTable({
           <Button variant="outline" size="sm" className="gap-1.5" onClick={handleExport} disabled={pending}>
             <Download className="h-4 w-4" />Export
           </Button>
-          <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700" onClick={openCreate}>
+          <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand-strong" onClick={openCreate}>
             <Plus className="h-4 w-4" />Tambah
           </Button>
         </div>
@@ -245,10 +245,10 @@ export function StudentTable({
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="Edit" onClick={() => openEdit(s)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" title="Edit" onClick={() => openEdit(s)}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" title="Reset Password" onClick={() => handleReset(s)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-text hover:bg-brand-soft" title="Reset Password" onClick={() => handleReset(s)}>
                           <RotateCcw className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon" className={`h-8 w-8 ${s.user.isActive ? "text-yellow-600 hover:bg-yellow-50" : "text-green-600 hover:bg-green-50"}`} title={s.user.isActive ? "Nonaktifkan" : "Aktifkan"} onClick={() => handleToggle(s)}>
@@ -333,7 +333,7 @@ export function StudentTable({
             {error && <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+              <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                 {pending ? "Menyimpan..." : editing ? "Simpan Perubahan" : "Tambah Siswa"}
               </Button>
             </div>
@@ -349,7 +349,7 @@ export function StudentTable({
           </DialogHeader>
           <div className="space-y-4 pt-2">
             {/* Info kolom */}
-            <div className="rounded-xl border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700 space-y-1">
+            <div className="rounded-xl border border-brand-soft bg-brand-soft p-3 text-xs text-brand-text space-y-1">
               <p className="font-semibold">Kolom yang diperlukan:</p>
               <ul className="list-disc pl-4 space-y-0.5">
                 <li><span className="font-medium">Nama Lengkap</span> — wajib</li>
@@ -387,7 +387,7 @@ export function StudentTable({
               )}
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setImportOpen(false)}>Tutup</Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={pending}>
+                <Button type="submit" className="bg-brand hover:bg-brand-strong" disabled={pending}>
                   {pending ? "Mengimport..." : "Import Sekarang"}
                 </Button>
               </div>

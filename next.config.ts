@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Wajib untuk Dockerfile (stage runner meng-copy .next/standalone)
+  output: "standalone",
   async headers() {
     return [
       {

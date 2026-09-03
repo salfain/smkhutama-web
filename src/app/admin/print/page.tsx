@@ -13,7 +13,7 @@ export default async function PrintPage() {
     <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-6 print:hidden">
         <div className="flex items-center gap-2">
-          <Printer className="h-6 w-6 text-blue-600" />
+          <Printer className="h-6 w-6 text-brand-text" />
           <h1 className="font-heading text-2xl font-bold text-gray-900">Cetak Dokumen</h1>
         </div>
         <p className="text-sm text-gray-500">

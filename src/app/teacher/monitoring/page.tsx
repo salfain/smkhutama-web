@@ -16,9 +16,14 @@ export default async function TeacherMonitoringPage() {
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-gray-900">Monitoring Ujian</h1>
-        <p className="text-sm text-gray-500">Pantau peserta yang sedang mengerjakan ujian Anda</p>
+      <div className="mb-6 flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text">
+          <MonitorCheck className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="font-heading text-2xl font-bold text-gray-900 dark:text-white">Monitoring Ujian</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Pantau peserta yang sedang mengerjakan ujian Anda</p>
+        </div>
       </div>
 
       {exams.length === 0 ? (
@@ -63,7 +68,7 @@ export default async function TeacherMonitoringPage() {
                             <div className="flex flex-col gap-1 items-end shrink-0">
                               <Badge className={`text-xs hover:opacity-100 ${
                                 isInProgress ? "bg-green-100 text-green-700 border-green-200"
-                                : isSubmitted ? "bg-blue-100 text-blue-700 border-blue-200"
+                                : isSubmitted ? "bg-brand-soft text-brand-text border-brand-soft"
                                 : "bg-gray-100 text-gray-600 border-gray-200"
                               }`}>
                                 {isInProgress ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Mengerjakan</span>

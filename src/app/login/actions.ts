@@ -13,30 +13,20 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { clearSession, setSession } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
+import { getActiveAssignmentTypes } from "@/lib/assignment-access";
+import type { AssignmentType } from "@/generated/prisma/client";
 import { checkCredentials, type CredentialFailure } from "@/server/modules/auth/service";
+import { portals, suggestedPortal, type Portal, type Role, type System } from "./portals";
 
-type Role =
-  | "ADMIN"
-  | "TEACHER"
-  | "STUDENT"
-  | "COUNSELOR"
-  | "PIKET"
-  | "KURIKULUM"
-  | "KESISWAAN"
-  | "ADMIN_CBT";
-type System = "CBT" | "SIBIKONS" | "PIKET";
-
-type LoginResult = { error: string } | { success: true; redirectTo: string };
+type LoginResult = { error: string } | { success: true; redirectTo: string; role: Role };
 
 /** Kalimat versi web — diakhiri titik, berbeda dari kalimat API. */
-function messageFor(reason: CredentialFailure, role: Role, today?: string) {
+function messageFor(reason: CredentialFailure, today?: string) {
   switch (reason) {
     case "MISSING_FIELDS":
       return "Username dan password wajib diisi.";
     case "ACCOUNT_INACTIVE":
       return "Akun Anda nonaktif. Hubungi admin.";
-    case "ROLE_MISMATCH":
-      return `Akun ini bukan akun ${role.toLowerCase()}.`;
     case "PIKET_REQUIRES_TEACHER":
       return "Login piket menggunakan akun guru.";
     case "PIKET_NOT_SCHEDULED":
@@ -46,8 +36,10 @@ function messageFor(reason: CredentialFailure, role: Role, today?: string) {
   }
 }
 
-function destinationFor(role: string, system?: System) {
+function destinationFor(role: string, system: System | undefined, assignments: AssignmentType[]) {
   if (system === "PIKET") return "/piket/dashboard";
+  if (system === "SIBIKONS" && assignments.includes("COUNSELOR")) return "/counselor/dashboard";
+  if (system === "CBT" && assignments.some((type) => ["KURIKULUM", "KESISWAAN", "ADMIN_CBT"].includes(type))) return "/admin/dashboard";
   if (role === "ADMIN") return "/admin/dashboard";
   if (role === "KURIKULUM") return "/admin/dashboard";
   if (role === "KESISWAAN") return "/admin/dashboard";
@@ -66,22 +58,54 @@ export async function getStudentWebLoginEnabled() {
   return setting?.value === "true";
 }
 
+/**
+ * Pesan untuk akun yang benar tapi membuka pintu yang salah.
+ *
+ * Password-nya sudah terbukti pada titik ini, jadi menunjukkan pintu yang tepat
+ * tidak membocorkan apa pun yang belum diketahui pemilik akun — dan jauh lebih
+ * berguna daripada sekadar "akses ditolak".
+ */
+function wrongPortalMessage(role: Role, portal: Portal) {
+  const suggestion = suggestedPortal(role);
+  const opened = portals[portal].title;
+  if (!suggestion || suggestion === portal) {
+    return `Akun ini tidak memiliki akses ke ${opened}.`;
+  }
+  return `Akun ini tidak masuk lewat ${opened}. Silakan gunakan halaman ${portals[suggestion].title}.`;
+}
+
 export async function loginAction(
   username: string,
   password: string,
-  expectedRole: Role,
-  system?: System
+  portal: Portal
 ): Promise<LoginResult> {
   try {
-    const result = await checkCredentials({ username, password, role: expectedRole, system });
+    const def = portals[portal];
+    const system = def.system;
+
+    // `role` sengaja tidak dikirim ke pemeriksa kredensial: perannya ditentukan
+    // oleh akun, bukan oleh pilihan di layar. Yang diperiksa di bawah adalah
+    // apakah peran itu boleh lewat pintu yang dibuka.
+    const result = await checkCredentials({ username, password, system });
     if (!result.ok) {
-      return { error: messageFor(result.reason, expectedRole, result.today) };
+      return { error: messageFor(result.reason, result.today) };
     }
 
     const user = result.user!;
+    const role = user.role as Role;
+    const assignments = await getActiveAssignmentTypes(user.id);
+
+    const allowedByAssignment =
+      (portal === "staf" && assignments.some((type) => ["KURIKULUM", "KESISWAAN", "ADMIN_CBT"].includes(type))) ||
+      (portal === "sibikons" && assignments.includes("COUNSELOR")) ||
+      (portal === "piket" && (role === "PIKET" || assignments.includes("PIKET")));
+
+    if (!def.roles.includes(role) && !allowedByAssignment) {
+      return { error: wrongPortalMessage(role, portal) };
+    }
 
     // Aturan khusus web: siswa bisa dilarang masuk lewat browser.
-    if (user.role === "STUDENT" && !(await getStudentWebLoginEnabled())) {
+    if (role === "STUDENT" && !(await getStudentWebLoginEnabled())) {
       return {
         error:
           "Login siswa melalui website sedang dinonaktifkan. Silakan gunakan aplikasi mobile.",
@@ -94,10 +118,10 @@ export async function loginAction(
       action: "LOGIN_SUCCESS",
       entity: "auth",
       entityId: user.id,
-      details: { username: user.username, role: user.role },
+      details: { username: user.username, role: user.role, portal },
     });
 
-    return { success: true, redirectTo: destinationFor(user.role, system) };
+    return { success: true, redirectTo: destinationFor(role, system, assignments), role };
   } catch {
     return { error: "Terjadi kesalahan. Periksa koneksi database." };
   }

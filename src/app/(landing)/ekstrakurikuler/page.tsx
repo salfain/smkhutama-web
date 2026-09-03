@@ -25,14 +25,14 @@ export default async function EkstrakurikulerPage() {
         subtitle="Kembangkan bakat, minat, dan karakter melalui beragam kegiatan ekstrakurikuler."
       />
 
-      <section className="bg-slate-50 dark:bg-slate-900">
+      <section className="bg-canvas">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <RevealContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((e, i) => {
               const Icon = ICONS[e.icon] ?? Sparkles;
               return (
                 <RevealCard key={i}>
-                  <div className="group flex flex-col overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-xl h-full">
+                  <div className="group flex flex-col overflow-hidden rounded-3xl border border-hairline bg-surface shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-xl h-full">
                     <div className="relative h-44 overflow-hidden">
                       {e.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -50,9 +50,9 @@ export default async function EkstrakurikulerPage() {
                       <h3 className="absolute bottom-3 left-4 font-heading text-lg font-bold text-white">{e.name}</h3>
                     </div>
                     <div className="flex flex-col flex-1 p-5">
-                      <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400 flex-1">{e.description}</p>
-                      <div className="mt-4 flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+                      <p className="text-sm leading-relaxed text-ink-soft flex-1">{e.description}</p>
+                      <div className="mt-4 flex items-center gap-2 text-xs font-medium text-ink-soft">
+                        <span className="inline-block h-2 w-2 rounded-full bg-brand" />
                         {e.schedule}
                       </div>
                     </div>

@@ -57,9 +57,9 @@ export function EssayGradingList({ essays }: { essays: Essay[] }) {
               </div>
             </div>
 
-            <div className="mb-3 rounded-lg bg-blue-50 border border-blue-100 p-3">
-              <p className="text-xs font-semibold text-blue-700 mb-1">Soal:</p>
-              <p className="text-sm text-blue-900 whitespace-pre-wrap">{e.question.questionText}</p>
+            <div className="mb-3 rounded-lg bg-brand-soft border border-brand-soft p-3">
+              <p className="text-xs font-semibold text-brand-text mb-1">Soal:</p>
+              <p className="text-sm text-brand-text whitespace-pre-wrap">{e.question.questionText}</p>
             </div>
 
             <div className="mb-4 rounded-lg bg-gray-50 border p-3">

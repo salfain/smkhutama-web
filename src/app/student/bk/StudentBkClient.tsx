@@ -27,15 +27,15 @@ type Survey = { id: string; title: string; description: string; questionCount: n
 
 const typeLabel: Record<string, string> = { PRIBADI: "Pribadi", SOSIAL: "Sosial", BELAJAR: "Belajar", KARIR: "Karir" };
 const caseStatus: Record<string, { label: string; cls: string }> = {
-  OPEN: { label: "Terbuka", cls: "bg-blue-100 text-blue-700" },
-  IN_PROGRESS: { label: "Proses", cls: "bg-sky-100 text-sky-700" },
+  OPEN: { label: "Terbuka", cls: "bg-brand-soft text-brand-text" },
+  IN_PROGRESS: { label: "Proses", cls: "bg-brand-soft text-brand-text" },
   RESOLVED: { label: "Selesai", cls: "bg-green-100 text-green-700" },
   REFERRED: { label: "Rujukan", cls: "bg-purple-100 text-purple-700" },
 };
 const reqStatus: Record<string, { label: string; cls: string }> = {
   PENDING: { label: "Menunggu", cls: "bg-gray-100 text-gray-700" },
-  APPROVED: { label: "Disetujui", cls: "bg-blue-100 text-blue-700" },
-  SCHEDULED: { label: "Dijadwalkan", cls: "bg-sky-100 text-sky-700" },
+  APPROVED: { label: "Disetujui", cls: "bg-brand-soft text-brand-text" },
+  SCHEDULED: { label: "Dijadwalkan", cls: "bg-brand-soft text-brand-text" },
   DONE: { label: "Selesai", cls: "bg-green-100 text-green-700" },
   REJECTED: { label: "Ditolak", cls: "bg-red-100 text-red-700" },
 };
@@ -85,15 +85,15 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
           <p className="text-xs text-gray-500">Poin Prestasi</p>
         </div>
         <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500"><Scale className="h-5 w-5 text-white" /></div>
-          <p className={`text-2xl font-bold ${data.netPoints < 0 ? "text-red-600" : "text-blue-600"}`}>{data.netPoints}</p>
+          <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-brand"><Scale className="h-5 w-5 text-white" /></div>
+          <p className={`text-2xl font-bold ${data.netPoints < 0 ? "text-red-600" : "text-brand-text"}`}>{data.netPoints}</p>
           <p className="text-xs text-gray-500">Poin Bersih</p>
         </div>
       </div>
 
       {/* Tabs + tombol ajukan */}
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex gap-1 rounded-xl bg-gray-100 p-1">
+        <div className="flex flex-wrap gap-1 rounded-xl bg-gray-100 p-1">
           {tabs.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
@@ -144,7 +144,7 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
                 <div>
                   {v.typeName && <p className="text-sm font-medium text-gray-800">{v.typeName}</p>}
                   <p className="text-xs text-gray-500">{v.description}</p>
-                  {v.sanction && <p className="text-[11px] text-sky-600 mt-0.5">Sanksi: {v.sanction}</p>}
+                  {v.sanction && <p className="text-[11px] text-brand-text mt-0.5">Sanksi: {v.sanction}</p>}
                   <p className="text-[11px] text-gray-400 mt-0.5">{fmt(v.date)}</p>
                 </div>
                 <span className="shrink-0 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">{v.points}</span>
@@ -184,7 +184,7 @@ export function StudentBkClient({ data, surveys }: { data: Data; surveys: Survey
                 </div>
                 {r.description && <p className="mt-1 text-xs text-gray-600">{r.description}</p>}
                 <p className="text-[11px] text-gray-400 mt-1">Diajukan {fmt(r.createdAt)}{r.preferredDate && ` · Preferensi: ${fmt(r.preferredDate)}`}</p>
-                {r.response && <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">Tanggapan BK: {r.response}</p>}
+                {r.response && <p className="mt-2 rounded-lg bg-brand-soft px-3 py-2 text-xs text-brand-text">Tanggapan BK: {r.response}</p>}
                 {r.status === "PENDING" && (
                   <Button variant="ghost" size="sm" className="mt-2 h-7 gap-1 text-red-500 hover:bg-red-50" onClick={() => cancel(r.id)}>
                     <Trash2 className="h-3.5 w-3.5" />Batalkan

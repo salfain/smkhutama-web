@@ -63,9 +63,9 @@ export function PrintClient({ exams }: { exams: ExamOpt[] }) {
                 {docs.map((d) => (
                   <button key={d.key} type="button" onClick={() => setDocType(d.key)}
                     className={`rounded-xl border-2 p-4 text-left transition-all ${
-                      docType === d.key ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
+                      docType === d.key ? "border-brand bg-brand-soft" : "border-gray-200 hover:border-gray-300"
                     }`}>
-                    <d.icon className={`mb-2 h-6 w-6 ${docType === d.key ? "text-blue-600" : "text-gray-400"}`} />
+                    <d.icon className={`mb-2 h-6 w-6 ${docType === d.key ? "text-brand-text" : "text-gray-400"}`} />
                     <p className="text-sm font-semibold text-gray-900">{d.label}</p>
                     <p className="text-xs text-gray-500">{d.desc}</p>
                   </button>
@@ -73,7 +73,7 @@ export function PrintClient({ exams }: { exams: ExamOpt[] }) {
               </div>
             </div>
 
-            <Button onClick={handlePrint} disabled={!data || pending} className="gap-2 bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handlePrint} disabled={!data || pending} className="gap-2 bg-brand hover:bg-brand-strong">
               {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
               Cetak Dokumen
             </Button>
