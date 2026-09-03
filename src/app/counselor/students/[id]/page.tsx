@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldAlert, Award, MessagesSquare, Home as HomeIcon, Gavel, Scale, Clock, LogOut } from "lucide-react";
 
 import { PrintButton } from "./PrintButton";
+import { BiodataPanel } from "./BiodataPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,22 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <BiodataPanel
+          data={{
+            studentId: s.id,
+            nis: s.nis,
+            nisn: s.nisn,
+            birthPlace: s.birthPlace,
+            birthDate: s.birthDate ? new Date(s.birthDate).toISOString().slice(0, 10) : "",
+            address: s.address,
+            parentPhone: s.parentPhone,
+            medicalHistory: s.medicalHistory,
+            photoUrl: s.photoUrl,
+            status: s.profileStatus,
+            note: s.profileNote,
+            verifiedBy: s.profileVerifiedBy,
+          }}
+        />
         <Panel title="Riwayat Konseling" icon={MessagesSquare}>
           {s.cases.length === 0 ? <Empty /> : s.cases.map((c) => (
             <Item key={c.id} title={c.title} sub={`${typeLabel[c.type]} · ${fmt(c.sessionDate)}`} />

@@ -63,6 +63,7 @@ export function toStudentWithPoints(student: StudentWithPoints) {
     violationPoints: sumPoints(student.violationRecords),
     achievementPoints: sumPoints(student.achievementRecords),
     cases: student.counselingCases.length,
+    profileStatus: student.profileStatus,
   };
 }
 
@@ -78,6 +79,19 @@ export function toStudentBook(student: StudentBook) {
     className: student.class?.name ?? NO_CLASS,
     major: student.major?.name ?? NO_CLASS,
     gender: student.gender,
+    // Biodata (diisi siswa, diverifikasi BK). `medicalHistory` sensitif —
+    // pemanggil wajib sudah lolos permission `bk.sensitive.view`.
+    birthPlace: student.birthPlace ?? "",
+    birthDate: student.birthDate,
+    address: student.address ?? "",
+    parentPhone: student.parentPhone ?? "",
+    medicalHistory: student.medicalHistory ?? "",
+    photoUrl: student.photoUrl ?? "",
+    profileStatus: student.profileStatus,
+    profileSubmittedAt: student.profileSubmittedAt,
+    profileVerifiedAt: student.profileVerifiedAt,
+    profileNote: student.profileNote ?? "",
+    profileVerifiedBy: student.profileVerifiedBy?.name ?? "",
     violationPoints,
     achievementPoints,
     netPoints: achievementPoints - violationPoints,

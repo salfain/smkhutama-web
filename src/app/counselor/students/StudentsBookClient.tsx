@@ -5,7 +5,15 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Search, BookUser, ChevronRight } from "lucide-react";
 
-type Row = { id: string; name: string; nis: string; className: string; violationPoints: number; achievementPoints: number; cases: number };
+type ProfileStatus = "DRAFT" | "PENDING" | "VERIFIED" | "REJECTED";
+type Row = { id: string; name: string; nis: string; className: string; violationPoints: number; achievementPoints: number; cases: number; profileStatus: ProfileStatus };
+
+/** Status biodata; hanya ditandai bila belum beres agar daftar tetap tenang. */
+const profileBadge: Partial<Record<ProfileStatus, { label: string; cls: string }>> = {
+  DRAFT: { label: "Biodata kosong", cls: "bg-gray-100 text-gray-600" },
+  PENDING: { label: "Perlu verifikasi", cls: "bg-amber-100 text-amber-700" },
+  REJECTED: { label: "Dikembalikan", cls: "bg-red-100 text-red-700" },
+};
 
 export function StudentsBookClient({ students }: { students: Row[] }) {
   const [q, setQ] = useState("");
@@ -76,6 +84,11 @@ export function StudentsBookClient({ students }: { students: Row[] }) {
                       <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600">
                         {s.cases} konseling
                       </span>
+                      {profileBadge[s.profileStatus] && (
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${profileBadge[s.profileStatus]!.cls}`}>
+                          {profileBadge[s.profileStatus]!.label}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
@@ -102,6 +115,11 @@ export function StudentsBookClient({ students }: { students: Row[] }) {
                     <td className="px-4 py-3">
                       <p className="font-medium text-gray-900">{s.name}</p>
                       <p className="text-xs text-gray-400">{s.className}{s.nis && ` · ${s.nis}`}</p>
+                      {profileBadge[s.profileStatus] && (
+                        <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${profileBadge[s.profileStatus]!.cls}`}>
+                          {profileBadge[s.profileStatus]!.label}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center"><span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">{s.violationPoints}</span></td>
                     <td className="px-4 py-3 text-center"><span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">{s.achievementPoints}</span></td>

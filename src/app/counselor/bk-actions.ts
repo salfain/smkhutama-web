@@ -11,6 +11,7 @@ import { requirePermission } from "@/lib/permissions";
 import { logSensitiveAccess } from "@/lib/sensitive-access";
 import * as bk from "@/server/modules/bk/service";
 import * as followUp from "@/server/modules/bk/follow-up";
+import * as profile from "@/server/modules/bk/profile";
 import { toStudentBook, toStudentWithPoints } from "@/server/modules/bk/dto";
 
 const HOME_VISITS_PATH = "/counselor/home-visits";
@@ -38,6 +39,56 @@ export async function getStudentBook(studentId: string) {
   if (!student) return null;
   await logSensitiveAccess({ userId: user.id, resourceType: "student_bk_book", resourceId: studentId, purpose: "Membuka buku siswa BK" });
   return toStudentBook(student);
+}
+
+// ============= BIODATA SISWA =============
+/**
+ * Verifikasi/koreksi biodata yang dikirim siswa. Guru BK boleh mengedit
+ * langsung untuk siswa yang tidak kunjung mengisi sendiri.
+ */
+export async function verifyStudentProfile(fd: FormData) {
+  await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.view");
+  const studentId = text(fd, "studentId");
+  if (!studentId) return { error: "Siswa tidak valid" };
+
+  await profile.verifyProfile(studentId, user.id);
+  revalidatePath(`/counselor/students/${studentId}`);
+  return { success: "Biodata diverifikasi" };
+}
+
+export async function rejectStudentProfile(fd: FormData) {
+  await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.view");
+  const studentId = text(fd, "studentId");
+  const note = text(fd, "note");
+  if (!studentId) return { error: "Siswa tidak valid" };
+  if (!note) return { error: "Catatan perbaikan wajib diisi" };
+
+  await profile.rejectProfile(studentId, user.id, note);
+  revalidatePath(`/counselor/students/${studentId}`);
+  return { success: "Biodata dikembalikan ke siswa" };
+}
+
+export async function saveStudentProfile(fd: FormData) {
+  await requireCounselorAuth();
+  const user = await requirePermission("bk.sensitive.view");
+  const studentId = text(fd, "studentId");
+  if (!studentId) return { error: "Siswa tidak valid" };
+
+  const input: profile.ProfileInput = {
+    birthPlace: text(fd, "birthPlace"),
+    birthDate: text(fd, "birthDate"),
+    address: text(fd, "address"),
+    parentPhone: text(fd, "parentPhone"),
+    medicalHistory: text(fd, "medicalHistory"),
+  };
+  const invalid = profile.validateProfile(input);
+  if (invalid) return { error: invalid };
+
+  await profile.saveProfileByCounselor(studentId, user.id, input);
+  revalidatePath(`/counselor/students/${studentId}`);
+  return { success: "Biodata tersimpan & terverifikasi" };
 }
 
 // ============= KUNJUNGAN RUMAH =============

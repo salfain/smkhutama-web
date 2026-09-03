@@ -265,6 +265,7 @@ model User {
 
   violationsRecorded   ViolationRecord[]   @relation("ViolationRecorder")
   achievementsRecorded AchievementRecord[] @relation("AchievementRecorder")
+  profilesVerified     Student[]           @relation("StudentProfileVerifier")
 
   @@map("users")
 }
@@ -328,6 +329,14 @@ model Subject {
 }
 
 /// Profil siswa
+/// Status verifikasi biodata siswa oleh guru BK.
+enum StudentProfileStatus {
+  DRAFT // belum pernah dikirim siswa
+  PENDING // menunggu verifikasi BK
+  VERIFIED // sudah diverifikasi & terkunci
+  REJECTED // dikembalikan ke siswa untuk diperbaiki
+}
+
 model Student {
   id        String   @id @default(uuid())
   userId    String   @unique @map("user_id")
@@ -339,7 +348,24 @@ model Student {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // ── Biodata Buku Siswa (BK) ──
+  // Diisi siswa lewat "Biodata Saya", lalu diverifikasi guru BK.
+  birthPlace String?   @map("birth_place")
+  birthDate  DateTime? @map("birth_date")
+  address    String?
+  parentPhone String?  @map("parent_phone")
+  photoUrl   String?   @map("photo_url")
+  /// Data kesehatan — sensitif, hanya BK yang boleh membaca.
+  medicalHistory String? @map("medical_history")
+
+  profileStatus      StudentProfileStatus @default(DRAFT) @map("profile_status")
+  profileSubmittedAt DateTime?            @map("profile_submitted_at")
+  profileVerifiedAt  DateTime?            @map("profile_verified_at")
+  profileVerifiedById String?             @map("profile_verified_by_id")
+  profileNote        String?              @map("profile_note")
+
   user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileVerifiedBy  User?                @relation("StudentProfileVerifier", fields: [profileVerifiedById], references: [id])
   class              Class?               @relation(fields: [classId], references: [id])
   major              Major?               @relation(fields: [majorId], references: [id])
   attempts           StudentExamAttempt[]
@@ -353,6 +379,7 @@ model Student {
   tardinessRecords   StudentTardiness[]
   permits            StudentPermit[]
 
+  @@index([profileStatus])
   @@map("students")
 }
 

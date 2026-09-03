@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, ClipboardList, HeartHandshake, KeyRound, LayoutDashboard, Trophy } from "lucide-react";
+import { CalendarDays, ClipboardList, HeartHandshake, IdCard, KeyRound, LayoutDashboard, Trophy } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { MobileBottomNav } from "@/components/layouts/MobileBottomNav";
@@ -15,6 +15,7 @@ const navItems = [
   { href: "/student/exams", icon: ClipboardList, label: "Ujian Saya" },
   { href: "/student/results", icon: Trophy, label: "Nilai Saya" },
   { href: "/student/bk", icon: HeartHandshake, label: "Konseling" },
+  { href: "/student/profile", icon: IdCard, label: "Biodata" },
 ];
 
 type UserInfo = { name: string; nis: string | null; className: string | null };
@@ -49,7 +50,14 @@ export function StudentHeader({ user, system }: { user: UserInfo; system: "CBT" 
   const pathname = usePathname();
   const brandTitle = system === "SIBIKONS" ? "BK SMK HUTAMA" : "SISWA SMK HUTAMA";
   const brandAbbr = system === "SIBIKONS" ? "BK" : "SW";
-  const filteredNavItems = navItems.filter((item) => system === "SIBIKONS" ? item.href === "/student/bk" : item.href !== "/student/bk");
+  // Biodata dipakai kedua sistem; menu Konseling hanya untuk SIBIKONS.
+  const filteredNavItems = navItems.filter((item) =>
+    item.href === "/student/profile"
+      ? true
+      : system === "SIBIKONS"
+        ? item.href === "/student/bk"
+        : item.href !== "/student/bk",
+  );
 
   return (
     <>

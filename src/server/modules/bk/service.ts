@@ -89,6 +89,7 @@ export async function getStudentBook(studentId: string) {
     where: { id: studentId },
     include: {
       user: { select: { name: true, email: true } },
+      profileVerifiedBy: { select: { name: true } },
       class: { select: { name: true } },
       major: { select: { name: true } },
       violationRecords: {
