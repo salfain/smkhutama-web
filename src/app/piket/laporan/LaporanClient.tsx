@@ -166,8 +166,8 @@ export function LaporanClient({ summary, tardiness, permits, teacherAttendances,
         {tab === "tardiness" && (
           tardiness.length === 0
             ? <EmptyState label="Tidak ada catatan keterlambatan." />
-            : <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
-                <table className="w-full text-sm">
+            : <div className="overflow-x-auto rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
+                <table className="w-full min-w-[640px] text-sm">
                   <thead className="bg-gray-50 dark:bg-slate-950 text-xs text-gray-500 dark:text-gray-400">
                     <tr>
                       <th className="px-4 py-3 text-left">Siswa</th>
@@ -196,8 +196,8 @@ export function LaporanClient({ summary, tardiness, permits, teacherAttendances,
         {tab === "permits" && (
           permits.length === 0
             ? <EmptyState label="Tidak ada catatan izin keluar." />
-            : <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
-                <table className="w-full text-sm">
+            : <div className="overflow-x-auto rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
+                <table className="w-full min-w-[640px] text-sm">
                   <thead className="bg-gray-50 dark:bg-slate-950 text-xs text-gray-500 dark:text-gray-400">
                     <tr>
                       <th className="px-4 py-3 text-left">Siswa</th>
@@ -234,8 +234,8 @@ export function LaporanClient({ summary, tardiness, permits, teacherAttendances,
         {tab === "attendance" && (
           teacherAttendances.length === 0
             ? <EmptyState label="Tidak ada catatan kehadiran guru." />
-            : <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
-                <table className="w-full text-sm">
+            : <div className="overflow-x-auto rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
+                <table className="w-full min-w-[640px] text-sm">
                   <thead className="bg-gray-50 dark:bg-slate-950 text-xs text-gray-500 dark:text-gray-400">
                     <tr>
                       <th className="px-4 py-3 text-left">Guru</th>

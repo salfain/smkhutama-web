@@ -23,8 +23,8 @@ export default async function TeacherBkPage() {
           {classes.map((c) => (
             <div key={c.id}>
               <h2 className="mb-2 text-sm font-semibold text-gray-800">{c.name} · {c.students.length} siswa</h2>
-              <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-                <table className="w-full text-sm">
+              <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
+                <table className="w-full min-w-[560px] text-sm">
                   <thead className="bg-gray-50 text-left text-xs text-gray-500">
                     <tr>
                       <th className="px-4 py-3">Siswa</th>

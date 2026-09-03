@@ -25,7 +25,7 @@ export default async function ViolationsPage() {
         violations={violations}
         types={types}
         students={students}
-        canManageRecords={false}
+        canManageRecords
         canManageTypes
       />
     </div>

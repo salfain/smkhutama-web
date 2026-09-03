@@ -51,8 +51,8 @@ export function TardinessClient({ records, students }: { records: Record[]; stud
           <p className="text-sm text-gray-500 dark:text-gray-400">Belum ada catatan keterlambatan hari ini.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
+          <table className="w-full min-w-[620px] text-sm">
             <thead className="bg-gray-50 dark:bg-slate-950 text-left text-xs text-gray-500 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-3">Siswa</th>

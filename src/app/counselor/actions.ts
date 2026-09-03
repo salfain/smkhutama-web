@@ -155,7 +155,8 @@ export async function listViolations() {
 }
 
 export async function saveViolation(fd: FormData) {
-  const user = await requireAuth("KESISWAAN");
+  // Guru BK ikut mencatat pelanggaran, tidak lagi khusus Kesiswaan.
+  const user = await requireAuth("KESISWAAN", "COUNSELOR", "ADMIN");
   const studentId = text(fd, "studentId");
   const description = text(fd, "description");
   if (!studentId || !description) return { error: "Siswa dan deskripsi wajib diisi" };
@@ -181,7 +182,7 @@ export async function saveViolation(fd: FormData) {
 }
 
 export async function deleteViolation(id: string) {
-  await requireAuth("KESISWAAN");
+  await requireAuth("KESISWAAN", "COUNSELOR", "ADMIN");
   await bk.deleteViolation(id);
   revalidatePath(VIOLATIONS_PATH);
   revalidatePath(ADMIN_VIOLATIONS_PATH);

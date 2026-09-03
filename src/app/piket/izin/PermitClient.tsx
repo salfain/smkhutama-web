@@ -69,7 +69,7 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
           <h3 className="mb-3 text-sm font-semibold text-red-600 dark:text-red-400 flex items-center gap-1.5">
             <LogOut className="h-4 w-4" />Sedang Keluar ({active.length})
           </h3>
-          <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
+          <div className="overflow-x-auto rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
             {active.map((r) => (
               <div key={r.id} className="flex items-center gap-4 px-4 py-3.5 border-b dark:border-slate-800 last:border-0">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold text-sm dark:bg-red-900/20 dark:text-red-400">
@@ -103,8 +103,8 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
       {done.length > 0 && (
         <div>
           <h3 className="mb-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Riwayat Hari Ini</h3>
-          <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
+            <table className="w-full min-w-[680px] text-sm">
               <thead className="bg-gray-50 dark:bg-slate-950 text-left text-xs text-gray-500 dark:text-gray-400">
                 <tr>
                   <th className="px-4 py-3">Siswa</th>

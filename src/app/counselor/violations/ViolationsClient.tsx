@@ -78,14 +78,14 @@ export function ViolationsClient({
   return (
     <div>
       {(canManageRecords || canManageTypes) && (
-        <div className="mb-4 flex justify-end gap-2">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
           {canManageTypes && (
-            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setTypesOpen(true)}>
+            <Button size="sm" variant="outline" className="w-full justify-center gap-1.5 sm:w-auto" onClick={() => setTypesOpen(true)}>
               <Settings2 className="h-4 w-4" />Jenis Pelanggaran
             </Button>
           )}
           {canManageRecords && (
-            <Button size="sm" className="gap-1.5 bg-purple-600 hover:bg-purple-700" onClick={openCreate}>
+            <Button size="sm" className="w-full justify-center gap-1.5 bg-purple-600 hover:bg-purple-700 sm:w-auto" onClick={openCreate}>
               <Plus className="h-4 w-4" />Catat Pelanggaran
             </Button>
           )}
@@ -98,8 +98,42 @@ export function ViolationsClient({
           <p className="text-sm text-gray-500">Belum ada catatan pelanggaran.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <>
+          {/* Mobile: kartu per catatan, tabel terlalu sempit di HP. */}
+          <ul className="space-y-2 md:hidden">
+            {violations.map((v) => (
+              <li key={v.id} className="rounded-xl border bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium break-words text-gray-900 dark:text-white">{v.studentName}</p>
+                    <p className="text-xs text-gray-400">{v.className}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">{v.points} poin</span>
+                </div>
+                <p className="mt-2 text-sm break-words text-gray-800 dark:text-gray-200">{v.typeName ?? v.description}</p>
+                {v.typeName && v.description && (
+                  <p className="text-xs break-words text-gray-500">{v.description}</p>
+                )}
+                {v.sanction && <p className="mt-1 text-xs break-words text-brand-text">Sanksi: {v.sanction}</p>}
+                <p className="mt-2 text-[11px] text-gray-400">
+                  {new Date(v.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })} · dicatat oleh {v.recordedByName}
+                </p>
+                {canManageRecords && (
+                  <div className="mt-2 flex justify-end gap-1 border-t pt-2">
+                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-purple-600" onClick={() => openEdit(v)}>
+                      <Pencil className="h-3.5 w-3.5" /> Edit
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-red-500" onClick={() => remove(v.id)}>
+                      <Trash2 className="h-3.5 w-3.5" /> Hapus
+                    </Button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden overflow-x-auto rounded-xl border bg-white shadow-sm md:block">
+          <table className="w-full min-w-[600px] text-sm">
             <thead className="bg-gray-50 text-left text-xs text-gray-500">
               <tr>
                 <th className="px-4 py-3">Siswa</th>
@@ -144,7 +178,8 @@ export function ViolationsClient({
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        </>
       )}
 
       {/* Dialog catat pelanggaran */}
@@ -220,27 +255,36 @@ function ViolationTypesDialog({ open, onOpenChange, types }: { open: boolean; on
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Jenis Pelanggaran & Poin</DialogTitle></DialogHeader>
-        <form action={submit} className="grid grid-cols-12 gap-2 items-end border-b pb-4">
-          <div className="col-span-5 space-y-1"><Label className="text-xs">Nama</Label><Input name="name" defaultValue={editing?.name ?? ""} key={editing?.id ?? "new"} placeholder="Terlambat" required /></div>
-          <div className="col-span-4 space-y-1">
+        <form action={submit} className="grid grid-cols-2 items-end gap-2 border-b pb-4 sm:grid-cols-12">
+          <div className="col-span-2 space-y-1 sm:col-span-5"><Label className="text-xs">Nama</Label><Input name="name" defaultValue={editing?.name ?? ""} key={editing?.id ?? "new"} placeholder="Terlambat" required /></div>
+          <div className="space-y-1 sm:col-span-4">
             <Label className="text-xs">Kategori</Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{CATS.map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <div className="col-span-2 space-y-1"><Label className="text-xs">Poin</Label><Input name="points" type="number" defaultValue={editing?.points ?? 0} key={(editing?.id ?? "new") + "p"} /></div>
-          <div className="col-span-1"><Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700" disabled={pending}><Plus className="h-4 w-4" /></Button></div>
-          {err && <p className="col-span-12 text-xs text-red-600">{err}</p>}
+          <div className="space-y-1 sm:col-span-2"><Label className="text-xs">Poin</Label><Input name="points" type="number" defaultValue={editing?.points ?? 0} key={(editing?.id ?? "new") + "p"} /></div>
+          <div className="col-span-2 sm:col-span-1"><Button type="submit" className="w-full gap-1.5 bg-purple-600 hover:bg-purple-700 sm:w-9 sm:px-0" disabled={pending}><Plus className="h-4 w-4" /><span className="sm:hidden">{editing ? "Simpan" : "Tambah"}</span></Button></div>
+          {editing && (
+            <button
+              type="button"
+              onClick={() => { setEditing(null); setCategory("RINGAN"); }}
+              className="col-span-2 text-left text-xs text-gray-500 underline sm:col-span-12"
+            >
+              Batal ubah &quot;{editing.name}&quot;
+            </button>
+          )}
+          {err && <p className="col-span-2 text-xs text-red-600 sm:col-span-12">{err}</p>}
         </form>
         <div className="space-y-2 pt-2">
           {types.length === 0 ? (
             <p className="text-sm text-gray-400">Belum ada jenis pelanggaran.</p>
           ) : types.map((t) => (
-            <div key={t.id} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2">
-              <div className="flex items-center gap-2">
+            <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <Badge className={`${catCls[t.category]} border-0`}>{CATS.find(([k]) => k === t.category)?.[1]}</Badge>
-                <span className="text-sm text-gray-800">{t.name}</span>
+                <span className="min-w-0 break-words text-sm text-gray-800">{t.name}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">{t.points} poin</span>

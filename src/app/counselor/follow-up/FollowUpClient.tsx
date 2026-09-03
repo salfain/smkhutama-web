@@ -79,8 +79,8 @@ export function FollowUpClient({ students, summons }: { students: StudentRow[]; 
           {students.length === 0 ? (
             <Empty text="Belum ada siswa dengan poin pelanggaran." />
           ) : (
-            <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
+              <table className="w-full min-w-[520px] text-sm">
                 <thead className="bg-gray-50 text-left text-xs text-gray-500">
                   <tr><th className="px-4 py-3">Siswa</th><th className="px-4 py-3 text-center">Poin</th><th className="px-4 py-3">Rekomendasi</th><th className="px-4 py-3"></th></tr>
                 </thead>
