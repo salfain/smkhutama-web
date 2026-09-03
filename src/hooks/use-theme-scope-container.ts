@@ -7,7 +7,7 @@ const SCOPE_SELECTOR = ".genesis-app, .landing-app";
 /**
  * Elemen portal Radix (Dialog, Sheet, dst.) dipindah ke akhir <body> saat
  * dirender, keluar dari div `.genesis-app`/`.landing-app` tempat token warna
- * merek (`--brand`, dst.) di-scope — jadi kelas seperti `bg-brand` di dalamnya
+ * merek (`--brand`, dst.) di-scope - jadi kelas seperti `bg-brand` di dalamnya
  * jatuh ke nilai kosong (transparan), bukan warna merek area yang aktif.
  *
  * Hook ini menaruh elemen penanda tak terlihat di lokasi asal komponen

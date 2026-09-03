@@ -107,7 +107,7 @@ export function ExtracurricularsClient({ items }: { items: Ekskul[] }) {
             <div className="space-y-1.5"><Label>Nama *</Label><Input name="name" defaultValue={editing?.name ?? ""} placeholder="Pramuka" required /></div>
             <div className="space-y-1.5"><Label>Kategori *</Label><Input name="category" defaultValue={editing?.category ?? ""} placeholder="Wajib / Olahraga / Seni" required /></div>
             <div className="space-y-1.5"><Label>Deskripsi</Label><Textarea name="description" defaultValue={editing?.description ?? ""} rows={3} placeholder="Deskripsi singkat kegiatan" /></div>
-            <div className="space-y-1.5"><Label>Jadwal</Label><Input name="schedule" defaultValue={editing?.schedule ?? ""} placeholder="Jumat, 14:00 – 16:00" /></div>
+            <div className="space-y-1.5"><Label>Jadwal</Label><Input name="schedule" defaultValue={editing?.schedule ?? ""} placeholder="Jumat, 14:00 - 16:00" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Ikon</Label>

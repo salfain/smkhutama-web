@@ -116,7 +116,7 @@ export function StudentTable({
   async function handleDeleteAll() {
     // Konfirmasi pertama (visual)
     const ok1 = await confirm({
-      title: "⚠️ BAHAYA — Hapus Semua Siswa",
+      title: "⚠️ BAHAYA - Hapus Semua Siswa",
       description: `Tindakan ini akan MENGHAPUS SEMUA ${students.length} siswa beserta akun, jawaban ujian, data BK, dan seluruh riwayat mereka. DATA TIDAK BISA DIKEMBALIKAN.`,
       confirmText: "Ya, Saya Paham",
       cancelText: "Batal",
@@ -229,15 +229,15 @@ export function StudentTable({
                     <td className="px-4 py-3 text-gray-500">{i + 1}</td>
                     <td className="px-4 py-3 font-medium text-gray-900">{s.user.name}</td>
                     <td className="px-4 py-3 text-xs font-mono text-gray-600">
-                      <p>{s.nis ?? "—"}</p>
+                      <p>{s.nis ?? "-"}</p>
                       <p className="text-gray-400">{s.nisn ?? ""}</p>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-gray-600">{s.user.username}</td>
-                    <td className="px-4 py-3 text-gray-600">{s.class?.name ?? <span className="text-gray-400">—</span>}</td>
+                    <td className="px-4 py-3 text-gray-600">{s.class?.name ?? <span className="text-gray-400"></span>}</td>
                     <td className="px-4 py-3">
-                      {s.major ? <Badge variant="secondary">{s.major.code}</Badge> : <span className="text-gray-400">—</span>}
+                      {s.major ? <Badge variant="secondary">{s.major.code}</Badge> : <span className="text-gray-400"></span>}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{s.gender === "MALE" ? "L" : s.gender === "FEMALE" ? "P" : "—"}</td>
+                    <td className="px-4 py-3 text-gray-600">{s.gender === "MALE" ? "L" : s.gender === "FEMALE" ? "P" : "-"}</td>
                     <td className="px-4 py-3">
                       <Badge className={s.user.isActive ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-100" : "bg-red-100 text-red-600 border-red-200 hover:bg-red-100"}>
                         {s.user.isActive ? "Aktif" : "Nonaktif"}
@@ -299,7 +299,7 @@ export function StudentTable({
                 <Select value={gender} onValueChange={setGender}>
                   <SelectTrigger><SelectValue placeholder="Pilih..." /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">— Tidak diisi —</SelectItem>
+                    <SelectItem value="none">Tidak diisi</SelectItem>
                     <SelectItem value="MALE">Laki-laki</SelectItem>
                     <SelectItem value="FEMALE">Perempuan</SelectItem>
                   </SelectContent>
@@ -310,7 +310,7 @@ export function StudentTable({
                 <Select value={classId} onValueChange={handleClassChange}>
                   <SelectTrigger><SelectValue placeholder="Pilih kelas..." /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">— Belum ditentukan —</SelectItem>
+                    <SelectItem value="none">Belum ditentukan</SelectItem>
                     {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -320,8 +320,8 @@ export function StudentTable({
                 <Select value={majorId} onValueChange={setMajorId}>
                   <SelectTrigger><SelectValue placeholder="Pilih jurusan..." /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">— Belum ditentukan —</SelectItem>
-                    {majors.map(m => <SelectItem key={m.id} value={m.id}>{m.code} – {m.name}</SelectItem>)}
+                    <SelectItem value="none">Belum ditentukan</SelectItem>
+                    {majors.map(m => <SelectItem key={m.id} value={m.id}>{m.code} - {m.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -352,13 +352,13 @@ export function StudentTable({
             <div className="rounded-xl border border-brand-soft bg-brand-soft p-3 text-xs text-brand-text space-y-1">
               <p className="font-semibold">Kolom yang diperlukan:</p>
               <ul className="list-disc pl-4 space-y-0.5">
-                <li><span className="font-medium">Nama Lengkap</span> — wajib</li>
-                <li><span className="font-medium">Username</span> — wajib, harus unik</li>
-                <li><span className="font-medium">Password</span> — wajib, min 6 karakter <span className="opacity-70">(default = username jika kosong)</span></li>
-                <li><span className="font-medium">NIS</span> — opsional</li>
-                <li><span className="font-medium">NISN</span> — opsional</li>
-                <li><span className="font-medium">Kelas</span> — opsional (cth: XII TKJ 1)</li>
-                <li><span className="font-medium">L/P</span> — opsional (L / P)</li>
+                <li><span className="font-medium">Nama Lengkap</span> - wajib</li>
+                <li><span className="font-medium">Username</span> - wajib, harus unik</li>
+                <li><span className="font-medium">Password</span> - wajib, min 6 karakter <span className="opacity-70">(default = username jika kosong)</span></li>
+                <li><span className="font-medium">NIS</span> - opsional</li>
+                <li><span className="font-medium">NISN</span> - opsional</li>
+                <li><span className="font-medium">Kelas</span> - opsional (cth: XII TKJ 1)</li>
+                <li><span className="font-medium">L/P</span> - opsional (L / P)</li>
               </ul>
             </div>
             {/* Download template */}

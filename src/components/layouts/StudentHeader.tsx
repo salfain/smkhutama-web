@@ -28,7 +28,7 @@ function StudentAccount({ user }: { user: UserInfo }) {
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-xs font-semibold text-brand-text dark:bg-brand/10 dark:text-brand-text">{initials}</div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium text-[#0A0A0A] dark:text-[#F5F5F7]">{user.name}</p>
-          <p className="mt-0.5 truncate text-[11px] text-[#9C9C9C]">{user.className ?? "—"}{user.nis && ` · ${user.nis}`}</p>
+          <p className="mt-0.5 truncate text-[11px] text-[#9C9C9C]">{user.className ?? "-"}{user.nis && ` · ${user.nis}`}</p>
         </div>
       </div>
       <NotificationCenter />
@@ -80,7 +80,7 @@ export function StudentHeader({ user, system }: { user: UserInfo; system: "CBT" 
           <div className="flex items-center gap-2">
             <div className="mr-1 text-right">
               <p className="text-xs font-medium text-[#0A0A0A] dark:text-[#F5F5F7]">{user.name}</p>
-              <p className="text-[11px] text-[#9C9C9C]">{user.className ?? "—"}</p>
+              <p className="text-[11px] text-[#9C9C9C]">{user.className ?? "-"}</p>
             </div>
             <NotificationCenter compact />
             <Link href="/student/change-password" className="flex h-9 w-9 items-center justify-center rounded-md text-[#6B6B6B] hover:bg-[#F5F5F7] dark:text-[#A7A7AE] dark:hover:bg-white/5" title="Ganti Password"><KeyRound className="h-4 w-4" /></Link>

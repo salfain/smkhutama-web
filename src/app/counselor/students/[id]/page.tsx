@@ -74,7 +74,7 @@ export default async function StudentBookDetail({ params }: { params: Promise<{ 
           {s.homeVisits.length === 0 && s.summons.length === 0 ? <Empty /> : (
             <>
               {s.homeVisits.map((h) => <Item key={h.id} title={h.purpose} sub={`Kunjungan · ${fmt(h.visitDate)}`} />)}
-              {s.summons.map((p) => <Item key={p.id} title={`${p.level} — ${p.reason}`} sub={`Surat · ${fmt(p.createdAt)}`} icon={<Gavel className="h-3.5 w-3.5 text-gray-400" />} />)}
+              {s.summons.map((p) => <Item key={p.id} title={`${p.level} - ${p.reason}`} sub={`Surat · ${fmt(p.createdAt)}`} icon={<Gavel className="h-3.5 w-3.5 text-gray-400" />} />)}
             </>
           )}
         </Panel>

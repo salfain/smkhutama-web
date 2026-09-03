@@ -4,7 +4,7 @@ import { requireTeacher } from "@/server/auth";
 import { getTeacherCounts } from "@/server/modules/cbt/teacher";
 import { toTeacherStats } from "@/server/modules/cbt/dto";
 
-/** GET /api/v1/cbt/teacher/dashboard — ringkasan angka milik guru. */
+/** GET /api/v1/cbt/teacher/dashboard - ringkasan angka milik guru. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     const { teacher } = await requireTeacher(req);

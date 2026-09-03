@@ -64,7 +64,7 @@ export async function getExamPrintData(examId: string) {
       name: s.user.name,
       nis: s.nis,
       nisn: s.nisn,
-      className: s.class?.name ?? "—",
+      className: s.class?.name ?? "-",
       present: !!s.attempts[0]?.startedAt,
       status: s.attempts[0]?.status ?? "NOT_STARTED",
     })),

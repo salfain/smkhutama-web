@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id: answerId } = await params;
   const { score } = await req.json();
   if (typeof score !== "number" || score < 0 || score > 100) {
-    return NextResponse.json({ error: "Nilai harus 0–100" }, { status: 400 });
+    return NextResponse.json({ error: "Nilai harus 0-100" }, { status: 400 });
   }
 
   const result = await gradeEssay({ answerId, teacherId: teacher.id, score });

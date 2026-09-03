@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SMK HUTAMA — Portal Akademik",
+    name: "SMK HUTAMA - Portal Akademik",
     short_name: "SMK Hutama",
     description:
       "Portal Akademik resmi SMK Hutama Pondok Gede. Akses informasi sekolah, PPDB, dan layanan digital terpadu.",

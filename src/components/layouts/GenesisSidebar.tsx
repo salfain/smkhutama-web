@@ -44,7 +44,7 @@ function AccountControls({
   showThemeToggle = false,
 }: Pick<Props, "brandAbbr" | "userName" | "userDetail" | "changePasswordHref" | "logoutControl"> & {
   closeOnNavigate?: boolean;
-  /** Hanya untuk sheet mobile — di desktop tombol tema tinggal di header. */
+  /** Hanya untuk sheet mobile - di desktop tombol tema tinggal di header. */
   showThemeToggle?: boolean;
 }) {
   const passwordLink = changePasswordHref ? (
@@ -107,7 +107,7 @@ function SidebarContent({
             </p>
             <p className="mt-1 truncate text-[11px] font-medium text-[#6B6B6B] dark:text-[#A7A7AE]">{brandSubtitle}</p>
           </div>
-          {/* Preferensi tampilan, bukan urusan akun — tempatnya di header
+          {/* Preferensi tampilan, bukan urusan akun - tempatnya di header
               bersama identitas, agar footer tersisa untuk aksi akun saja. */}
           <ThemeToggle className="shrink-0 rounded-md text-[#6B6B6B] hover:bg-[#F5F5F7] dark:text-[#A7A7AE] dark:hover:bg-white/5" />
         </div>

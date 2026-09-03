@@ -88,7 +88,7 @@ export function HomeVisitsClient({ visits, students }: { visits: Visit[]; studen
               <Label>Siswa *</Label>
               <Select value={studentId} onValueChange={setStudentId}>
                 <SelectTrigger><SelectValue placeholder="Pilih siswa" /></SelectTrigger>
-                <SelectContent>{students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} — {s.className}</SelectItem>)}</SelectContent>
+                <SelectContent>{students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} - {s.className}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5"><Label>Tanggal Kunjungan</Label><Input name="visitDate" type="date" defaultValue={editing ? toDateInput(editing.visitDate) : toDateInput(new Date())} /></div>

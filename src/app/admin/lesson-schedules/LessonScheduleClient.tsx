@@ -165,7 +165,7 @@ export function LessonScheduleClient({
   async function handleDelete(schedule: Schedule) {
     const approved = await confirm({
       title: "Hapus jadwal?",
-      description: `${schedule.subject.name} untuk ${schedule.class.name}, ${DAY_NAMES[schedule.dayOfWeek]} ${schedule.startTime}–${schedule.endTime} akan dihapus.`,
+      description: `${schedule.subject.name} untuk ${schedule.class.name}, ${DAY_NAMES[schedule.dayOfWeek]} ${schedule.startTime}-${schedule.endTime} akan dihapus.`,
       confirmText: "Hapus Jadwal",
       cancelText: "Batal",
       variant: "danger",

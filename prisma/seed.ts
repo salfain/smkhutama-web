@@ -657,10 +657,10 @@ async function main() {
     await prisma.landingTeacher.upsert({ where: { id: `demo-landing-teacher-${index + 1}` }, update: { name: item.name, subject: subjects.get(item.subject)!.name, isActive: true, orderNumber: index }, create: { id: `demo-landing-teacher-${index + 1}`, name: item.name, position: index === 5 ? "Kepala Program Keahlian" : "Guru", subject: subjects.get(item.subject)!.name, photoUrl: `https://i.pravatar.cc/400?img=${index + 20}`, orderNumber: index, isActive: true } });
   }
   const extracurriculars = [
-    ["Pramuka", "Wajib", "Jumat, 14.00–16.00", "Tent"],
-    ["Futsal", "Olahraga", "Selasa, 15.30–17.00", "Trophy"],
-    ["Paskibra", "Kedisiplinan", "Sabtu, 08.00–11.00", "Flag"],
-    ["English Club", "Akademik", "Senin, 15.30–17.00", "Languages"],
+    ["Pramuka", "Wajib", "Jumat, 14.00-16.00", "Tent"],
+    ["Futsal", "Olahraga", "Selasa, 15.30-17.00", "Trophy"],
+    ["Paskibra", "Kedisiplinan", "Sabtu, 08.00-11.00", "Flag"],
+    ["English Club", "Akademik", "Senin, 15.30-17.00", "Languages"],
   ] as const;
   for (let index = 0; index < extracurriculars.length; index += 1) {
     const item = extracurriculars[index];

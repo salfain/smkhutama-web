@@ -11,7 +11,7 @@ import {
 import { requireCounselorAccess } from "@/server/auth";
 import { getSurvey, saveQuestion } from "@/server/modules/bk/surveys";
 
-/** POST /api/v1/bk/counselor/surveys/{id}/questions — tambah pertanyaan. */
+/** POST /api/v1/bk/counselor/surveys/{id}/questions - tambah pertanyaan. */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
     await requireCounselorAccess(req);

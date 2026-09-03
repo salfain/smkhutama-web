@@ -10,7 +10,7 @@ import { toResumeWithoutAttempt } from "@/server/modules/cbt/dto";
  *
  * Dipanggil saat aplikasi dibuka kembali setelah tertutup atau koneksi putus.
  * Berbeda dengan `/questions`, siswa yang belum memulai ujian tidak dianggap
- * error — yang dikembalikan `attempt: null` supaya klien tahu harus meminta
+ * error - yang dikembalikan `attempt: null` supaya klien tahu harus meminta
  * token dulu.
  */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {

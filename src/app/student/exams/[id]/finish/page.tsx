@@ -79,7 +79,7 @@ export default async function FinishPage({ params }: { params: Promise<{ id: str
 
       <div className="mb-6 rounded-xl border bg-white p-4 shadow-sm space-y-2 text-sm">
         <div className="flex justify-between"><span className="text-gray-500">Peserta</span><span className="font-medium">{user.name}</span></div>
-        <div className="flex justify-between"><span className="text-gray-500">Kelas</span><span className="font-medium">{user.student.class?.name ?? "—"}</span></div>
+        <div className="flex justify-between"><span className="text-gray-500">Kelas</span><span className="font-medium">{user.student.class?.name ?? "-"}</span></div>
         {attempt.submittedAt && (
           <div className="flex justify-between"><span className="text-gray-500">Waktu Submit</span><span className="font-medium">{new Date(attempt.submittedAt).toLocaleString("id-ID")}</span></div>
         )}

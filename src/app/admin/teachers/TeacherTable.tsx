@@ -185,12 +185,12 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
                       <p className="font-medium text-gray-900">{t.user.name}</p>
                       {t.user.email && <p className="text-xs text-gray-400">{t.user.email}</p>}
                     </td>
-                    <td className="px-4 py-3 text-gray-600 font-mono text-xs">{t.nip ?? "—"}</td>
+                    <td className="px-4 py-3 text-gray-600 font-mono text-xs">{t.nip ?? "-"}</td>
                     <td className="px-4 py-3 text-gray-600 font-mono text-xs">{t.user.username}</td>
                     <td className="px-4 py-3">
                       {t.subject
                         ? <Badge variant="secondary">{t.subject.code}</Badge>
-                        : <span className="text-gray-400">—</span>}
+                        : <span className="text-gray-400"></span>}
                     </td>
                     <td className="px-4 py-3 text-center text-gray-600">{t._count.questions}</td>
                     <td className="px-4 py-3 text-center text-gray-600">{t._count.exams}</td>
@@ -274,9 +274,9 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
               <Select value={subjectId} onValueChange={setSubjectId}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">— Belum ditentukan —</SelectItem>
+                  <SelectItem value="none">Belum ditentukan</SelectItem>
                   {subjects.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>{s.code} – {s.name}</SelectItem>
+                    <SelectItem key={s.id} value={s.id}>{s.code} - {s.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -305,12 +305,12 @@ export function TeacherTable({ teachers, subjects }: { teachers: Teacher[]; subj
             <div className="rounded-xl border border-brand-soft bg-brand-soft p-3 text-xs text-brand-text space-y-1">
               <p className="font-semibold">Kolom yang diperlukan:</p>
               <ul className="list-disc pl-4 space-y-0.5">
-                <li><span className="font-medium">Nama Lengkap</span> — wajib</li>
-                <li><span className="font-medium">Username</span> — wajib, harus unik</li>
-                <li><span className="font-medium">Password</span> — wajib, min 6 karakter</li>
-                <li><span className="font-medium">NIP/NUPTK</span> — opsional</li>
-                <li><span className="font-medium">Email</span> — opsional</li>
-                <li><span className="font-medium">Kode Mapel</span> — opsional (cth: MTK, BIG)</li>
+                <li><span className="font-medium">Nama Lengkap</span> - wajib</li>
+                <li><span className="font-medium">Username</span> - wajib, harus unik</li>
+                <li><span className="font-medium">Password</span> - wajib, min 6 karakter</li>
+                <li><span className="font-medium">NIP/NUPTK</span> - opsional</li>
+                <li><span className="font-medium">Email</span> - opsional</li>
+                <li><span className="font-medium">Kode Mapel</span> - opsional (cth: MTK, BIG)</li>
               </ul>
             </div>
 

@@ -2,7 +2,7 @@ import { ChangePasswordForm } from "@/app/profile/change-password/ChangePassword
 import { requireCounselorAuth } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Ganti Password — Guru BK" };
+export const metadata = { title: "Ganti Password - Guru BK" };
 
 export default async function CounselorChangePasswordPage() {
   await requireCounselorAuth();

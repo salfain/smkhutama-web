@@ -11,7 +11,7 @@ import { toStudentSurveyDetail } from "@/server/modules/bk/dto";
 const MIN_VALUE = 1;
 const MAX_VALUE = 4;
 
-/** GET /api/v1/bk/student/surveys/{id} — pertanyaan angket untuk diisi. */
+/** GET /api/v1/bk/student/surveys/{id} - pertanyaan angket untuk diisi. */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
     const { student } = await requireStudent(req);
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   });
 }
 
-/** POST /api/v1/bk/student/surveys/{id} — kirim jawaban angket. */
+/** POST /api/v1/bk/student/surveys/{id} - kirim jawaban angket. */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
     const { student } = await requireStudent(req);
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       }
       const value = answer?.value;
       if (typeof value !== "number" || value < MIN_VALUE || value > MAX_VALUE) {
-        throw badRequest(`Nilai jawaban harus ${MIN_VALUE}–${MAX_VALUE}`, "VALIDATION_ERROR");
+        throw badRequest(`Nilai jawaban harus ${MIN_VALUE}-${MAX_VALUE}`, "VALIDATION_ERROR");
       }
       return { questionId, value };
     });

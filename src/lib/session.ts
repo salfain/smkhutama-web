@@ -109,7 +109,7 @@ export async function requireAuth(...roles: AppRole[]) {
 
 /**
  * Gerbang kerangka /admin. Hanya memastikan penggunanya salah satu peran
- * keluarga admin — TIDAK menentukan halaman mana yang boleh dibuka.
+ * keluarga admin - TIDAK menentukan halaman mana yang boleh dibuka.
  * Pembatasan per halaman dilakukan di masing-masing page.tsx dan actions.ts.
  */
 export async function requireAdminArea() {

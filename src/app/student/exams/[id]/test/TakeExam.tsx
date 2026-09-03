@@ -78,8 +78,8 @@ export function TakeExam({
   useEffect(() => { lockedRef.current = locked; }, [locked]);
 
   // ===== ANTI-CHEAT =====
-  // Pelanggaran dicatat & dihitung di server — sumber yang sama dengan
-  // aplikasi mobile — supaya ambang batas dan status kunci tidak hilang saat
+  // Pelanggaran dicatat & dihitung di server - sumber yang sama dengan
+  // aplikasi mobile - supaya ambang batas dan status kunci tidak hilang saat
   // halaman dimuat ulang, dan pengawas bisa membuka kuncinya dari monitoring.
   useEffect(() => {
     async function reportAndHandle(reason: string) {
@@ -453,7 +453,7 @@ export function TakeExam({
             </p>
             {lockReason && <p className="mt-1 text-xs text-gray-400">Alasan: {lockReason}</p>}
             <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
-              Minta guru pengawas atau Admin CBT membuka kunci ujian Anda dari halaman monitoring. Jangan tutup halaman ini — ujian akan lanjut otomatis begitu dibuka.
+              Minta guru pengawas atau Admin CBT membuka kunci ujian Anda dari halaman monitoring. Jangan tutup halaman ini - ujian akan lanjut otomatis begitu dibuka.
             </div>
             <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />Menunggu guru membuka kunci...

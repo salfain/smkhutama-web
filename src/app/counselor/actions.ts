@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * Server action halaman guru BK — sesi konseling, pelanggaran, prestasi,
+ * Server action halaman guru BK - sesi konseling, pelanggaran, prestasi,
  * dan permohonan.
  *
  * Query-nya dipinjam dari `@/server/modules/bk/service`, sumber yang sama

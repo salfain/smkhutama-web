@@ -115,7 +115,7 @@ export function TokenManager({ tokens, exams }: { tokens: Token[]; exams: Exam[]
                   {exams.length === 0 ? (
                     <div className="p-3 text-xs text-gray-400">Belum ada ujian. Buat di /admin/exams</div>
                   ) : exams.map((e) => (
-                    <SelectItem key={e.id} value={e.id}>{e.subject.code} – {e.title}</SelectItem>
+                    <SelectItem key={e.id} value={e.id}>{e.subject.code} - {e.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

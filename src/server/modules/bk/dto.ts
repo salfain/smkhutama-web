@@ -1,5 +1,5 @@
 /**
- * Modul BK — pemetaan record Prisma ke bentuk JSON API.
+ * Modul BK - pemetaan record Prisma ke bentuk JSON API.
  *
  * Bentuk di sini sengaja sama persis dengan response route lama
  * (`/api/counselor/**`, `/api/student/bk/**`, `/api/student/surveys/**`)
@@ -79,7 +79,7 @@ export function toStudentBook(student: StudentBook) {
     className: student.class?.name ?? NO_CLASS,
     major: student.major?.name ?? NO_CLASS,
     gender: student.gender,
-    // Biodata (diisi siswa, diverifikasi BK). `medicalHistory` sensitif —
+    // Biodata (diisi siswa, diverifikasi BK). `medicalHistory` sensitif -
     // pemanggil wajib sudah lolos permission `bk.sensitive.view`.
     birthPlace: student.birthPlace ?? "",
     birthDate: student.birthDate,
@@ -152,7 +152,7 @@ export function toStudentBook(student: StudentBook) {
 
 /**
  * Ringkasan BK milik siswa sendiri. Deskripsi sesi yang ditandai rahasia
- * disembunyikan — siswa tetap melihat sesinya ada, bukan isinya.
+ * disembunyikan - siswa tetap melihat sesinya ada, bukan isinya.
  */
 export function toStudentSummary(summary: StudentSummary) {
   const violationPoints = sumPoints(summary.violations);
@@ -294,7 +294,7 @@ export function toRequest(record: CounselingRequest) {
   };
 }
 
-/** Bentuk permohonan tanpa identitas siswa — dipakai di ringkasan siswa. */
+/** Bentuk permohonan tanpa identitas siswa - dipakai di ringkasan siswa. */
 function toOwnRequest(record: {
   id: string;
   topic: string;

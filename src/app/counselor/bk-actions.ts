@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * Server action halaman guru BK — buku siswa, kunjungan rumah, dan agenda.
+ * Server action halaman guru BK - buku siswa, kunjungan rumah, dan agenda.
  * Query-nya dipinjam dari modul BK di `@/server/modules/bk`.
  */
 

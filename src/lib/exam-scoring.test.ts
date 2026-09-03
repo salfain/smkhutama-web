@@ -1,5 +1,5 @@
 /**
- * Penilaian ujian — bagian paling berisiko di seluruh aplikasi: kalau salah,
+ * Penilaian ujian - bagian paling berisiko di seluruh aplikasi: kalau salah,
  * nilai siswa salah dan tidak ada yang menyadarinya sampai rapor terbit.
  */
 

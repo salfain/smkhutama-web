@@ -1,5 +1,5 @@
 /**
- * Rentang tanggal harian — dipakai seluruh pencatatan piket.
+ * Rentang tanggal harian - dipakai seluruh pencatatan piket.
  * Batas harinya mengikuti zona waktu proses; lihat catatan di `date-range.ts`.
  */
 

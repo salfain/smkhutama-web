@@ -3,8 +3,8 @@
 /**
  * Server action halaman login web.
  *
- * Aturan kredensialnya dipinjam dari `@/server/modules/auth/service` — sumber
- * yang sama dengan `/api/v1/auth/login` — supaya login lewat browser dan lewat
+ * Aturan kredensialnya dipinjam dari `@/server/modules/auth/service` - sumber
+ * yang sama dengan `/api/v1/auth/login` - supaya login lewat browser dan lewat
  * aplikasi mobile tidak bisa berbeda syarat. Yang khas web tinggal di sini:
  * saklar login siswa, cookie sesi, dan tujuan pengalihan setelah masuk.
  */
@@ -20,7 +20,7 @@ import { portals, suggestedPortal, type Portal, type Role, type System } from ".
 
 type LoginResult = { error: string } | { success: true; redirectTo: string; role: Role };
 
-/** Kalimat versi web — diakhiri titik, berbeda dari kalimat API. */
+/** Kalimat versi web - diakhiri titik, berbeda dari kalimat API. */
 function messageFor(reason: CredentialFailure, today?: string) {
   switch (reason) {
     case "MISSING_FIELDS":
@@ -62,7 +62,7 @@ export async function getStudentWebLoginEnabled() {
  * Pesan untuk akun yang benar tapi membuka pintu yang salah.
  *
  * Password-nya sudah terbukti pada titik ini, jadi menunjukkan pintu yang tepat
- * tidak membocorkan apa pun yang belum diketahui pemilik akun — dan jauh lebih
+ * tidak membocorkan apa pun yang belum diketahui pemilik akun - dan jauh lebih
  * berguna daripada sekadar "akses ditolak".
  */
 function wrongPortalMessage(role: Role, portal: Portal) {

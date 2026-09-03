@@ -98,7 +98,7 @@ export function TeacherDashboardClient({ teacherName, subjectName, data }: { tea
         <DashboardSectionHeading title="Performa & aktivitas" description="Rata-rata nilai kelas dan ujian yang baru diperbarui." />
         <div id="teacher-activity" className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
           <DashboardPanel>
-            <DashboardPanelHeader icon={BarChart3} title="Rata-rata nilai per kelas" description="Perbandingan nilai pada skala 0–100" />
+            <DashboardPanelHeader icon={BarChart3} title="Rata-rata nilai per kelas" description="Perbandingan nilai pada skala 0-100" />
             <div className="p-5">
               {dashboard.scoreByClass.length === 0 ? (
                 <DashboardEmpty icon={BarChart3} title="Belum ada data nilai" description="Grafik akan muncul setelah nilai ujian tersedia." className="min-h-[280px]" />

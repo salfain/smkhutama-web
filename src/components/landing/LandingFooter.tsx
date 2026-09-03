@@ -61,7 +61,7 @@ export function LandingFooter({ profile }: { profile: Profile }) {
   const hasContact = Boolean(profile.address || profile.phone || profile.email || profile.instagram);
 
   return (
-    // Footer selalu gelap di kedua mode, jadi warnanya dipatok — bukan token
+    // Footer selalu gelap di kedua mode, jadi warnanya dipatok - bukan token
     // yang ikut berbalik. Emas dipakai versi terang (#FBBF24) karena
     // --brand-text di mode terang terlalu gelap untuk latar sepekat ini.
     // pb di mobile = tinggi bar mengambang (64px + jarak 12px) + area aman,

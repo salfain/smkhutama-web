@@ -4,7 +4,7 @@ import { requireStudent } from "@/server/auth";
 import { getStudentBkSummary } from "@/server/modules/bk/service";
 import { toStudentSummary } from "@/server/modules/bk/dto";
 
-/** GET /api/v1/bk/student/summary — poin, pelanggaran, prestasi, sesi, permohonan. */
+/** GET /api/v1/bk/student/summary - poin, pelanggaran, prestasi, sesi, permohonan. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     const { student } = await requireStudent(req);

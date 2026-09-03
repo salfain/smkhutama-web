@@ -1,5 +1,5 @@
 /**
- * Modul CBT — analisis butir soal.
+ * Modul CBT - analisis butir soal.
  *
  * Menghitung tingkat kesukaran tiap soal dari jawaban peserta, dipakai
  * halaman analisis guru. Rumusnya sengaja ditaruh di sini, bukan di halaman,
@@ -10,7 +10,7 @@ import { prisma } from "@/lib/prisma";
 
 const SUBMITTED = ["SUBMITTED", "AUTO_SUBMITTED"] as const;
 
-/** Ujian guru yang sudah ditutup — hanya ini yang layak dianalisis. */
+/** Ujian guru yang sudah ditutup - hanya ini yang layak dianalisis. */
 export async function listClosedExams(teacherId: string) {
   return prisma.exam.findMany({
     where: { teacherId, status: "CLOSED" },
@@ -29,7 +29,7 @@ export type QuestionStat = {
   correct: number;
   wrong: number;
   total: number;
-  /** Proporsi peserta yang menjawab benar, 0–1. Makin kecil, makin sulit. */
+  /** Proporsi peserta yang menjawab benar, 0-1. Makin kecil, makin sulit. */
   difficulty: number;
 };
 
@@ -37,7 +37,7 @@ export type QuestionStat = {
  * Statistik per soal untuk satu ujian.
  *
  * Pembagi tingkat kesukaran adalah **jumlah peserta**, bukan jumlah jawaban
- * yang masuk — soal yang banyak dikosongkan memang seharusnya terhitung sulit.
+ * yang masuk - soal yang banyak dikosongkan memang seharusnya terhitung sulit.
  */
 export async function getQuestionAnalysis(examId: string) {
   const exam = await prisma.exam.findUnique({

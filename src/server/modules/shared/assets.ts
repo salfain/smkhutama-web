@@ -3,7 +3,7 @@
  * Cloudflare R2.
  *
  * Berbeda dengan modul lain, hasilnya bukan JSON melainkan aliran byte, jadi
- * yang dikembalikan di sini bahan mentahnya — route yang membungkusnya jadi
+ * yang dikembalikan di sini bahan mentahnya - route yang membungkusnya jadi
  * response beserta header.
  */
 
@@ -23,7 +23,7 @@ const IMAGE_TYPES: Record<string, string> = {
 
 /**
  * Logo sekolah dari `public/uploads`. Null bila belum diunggah atau berkasnya
- * hilang — pemanggil mengalihkan ke favicon bawaan.
+ * hilang - pemanggil mengalihkan ke favicon bawaan.
  */
 export async function readSchoolLogo() {
   const profile = await prisma.schoolProfile.findFirst().catch(() => null);

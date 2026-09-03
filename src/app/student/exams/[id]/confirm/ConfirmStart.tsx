@@ -94,7 +94,7 @@ export function ConfirmStart({
             <Clock className="h-4 w-4 text-gray-400" />
             <div>
               <p className="text-xs text-gray-400">Waktu Ujian</p>
-              <p className="font-medium text-gray-800">{fmtTime(startAt)} – {fmtTime(endAt)} WIB</p>
+              <p className="font-medium text-gray-800">{fmtTime(startAt)} - {fmtTime(endAt)} WIB</p>
             </div>
           </div>
         </div>

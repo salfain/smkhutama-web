@@ -3,7 +3,7 @@ import { apiOk, handle, optionalString, preflight, readJson, requiredString } fr
 import { submitRegistration } from "@/server/modules/landing/ppdb";
 
 /**
- * POST /api/v1/landing/ppdb — kirim pendaftaran siswa baru. Publik.
+ * POST /api/v1/landing/ppdb - kirim pendaftaran siswa baru. Publik.
  *
  * Yang dikembalikan hanya nomor pendaftaran; nomor itulah yang dipakai calon
  * siswa untuk mengecek statusnya nanti.

@@ -24,7 +24,7 @@ import { portals, type Portal } from "./portals";
  * Formulir satu portal login.
  *
  * Portalnya ditentukan oleh route (`/login/siswa`, `/login/guru`, …), bukan oleh
- * pilihan di dalam halaman — jadi tautan ke pintu tertentu bisa dibagikan
+ * pilihan di dalam halaman - jadi tautan ke pintu tertentu bisa dibagikan
  * langsung ke kelompok yang dituju. Peran tidak pernah ditanyakan: server
  * membacanya dari akun, lalu menolak bila akun itu tidak berhak lewat sini.
  */
@@ -133,7 +133,7 @@ export function LoginForm({ portal }: { portal: Portal }) {
 
       {/* ── Panel kanan: formulir ── */}
       <main className="relative flex flex-col lg:items-center lg:justify-center lg:px-8 lg:py-10">
-        {/* Header gradien — hanya mobile, supaya identitas warna sistem tetap terlihat
+        {/* Header gradien - hanya mobile, supaya identitas warna sistem tetap terlihat
             walau panel kiri (desktop) disembunyikan. */}
         <div className={`flex flex-col bg-gradient-to-br ${def.theme.panel} px-5 pb-8 pt-6 text-white lg:hidden`}>
           <Link

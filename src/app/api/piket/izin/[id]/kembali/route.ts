@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requirePiketApiAuth } from "@/lib/piket-api-auth";
 import { markPermitReturned } from "@/server/modules/piket/service";
 
-// Endpoint versi lama — bentuk response dipertahankan untuk aplikasi mobile
+// Endpoint versi lama - bentuk response dipertahankan untuk aplikasi mobile
 // yang sudah beredar. Penggantinya: PATCH /api/v1/piket/izin/{id}/kembali.
 
 const corsHeaders = {

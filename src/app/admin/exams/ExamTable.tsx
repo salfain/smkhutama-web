@@ -252,7 +252,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
           <SelectContent>
             <SelectItem value="all">Semua Jenis</SelectItem>
             {ADMIN_EXAM_TYPES.map((t) => (
-              <SelectItem key={t.value} value={t.value}>{t.short} – {t.label}</SelectItem>
+              <SelectItem key={t.value} value={t.value}>{t.short} - {t.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -369,7 +369,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {ADMIN_EXAM_TYPES.map((t) => (
-                      <SelectItem key={t.value} value={t.value}>{t.short} – {t.label}</SelectItem>
+                      <SelectItem key={t.value} value={t.value}>{t.short} - {t.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -386,7 +386,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
                   <SelectTrigger><SelectValue placeholder="Pilih..." /></SelectTrigger>
                   <SelectContent>
                     {opts.subjects.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>{s.code} – {s.name}</SelectItem>
+                      <SelectItem key={s.id} value={s.id}>{s.code} - {s.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -573,7 +573,7 @@ export function ExamTable({ exams, opts }: { exams: Exam[]; opts: FormDataOpts }
               <Select value={academicYearId} onValueChange={setAcademicYearId}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">— Tidak diset —</SelectItem>
+                  <SelectItem value="none">Tidak diset</SelectItem>
                   {opts.academicYears.map((y) => (
                     <SelectItem key={y.id} value={y.id}>
                       {y.year} {y.semester === "GANJIL" ? "Ganjil" : "Genap"}{y.isActive ? " (Aktif)" : ""}

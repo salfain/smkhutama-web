@@ -4,7 +4,7 @@ import { getAttendanceData } from "../actions";
 import { AttendanceClient } from "./AttendanceClient";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Kehadiran Guru – Piket" };
+export const metadata = { title: "Kehadiran Guru - Piket" };
 
 export default async function GuruPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   await requirePiketAuth();

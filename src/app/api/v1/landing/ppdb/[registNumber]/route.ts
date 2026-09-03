@@ -4,7 +4,7 @@ import { findRegistration } from "@/server/modules/landing/ppdb";
 import { toRegistrationStatus } from "@/server/modules/landing/dto";
 
 /**
- * GET /api/v1/landing/ppdb/{registNumber} — status pendaftaran. Publik.
+ * GET /api/v1/landing/ppdb/{registNumber} - status pendaftaran. Publik.
  *
  * Hanya nama, jurusan pilihan, dan status yang dikirim. Nomor pendaftaran
  * bisa ditebak, jadi endpoint ini tidak boleh membocorkan alamat, email,

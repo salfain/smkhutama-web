@@ -17,7 +17,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   });
 }
 
-/** PATCH /api/v1/bk/counselor/cases/{id} — ubah status sesi. */
+/** PATCH /api/v1/bk/counselor/cases/{id} - ubah status sesi. */
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
     await requireCounselorAccess(req);

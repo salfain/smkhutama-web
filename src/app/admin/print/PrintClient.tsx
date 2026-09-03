@@ -39,7 +39,7 @@ export function PrintClient({ exams }: { exams: ExamOpt[] }) {
 
   return (
     <>
-      {/* Controls — hidden saat print */}
+      {/* Controls - hidden saat print */}
       <div className="print:hidden space-y-5">
         <Card className="border shadow-sm">
           <CardContent className="p-5 space-y-4">
@@ -51,7 +51,7 @@ export function PrintClient({ exams }: { exams: ExamOpt[] }) {
                   {exams.length === 0 ? (
                     <div className="p-3 text-xs text-gray-400">Belum ada ujian</div>
                   ) : exams.map((e) => (
-                    <SelectItem key={e.id} value={e.id}>{e.subject.code} – {e.title}</SelectItem>
+                    <SelectItem key={e.id} value={e.id}>{e.subject.code} - {e.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -101,7 +101,7 @@ export function PrintClient({ exams }: { exams: ExamOpt[] }) {
         )}
       </div>
 
-      {/* Print area — hanya muncul saat print */}
+      {/* Print area - hanya muncul saat print */}
       {data && (
         <div className="hidden print:block">
           {docType === "attendance" && <AttendanceSheet school={data.school} exam={data.exam} students={data.students} />}

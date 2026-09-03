@@ -13,7 +13,7 @@ import {
  *
  * Body `{ status, response? }` menanggapi permohonan. Kirim
  * `{ convertToCase: true }` untuk sekalian membuat sesi konseling dari isinya
- * — jalur yang sebelumnya hanya tersedia di halaman web.
+ * - jalur yang sebelumnya hanya tersedia di halaman web.
  */
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {

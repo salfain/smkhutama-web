@@ -8,7 +8,7 @@ import { toDashboard } from "@/server/modules/bk/dto";
  * GET /api/v1/bk/counselor/dashboard
  *
  * Berbeda dengan `/api/counselor/dashboard` yang lama, response v1 juga
- * memuat `topStudents` — sama seperti yang dilihat halaman web guru BK.
+ * memuat `topStudents` - sama seperti yang dilihat halaman web guru BK.
  */
 export async function GET(req: NextRequest) {
   return handle(async () => {

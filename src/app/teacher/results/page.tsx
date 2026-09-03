@@ -22,7 +22,7 @@ export default async function TeacherResultsPage() {
       status: a.status,
       student: {
         name: a.student.user.name,
-        class: a.student.class?.name ?? "—",
+        class: a.student.class?.name ?? "-",
       },
     })),
   }));

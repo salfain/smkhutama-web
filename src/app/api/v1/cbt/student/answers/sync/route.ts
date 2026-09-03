@@ -11,7 +11,7 @@ const MAX_BATCH = 100;
  * POST /api/v1/cbt/student/answers/sync
  *
  * Kirim antrean jawaban yang terkumpul saat aplikasi offline. Jawaban yang
- * lolos pemeriksaan tetap tersimpan meski ada entri lain yang ditolak —
+ * lolos pemeriksaan tetap tersimpan meski ada entri lain yang ditolak -
  * satu entri rusak tidak boleh menjatuhkan seluruh antrean.
  */
 export async function POST(req: NextRequest) {

@@ -89,7 +89,7 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
             <Select value={gender} onValueChange={setGender}>
               <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Pilih..." /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">— Pilih —</SelectItem>
+                <SelectItem value="none">Pilih</SelectItem>
                 <SelectItem value="MALE">Laki-laki</SelectItem>
                 <SelectItem value="FEMALE">Perempuan</SelectItem>
               </SelectContent>
@@ -134,7 +134,7 @@ export function PpdbForm({ majors }: { majors: Major[] }) {
               <SelectContent>
                 {majors.map((m) => (
                   <SelectItem key={m.code} value={m.code}>
-                    <span className="font-semibold">{m.code}</span> – {m.name}
+                    <span className="font-semibold">{m.code}</span> - {m.name}
                   </SelectItem>
                 ))}
               </SelectContent>

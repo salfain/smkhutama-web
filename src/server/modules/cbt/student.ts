@@ -1,5 +1,5 @@
 /**
- * Modul CBT — daftar ujian, dashboard, dan hasil untuk siswa.
+ * Modul CBT - daftar ujian, dashboard, dan hasil untuk siswa.
  * Bagian yang dibaca di luar sesi ujian; siklus ujiannya ada di
  * `exam-session.ts`.
  */
@@ -26,7 +26,7 @@ export async function listExams(student: { id: string; classId: string | null })
 
 /**
  * Ringkasan beranda siswa: ujian hari ini, ujian mendatang, dan lima hasil
- * terakhir. Batas "hari ini" mengikuti waktu lokal proses — lihat catatan
+ * terakhir. Batas "hari ini" mengikuti waktu lokal proses - lihat catatan
  * timezone di docs/api-v1-plan.md.
  */
 export async function getDashboard(student: { id: string; classId: string | null }) {
@@ -64,7 +64,7 @@ export async function getDashboard(student: { id: string; classId: string | null
 /**
  * Ringkasan satu attempt untuk halaman selesai ujian: jumlah benar, salah,
  * dan kosong. "Kosong" dihitung dari total soal dikurangi jawaban yang benar-
- * benar terisi, bukan dari jumlah baris jawaban — soal yang dibuka lalu
+ * benar terisi, bukan dari jumlah baris jawaban - soal yang dibuka lalu
  * ditinggalkan tetap punya baris jawaban kosong.
  */
 export async function getFinishSummary(examId: string, studentId: string) {

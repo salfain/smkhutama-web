@@ -3,7 +3,7 @@ import { apiOk, handle, notFound, preflight } from "@/server/http";
 import { requireCounselorAccess } from "@/server/auth";
 import { getSurveyWithResponses, summarizeSurvey } from "@/server/modules/bk/surveys";
 
-/** GET /api/v1/bk/counselor/surveys/{id}/results — rekap jawaban angket. */
+/** GET /api/v1/bk/counselor/surveys/{id}/results - rekap jawaban angket. */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
     await requireCounselorAccess(req);

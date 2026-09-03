@@ -24,7 +24,7 @@ export default async function ConfirmPage({ params }: { params: Promise<{ id: st
       title={exam.title}
       subjectName={exam.subject.name}
       studentName={user.name}
-      className={user.student.class?.name ?? "—"}
+      className={user.student.class?.name ?? "-"}
       questions={exam._count.questions}
       duration={exam.durationMinutes}
       startAt={exam.startAt}

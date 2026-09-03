@@ -120,7 +120,7 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
                     <td className="px-4 py-3 text-gray-500">{i + 1}</td>
                     <td className="px-4 py-3 font-medium text-gray-900">{s.name}</td>
                     <td className="px-4 py-3"><Badge variant="secondary" className="font-mono text-xs">{s.code}</Badge></td>
-                    <td className="px-4 py-3 text-gray-600">{s.major ? `${s.major.code} – ${s.major.name}` : <span className="text-gray-400">— Umum —</span>}</td>
+                    <td className="px-4 py-3 text-gray-600">{s.major ? `${s.major.code} - ${s.major.name}` : <span className="text-gray-400">Umum</span>}</td>
                     <td className="px-4 py-3 text-center text-gray-600">{s._count.questions}</td>
                     <td className="px-4 py-3 text-center text-gray-600">{s._count.exams}</td>
                     <td className="px-4 py-3">
@@ -160,9 +160,9 @@ export function SubjectTable({ subjects, majors }: { subjects: Subject[]; majors
               <Select value={majorId} onValueChange={setMajorId}>
                 <SelectTrigger><SelectValue placeholder="Pilih jurusan..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">— Umum (semua jurusan) —</SelectItem>
+                  <SelectItem value="none">Umum (semua jurusan)</SelectItem>
                   {majors.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>{m.code} – {m.name}</SelectItem>
+                    <SelectItem key={m.id} value={m.id}>{m.code} - {m.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

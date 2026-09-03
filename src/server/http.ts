@@ -3,7 +3,7 @@
  *
  * Semua route di `/api/v1` memakai helper di file ini supaya bentuk response,
  * kode error, dan header CORS-nya seragam di seluruh modul (landing, cbt, bk,
- * piket). Route lama di `/api/*` sengaja tidak diubah bentuk response-nya —
+ * piket). Route lama di `/api/*` sengaja tidak diubah bentuk response-nya -
  * lihat `docs/api-v1-plan.md`.
  *
  * Bentuk response v1:

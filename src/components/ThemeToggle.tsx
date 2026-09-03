@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 
 // Tema baru diketahui setelah hidrasi. useSyncExternalStore memberi false di
-// server dan true di klien tanpa setState di dalam effect — pola lama
+// server dan true di klien tanpa setState di dalam effect - pola lama
 // (useState + useEffect) melanggar aturan react-hooks/set-state-in-effect.
 const noopSubscribe = () => () => {};
 const getClientSnapshot = () => true;
@@ -14,7 +14,7 @@ const getServerSnapshot = () => false;
 
 export function ThemeToggle({
   className = "",
-  /** Tampilkan teks "Mode Terang/Gelap" — untuk baris menu, bukan tombol ikon. */
+  /** Tampilkan teks "Mode Terang/Gelap" - untuk baris menu, bukan tombol ikon. */
   showLabel = false,
 }: {
   className?: string;

@@ -4,7 +4,7 @@ import { getNewsBySlug, listRelatedNews } from "@/server/modules/landing/content
 import { toNews, toNewsDetail } from "@/server/modules/landing/dto";
 
 /**
- * GET /api/v1/landing/news/{slug} — satu berita beserta isinya dan beberapa
+ * GET /api/v1/landing/news/{slug} - satu berita beserta isinya dan beberapa
  * berita lain. Publik. Berita yang belum terbit dianggap tidak ada.
  */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {

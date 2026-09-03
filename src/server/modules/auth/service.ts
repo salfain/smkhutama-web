@@ -1,7 +1,7 @@
 /**
  * Modul Auth (lintas modul).
  *
- * Login dipakai semua sub-sistem — CBT, BK, dan piket — jadi tetap satu pintu,
+ * Login dipakai semua sub-sistem - CBT, BK, dan piket - jadi tetap satu pintu,
  * tidak dipecah ke tiap modul. Yang membedakan hanyalah parameter `system`
  * (mis. "PIKET") yang menambah syarat khusus saat memberi token.
  */

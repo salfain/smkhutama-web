@@ -1,5 +1,5 @@
 /**
- * Modul Landing — pendaftaran siswa baru (PPDB).
+ * Modul Landing - pendaftaran siswa baru (PPDB).
  *
  * Dipakai formulir di halaman publik maupun `/api/v1/landing/ppdb`, sehingga
  * aturan validasinya tidak bisa berbeda antara web dan klien luar.

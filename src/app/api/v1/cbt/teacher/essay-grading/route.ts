@@ -5,7 +5,7 @@ import { listEssayAnswers } from "@/server/modules/cbt/teacher";
 import { toEssayAnswer } from "@/server/modules/cbt/dto";
 
 /**
- * GET /api/v1/cbt/teacher/essay-grading — jawaban esai pada ujian yang sudah
+ * GET /api/v1/cbt/teacher/essay-grading - jawaban esai pada ujian yang sudah
  * dikumpulkan, termasuk yang sudah dinilai (nilainya ikut terkirim).
  */
 export async function GET(req: NextRequest) {

@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
  *
  * Formulirnya ada di `/login/{portal}` supaya tautan ke satu pintu bisa
  * dibagikan langsung. Halaman ini sendiri tanpa state, jadi tetap komponen
- * server — sekaligus bisa membaca saklar login siswa tanpa perlu efek klien.
+ * server - sekaligus bisa membaca saklar login siswa tanpa perlu efek klien.
  */
 export default async function LoginChooserPage() {
   const [studentLoginEnabled, profile] = await Promise.all([

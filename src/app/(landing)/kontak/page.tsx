@@ -5,7 +5,7 @@ import { PageHero } from "@/components/landing/PageHero";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Kontak – SMK Hutama" };
+export const metadata = { title: "Kontak - SMK Hutama" };
 
 export default async function KontakPage() {
   const { profile } = await getLandingContent().catch(() => ({ profile: null }));
@@ -83,7 +83,7 @@ export default async function KontakPage() {
           <RevealContainer className="mt-12 text-center">
             <RevealItem>
               <p className="text-sm text-ink-soft">
-                Jam operasional: Senin – Jumat, 07:00 – 15:00 WIB
+                Jam operasional: Senin - Jumat, 07:00 - 15:00 WIB
               </p>
             </RevealItem>
           </RevealContainer>

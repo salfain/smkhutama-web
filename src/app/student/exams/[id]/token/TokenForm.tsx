@@ -59,8 +59,8 @@ export function TokenForm({ examId, examTitle, subjectCode, startAt, endAt }: Pr
       <p className="mt-2 text-sm text-gray-500">Minta token kepada pengawas ujian</p>
 
       <div className="mt-2 rounded-lg bg-brand-soft border border-brand-soft p-3 text-left">
-        <p className="text-xs font-semibold text-brand-text">{subjectCode} – {examTitle}</p>
-        <p className="text-xs text-brand-text">{fmt(startAt)} – {fmt(endAt)}</p>
+        <p className="text-xs font-semibold text-brand-text">{subjectCode} - {examTitle}</p>
+        <p className="text-xs text-brand-text">{fmt(startAt)} - {fmt(endAt)}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
@@ -82,7 +82,7 @@ export function TokenForm({ examId, examTitle, subjectCode, startAt, endAt }: Pr
           </div>
         )}
 
-        {/* Keypad angka on-screen — pelengkap keyboard fisik, memudahkan input di layar sentuh (PWA). */}
+        {/* Keypad angka on-screen - pelengkap keyboard fisik, memudahkan input di layar sentuh (PWA). */}
         <div className="grid grid-cols-3 gap-2">
           {keypadKeys.map((key) => (
             <button

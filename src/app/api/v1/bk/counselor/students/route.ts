@@ -4,7 +4,7 @@ import { requireCounselorAccess } from "@/server/auth";
 import { listStudents } from "@/server/modules/bk/service";
 import { toStudentOption } from "@/server/modules/bk/dto";
 
-/** GET /api/v1/bk/counselor/students — daftar siswa untuk pilihan form. */
+/** GET /api/v1/bk/counselor/students - daftar siswa untuk pilihan form. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     await requireCounselorAccess(req);

@@ -13,7 +13,7 @@ function formatDate(d: Date) {
   });
 }
 function formatTime(d: Date | null) {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
@@ -34,12 +34,12 @@ export default async function IzinPrintPage({ params }: { params: Promise<{ id: 
     <div className="min-h-screen bg-gray-200 py-6 print:bg-white print:py-0">
       <PrintButtons />
 
-      {/* Pilihan ukuran — disembunyikan saat print */}
+      {/* Pilihan ukuran - disembunyikan saat print */}
       <div className="print:hidden mb-4 flex justify-center gap-3 text-xs text-gray-500">
         <span className="font-medium">Format: Struk Thermal (80mm)</span>
       </div>
 
-      {/* Struk thermal — lebar 80mm */}
+      {/* Struk thermal - lebar 80mm */}
       <div
         className="mx-auto bg-white print:mx-0 print:shadow-none"
         style={{ width: "80mm", padding: "4mm 5mm", fontFamily: "monospace, sans-serif" }}
@@ -84,8 +84,8 @@ export default async function IzinPrintPage({ params }: { params: Promise<{ id: 
           <tbody>
             {[
               ["Nama", permit.student.user.name],
-              ["Kelas", permit.student.class?.name ?? "—"],
-              ["Jurusan", permit.student.major?.name ?? "—"],
+              ["Kelas", permit.student.class?.name ?? "-"],
+              ["Jurusan", permit.student.major?.name ?? "-"],
               ["Keperluan", permit.reason],
               ["Tanggal", formatDate(permit.date)],
               ["Jam Keluar", formatTime(permit.exitTime)],
@@ -137,7 +137,7 @@ export default async function IzinPrintPage({ params }: { params: Promise<{ id: 
       <style>{`
         @media print {
           @page {
-            /* Format thermal 80mm — tinggi otomatis sesuai konten */
+            /* Format thermal 80mm - tinggi otomatis sesuai konten */
             size: 80mm auto;
             margin: 0;
           }

@@ -12,7 +12,7 @@ import {
 import { alreadySubmitted, examAccessError, examTokenError } from "@/server/modules/cbt/http-errors";
 
 /**
- * POST /api/v1/cbt/student/exams/start — mulai atau lanjutkan ujian.
+ * POST /api/v1/cbt/student/exams/start - mulai atau lanjutkan ujian.
  *
  * Aman dipanggil ulang: kalau attempt-nya sudah berjalan, yang dikembalikan
  * attempt yang sama, bukan yang baru. Token hanya diminta saat ujian benar-

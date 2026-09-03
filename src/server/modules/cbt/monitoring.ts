@@ -1,10 +1,10 @@
 /**
- * Modul CBT — pengawasan ujian.
+ * Modul CBT - pengawasan ujian.
  *
  * Guru memantau ujiannya sendiri, admin memantau seluruh ujian aktif.
  * Kendali attempt (buka kunci, kumpulkan paksa, reset login) sebelumnya
- * ditulis dua kali — di `admin/monitoring/actions.ts` dan
- * `teacher/monitoring/actions.ts` — dengan perbedaan halus pada nama aksi
+ * ditulis dua kali - di `admin/monitoring/actions.ts` dan
+ * `teacher/monitoring/actions.ts` - dengan perbedaan halus pada nama aksi
  * audit. Sekarang satu, dengan nama aksi diserahkan ke pemanggil.
  */
 
@@ -37,7 +37,7 @@ export async function listAttemptsForExam(examId: string) {
   });
 }
 
-/** Ujian aktif milik guru lengkap dengan peserta — dipakai halaman monitoring. */
+/** Ujian aktif milik guru lengkap dengan peserta - dipakai halaman monitoring. */
 export async function listTeacherActiveExams(teacherId: string) {
   return prisma.exam.findMany({
     where: { teacherId, status: "ACTIVE" },
@@ -71,7 +71,7 @@ export async function listActiveExams() {
 
 /**
  * Pengawasan satu ujian dari sisi admin: seluruh siswa di kelas peserta,
- * termasuk yang belum memulai — supaya pengawas tahu siapa yang belum masuk.
+ * termasuk yang belum memulai - supaya pengawas tahu siapa yang belum masuk.
  * Tanpa `examId`, dipilih ujian aktif terbaru.
  */
 export async function getExamMonitoring(examId: string | null) {
@@ -152,7 +152,7 @@ export async function unlockAttempt(
 /**
  * Kumpulkan paksa attempt yang sedang berjalan.
  *
- * Jawaban yang sudah tersimpan tidak dinilai ulang di sini — statusnya
+ * Jawaban yang sudah tersimpan tidak dinilai ulang di sini - statusnya
  * diubah jadi AUTO_SUBMITTED dan dikunci supaya siswa tidak bisa melanjutkan.
  */
 export async function forceSubmitAttempt(

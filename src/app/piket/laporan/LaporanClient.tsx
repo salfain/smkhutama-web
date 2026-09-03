@@ -30,7 +30,7 @@ const attendanceStyle: Record<string, { label: string; className: string }> = {
 };
 
 function fmtTime(d: Date | null) {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 

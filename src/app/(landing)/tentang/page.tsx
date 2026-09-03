@@ -4,7 +4,7 @@ import { PageHero } from "@/components/landing/PageHero";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Tentang Kami – SMK Hutama" };
+export const metadata = { title: "Tentang Kami - SMK Hutama" };
 
 export default async function TentangPage() {
   const { vision, missionItems, history, principalName, principalPhoto, principalWord } =

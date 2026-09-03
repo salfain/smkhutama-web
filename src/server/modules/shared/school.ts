@@ -1,5 +1,5 @@
 /**
- * Profil sekolah — identitas yang muncul di kop semua dokumen cetak.
+ * Profil sekolah - identitas yang muncul di kop semua dokumen cetak.
  *
  * Lintas modul: dipakai cetak naskah soal (CBT), surat pemanggilan dan
  * laporan konseling (BK), serta surat izin siswa (piket).

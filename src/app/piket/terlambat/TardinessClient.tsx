@@ -72,8 +72,8 @@ export function TardinessClient({ records, students }: { records: Record[]; stud
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                     {new Date(r.arrivalTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
                   </td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.reason ?? "—"}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.sanction ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.reason ?? "-"}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.sanction ?? "-"}</td>
                   <td className="px-4 py-3 text-right">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={() => remove(r.id)} disabled={pending}>
                       <Trash2 className="h-3.5 w-3.5" />
@@ -97,7 +97,7 @@ export function TardinessClient({ records, students }: { records: Record[]; stud
                 <SelectContent>
                   {students.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
-                      {s.name} — {s.className}{s.nis ? ` (${s.nis})` : ""}
+                      {s.name} - {s.className}{s.nis ? ` (${s.nis})` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -125,7 +125,7 @@ export function CaseWorkspaceClient({ record }: { record: RecordData }) {
         </div>
         <div className="mt-5 grid gap-3 border-t border-white/20 pt-5 sm:grid-cols-2 xl:grid-cols-4">
           <Info icon={UserRound} label="Siswa" value={`${record.student.user.name} · ${record.student.class?.name ?? "Tanpa kelas"}`} />
-          <Info icon={Building2} label="Jurusan" value={record.student.major ? `${record.student.major.code} · ${record.student.major.name}` : "–"} />
+          <Info icon={Building2} label="Jurusan" value={record.student.major ? `${record.student.major.code} · ${record.student.major.name}` : "-"} />
           <Info icon={MessagesSquare} label="Guru BK" value={record.counselor.user.name} />
           <Info icon={CalendarClock} label="Tindak lanjut" value={record.nextFollowUpAt ? fullDate(record.nextFollowUpAt) : "Belum dijadwalkan"} />
         </div>

@@ -184,9 +184,9 @@ async function findConflict(input: ScheduleInput, excludeId?: string) {
   const overlap = candidates.find((schedule) => timeRangesOverlap(input.startTime, input.endTime, schedule.startTime, schedule.endTime));
   if (!overlap) return null;
   if (overlap.classId === input.classId) {
-    return `Kelas ${overlap.class.name} sudah memiliki jadwal pukul ${overlap.startTime}–${overlap.endTime}.`;
+    return `Kelas ${overlap.class.name} sudah memiliki jadwal pukul ${overlap.startTime}-${overlap.endTime}.`;
   }
-  return `Guru ${overlap.teacher.user.name} sudah mengajar pukul ${overlap.startTime}–${overlap.endTime}.`;
+  return `Guru ${overlap.teacher.user.name} sudah mengajar pukul ${overlap.startTime}-${overlap.endTime}.`;
 }
 
 async function validateTeachingAssignment(input: ScheduleInput) {

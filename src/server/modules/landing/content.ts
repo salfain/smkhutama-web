@@ -1,9 +1,9 @@
 /**
- * Modul Landing — konten publik situs sekolah.
+ * Modul Landing - konten publik situs sekolah.
  *
  * Berbeda dengan tiga modul lain, bagian ini belum pernah punya API: halaman
  * publik mengambil datanya langsung lewat server component. Service ini jadi
- * sumber tunggal untuk keduanya — halaman web dan `/api/v1/landing/*` —
+ * sumber tunggal untuk keduanya - halaman web dan `/api/v1/landing/*` -
  * supaya situs dan API tidak pernah menampilkan isi yang berbeda.
  *
  * Semua fungsi di sini menerapkan **nilai bawaan** saat tabelnya masih kosong,

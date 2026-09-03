@@ -80,7 +80,7 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                   <p className="text-xs text-gray-500 dark:text-gray-400">{r.className} · {r.reason}</p>
                 </div>
                 <div className="text-xs text-gray-400 shrink-0">
-                  {r.exitTime ? new Date(r.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                  {r.exitTime ? new Date(r.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-"}
                 </div>
                 <Button size="sm" variant="outline" className="shrink-0 gap-1 text-green-600 border-green-200 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-900/20" onClick={() => markReturned(r.id)} disabled={pending}>
                   <CheckCircle2 className="h-3.5 w-3.5" />Kembali
@@ -124,10 +124,10 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                     </td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.reason}</td>
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs">
-                      {r.exitTime ? new Date(r.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                      {r.exitTime ? new Date(r.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-"}
                     </td>
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs">
-                      {r.returnTime ? new Date(r.returnTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                      {r.returnTime ? new Date(r.returnTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-"}
                     </td>
                     <td className="px-4 py-3">
                       <Badge className={`text-xs hover:opacity-100 ${statusStyle[r.status] ?? ""}`}>
@@ -172,7 +172,7 @@ export function PermitClient({ records, students }: { records: PermitRecord[]; s
                 <SelectContent>
                   {students.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
-                      {s.name} — {s.className}{s.nis ? ` (${s.nis})` : ""}
+                      {s.name} - {s.className}{s.nis ? ` (${s.nis})` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>

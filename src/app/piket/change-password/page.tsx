@@ -2,7 +2,7 @@ import { ChangePasswordForm } from "@/app/profile/change-password/ChangePassword
 import { requirePiketAuth } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Ganti Password — Guru Piket" };
+export const metadata = { title: "Ganti Password - Guru Piket" };
 
 export default async function PiketChangePasswordPage() {
   await requirePiketAuth();

@@ -5,7 +5,7 @@ import { PpdbForm } from "./PpdbForm";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Pendaftaran Online (PPDB) – SMK Hutama",
+  title: "Pendaftaran Online (PPDB) - SMK Hutama",
   description: "Formulir pendaftaran peserta didik baru SMK Hutama Pondok Gede.",
 };
 
@@ -37,7 +37,7 @@ export default async function PpdbPage() {
             Pendaftaran Peserta Didik Baru
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-ink-soft text-base md:text-lg">
-            Bergabunglah bersama SMK Hutama. Isi formulir di bawah ini dengan lengkap — 
+            Bergabunglah bersama SMK Hutama. Isi formulir di bawah ini dengan lengkap - 
             proses cepat, mudah, dan sepenuhnya online.
           </p>
 
@@ -78,7 +78,7 @@ export default async function PpdbPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  Fotokopi Rapor semester 1–5
+                  Fotokopi Rapor semester 1-5
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -105,10 +105,10 @@ export default async function PpdbPage() {
                 Jadwal PPDB
               </h3>
               <div className="mt-4 space-y-4">
-                <TimelineItem date="1 Jun – 15 Jul 2026" label="Pendaftaran Online" active />
-                <TimelineItem date="16 – 20 Jul 2026" label="Verifikasi Berkas" />
+                <TimelineItem date="1 Jun - 15 Jul 2026" label="Pendaftaran Online" active />
+                <TimelineItem date="16 - 20 Jul 2026" label="Verifikasi Berkas" />
                 <TimelineItem date="22 Jul 2026" label="Pengumuman" />
-                <TimelineItem date="23 – 25 Jul 2026" label="Daftar Ulang" />
+                <TimelineItem date="23 - 25 Jul 2026" label="Daftar Ulang" />
               </div>
             </div>
 

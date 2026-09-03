@@ -1,5 +1,5 @@
 /**
- * Modul Piket — pemetaan record Prisma ke bentuk JSON yang dikirim ke klien.
+ * Modul Piket - pemetaan record Prisma ke bentuk JSON yang dikirim ke klien.
  *
  * Dipisah dari service supaya halaman web tetap bisa memakai record Prisma
  * apa adanya, sementara API mengirim bentuk yang datar dan stabil.
@@ -23,7 +23,7 @@ type TeacherOption = Awaited<ReturnType<typeof listAttendance>>["teachers"][numb
 type ClassOption = Awaited<ReturnType<typeof listAttendance>>["classes"][number];
 type DashboardResult = Awaited<ReturnType<typeof getDashboard>>;
 
-const NO_CLASS = "—";
+const NO_CLASS = "-";
 
 export function toStudentOption(student: StudentOption) {
   return {

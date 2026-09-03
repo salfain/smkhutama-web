@@ -157,7 +157,7 @@ export function ViolationsClient({
               <Select value={studentId} onValueChange={setStudentId}>
                 <SelectTrigger><SelectValue placeholder="Pilih siswa" /></SelectTrigger>
                 <SelectContent>
-                  {students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} — {s.className}</SelectItem>)}
+                  {students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} - {s.className}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -166,7 +166,7 @@ export function ViolationsClient({
               <Select value={typeId} onValueChange={onTypeChange}>
                 <SelectTrigger><SelectValue placeholder="Pilih (opsional)" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">— Lainnya / manual —</SelectItem>
+                  <SelectItem value="none">Lainnya / manual</SelectItem>
                   {types.map((t) => <SelectItem key={t.id} value={t.id}>{t.name} ({t.points} poin)</SelectItem>)}
                 </SelectContent>
               </Select>

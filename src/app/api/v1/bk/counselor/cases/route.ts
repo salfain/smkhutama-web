@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-/** POST /api/v1/bk/counselor/cases — buat sesi konseling baru. */
+/** POST /api/v1/bk/counselor/cases - buat sesi konseling baru. */
 export async function POST(req: NextRequest) {
   return handle(async () => {
     const actor = await requireCounselorAccess(req);

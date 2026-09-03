@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
 
     const score = body.score;
     if (typeof score !== "number" || score < MIN_SCORE || score > MAX_SCORE) {
-      throw badRequest(`Nilai harus ${MIN_SCORE}–${MAX_SCORE}`, "VALIDATION_ERROR");
+      throw badRequest(`Nilai harus ${MIN_SCORE}-${MAX_SCORE}`, "VALIDATION_ERROR");
     }
 
     const result = await gradeEssay({

@@ -42,7 +42,7 @@ export function WeeklyLessonSchedule({ items, emptyText }: { items: WeeklySchedu
               <p className="flex min-h-28 items-center justify-center px-4 text-xs text-gray-400">Tidak ada jadwal</p>
             ) : grouped[day].map((item) => (
               <article key={item.id} className="px-4 py-4 transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-                <p className="flex items-center gap-2 font-mono text-xs font-semibold text-brand-text"><Clock className="h-3.5 w-3.5" /> {item.startTime}–{item.endTime}</p>
+                <p className="flex items-center gap-2 font-mono text-xs font-semibold text-brand-text"><Clock className="h-3.5 w-3.5" /> {item.startTime}-{item.endTime}</p>
                 <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{item.subjectName}</h3>
                 <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{item.subjectCode}</p>
                 <div className="mt-3 space-y-1.5 text-xs text-gray-500 dark:text-gray-400">

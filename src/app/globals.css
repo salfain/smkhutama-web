@@ -47,7 +47,7 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Token merek landing — nilainya di-scope pada .landing-app, jadi utility
+  /* Token merek landing - nilainya di-scope pada .landing-app, jadi utility
      seperti `bg-brand` otomatis ikut tema area tempat ia dipakai. */
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
@@ -166,7 +166,7 @@
   /* Tema Navy + Emas.
      Aturan kontras yang mengikat seluruh palet ini:
      emas SELALU jadi latar dengan tulisan gelap (--brand-ink), tidak pernah
-     sebaliknya — teks putih di atas #FBBF24 hanya 1.7:1 dan tidak terbaca.
+     sebaliknya - teks putih di atas #FBBF24 hanya 1.7:1 dan tidak terbaca.
      Untuk teks/tautan berwarna emas di latar terang pakai --brand-text
      (#B45309, 5.1:1), bukan --brand. */
   --brand: #FBBF24;
@@ -201,19 +201,19 @@
   --brand-ink: #0F172A;
   --brand-text: #FCD34D;
   --brand-soft: rgba(251, 191, 36, 0.12);
-  /* Di mode gelap, "jangkar" bukan lagi navy — kanvasnya sendiri sudah hitam
+  /* Di mode gelap, "jangkar" bukan lagi navy - kanvasnya sendiri sudah hitam
      hangat, jadi kartu justru harus lebih terang dari latarnya. */
   --anchor: #1A1813;
   --anchor-soft: #26231B;
   /* Di latar gelap, emas pekat pada bidang sekecil chip jadi titik paling
      menyilaukan di halaman. Diganti keping bernada emas: latar transparan
-     tipis + tulisan emas redup — 8.7:1 di atas kartu, tetap terbaca jelas
+     tipis + tulisan emas redup - 8.7:1 di atas kartu, tetap terbaca jelas
      tanpa memaksa mata. */
   --chip: rgba(251, 191, 36, 0.14);
   --chip-ink: #E8C25A;
   /* Kontras di mode gelap sengaja DIREM, bukan dimaksimalkan.
      Di atas kanvas #0F0E0A: putih murni ~19:1 dan off-white #EDE8DE masih
-     15.8:1 — dua-duanya menyilaukan untuk judul tebal berukuran besar.
+     15.8:1 - dua-duanya menyilaukan untuk judul tebal berukuran besar.
      Nilai di bawah memberi 11.6:1 untuk judul dan 6.4:1 untuk teks isi;
      keduanya masih lolos AA (4.5:1) dengan margin lega, tapi jauh lebih teduh
      dibaca lama. Di atas kartu --surface pun tetap 10.8:1 dan 6.0:1. */
@@ -236,7 +236,7 @@
   letter-spacing: -0.03em;
 }
 
-/* Genesis visual system — scoped to authenticated application areas only. */
+/* Genesis visual system - scoped to authenticated application areas only. */
 .genesis-app {
   /* Tema emas versi aplikasi.
      Area aplikasi memakai pola "latar aksen pekat + tulisan putih" di ratusan
@@ -478,7 +478,7 @@
 }
 
 /* Area CBT siswa (dashboard + alur ujian) memakai biru khas sistem CBT,
-   bukan amber generik genesis — lihat portals.ts tema "blue". Diaktifkan
+   bukan amber generik genesis - lihat portals.ts tema "blue". Diaktifkan
    di student/layout.tsx hanya saat system === "CBT", jadi BK tetap amber. */
 .genesis-app.cbt-scope {
   --brand: #1d4ed8;
@@ -496,7 +496,7 @@
   --brand-soft: rgba(59, 130, 246, 0.14);
 }
 
-/* Area SIBIKONS (BK) — siswa & guru BK — memakai ungu khas sistem, sesuai
+/* Area SIBIKONS (BK) - siswa & guru BK - memakai ungu khas sistem, sesuai
    tema "purple" di portals.ts. */
 .genesis-app.bk-scope {
   --brand: #7c3aed;
@@ -514,7 +514,7 @@
   --brand-soft: rgba(139, 92, 246, 0.14);
 }
 
-/* Area Piket — amber terang khas sistem, sesuai tema "amber" di portals.ts
+/* Area Piket - amber terang khas sistem, sesuai tema "amber" di portals.ts
    (beda dari amber-coklat default genesis). */
 .genesis-app.piket-scope {
   --brand: #f59e0b;
@@ -533,7 +533,7 @@
 }
 
 /* ============================================
-   LANDING PAGE — Liquid Glass & Visual Effects
+   LANDING PAGE - Liquid Glass & Visual Effects
    ============================================ */
 
 /* Glassmorphism / liquid glass cards */
@@ -600,7 +600,7 @@
 }
 .shine:hover::after { left: 150%; }
 
-/* Gradient text — nada emas; landing menimpanya dengan ramp sendiri di bawah. */
+/* Gradient text - nada emas; landing menimpanya dengan ramp sendiri di bawah. */
 .text-gradient {
   background: linear-gradient(120deg, #B45309, #D97706, #F59E0B);
   -webkit-background-clip: text;
@@ -712,7 +712,7 @@
 }
 
 /* ============================================================
-   PRINT STYLES — Cetak Dokumen Admin
+   PRINT STYLES - Cetak Dokumen Admin
    ============================================================ */
 @media print {
   /* A4 page setup */
@@ -892,7 +892,7 @@
 }
 
 /* ============================================
-   PRINT FIX — pastikan kontainer scroll tidak memotong cetakan
+   PRINT FIX - pastikan kontainer scroll tidak memotong cetakan
    ============================================ */
 @media print {
   html, body {
@@ -905,7 +905,7 @@
 }
 
 /* ============================================================
-   PRINT STYLES — Jadwal Pelajaran Kurikulum
+   PRINT STYLES - Jadwal Pelajaran Kurikulum
    ============================================================ */
 .lesson-schedule-print {
   page: lesson-schedule;

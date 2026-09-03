@@ -1,5 +1,5 @@
 /**
- * Modul CBT — pesan dan status HTTP untuk kode kegagalan sesi ujian.
+ * Modul CBT - pesan dan status HTTP untuk kode kegagalan sesi ujian.
  *
  * Dipisah dari service supaya service tetap bebas dari urusan HTTP: service
  * mengembalikan kode, lapisan ini yang menentukan kalimat dan status-nya.

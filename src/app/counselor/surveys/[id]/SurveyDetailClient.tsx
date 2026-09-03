@@ -55,7 +55,7 @@ export function SurveyDetailClient({ survey, results }: { survey: Survey; result
             <Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700 shrink-0" disabled={pending}><Plus className="h-4 w-4" /></Button>
           </form>
           {err && <p className="mb-2 text-sm text-red-600">{err}</p>}
-          <p className="mb-2 text-xs text-gray-400">Siswa menjawab tiap pernyataan dengan skala: 1 (Tidak Butuh) – 4 (Sangat Butuh).</p>
+          <p className="mb-2 text-xs text-gray-400">Siswa menjawab tiap pernyataan dengan skala: 1 (Tidak Butuh) - 4 (Sangat Butuh).</p>
 
           {survey.questions.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">

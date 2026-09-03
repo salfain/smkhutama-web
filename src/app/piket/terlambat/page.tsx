@@ -5,7 +5,7 @@ import { TardinessClient } from "./TardinessClient";
 import { PiketDateFilter } from "@/components/piket/PiketDateFilter";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Keterlambatan Siswa – Piket" };
+export const metadata = { title: "Keterlambatan Siswa - Piket" };
 
 export default async function TerlambatPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   await requirePiketAuth();
@@ -31,7 +31,7 @@ export default async function TerlambatPage({ searchParams }: { searchParams: Pr
       <TardinessClient records={records.map((r) => ({
         id: r.id,
         studentName: r.student.user.name,
-        className: r.student.class?.name ?? "—",
+        className: r.student.class?.name ?? "-",
         arrivalTime: r.arrivalTime,
         reason: r.reason,
         sanction: r.sanction,
@@ -39,7 +39,7 @@ export default async function TerlambatPage({ searchParams }: { searchParams: Pr
       }))} students={students.map((s) => ({
         id: s.id,
         name: s.user.name,
-        className: s.class?.name ?? "—",
+        className: s.class?.name ?? "-",
         nis: s.nis,
       }))} />
     </div>

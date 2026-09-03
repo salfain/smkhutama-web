@@ -63,7 +63,7 @@ export default async function TeacherMonitoringPage() {
                           <div className="mb-2 flex items-start justify-between">
                             <div className="flex-1 min-w-0 pr-2">
                               <p className="text-sm font-semibold text-gray-900 truncate">{a.student.user.name}</p>
-                              <p className="text-xs text-gray-400 truncate">{a.student.class?.name ?? "—"}</p>
+                              <p className="text-xs text-gray-400 truncate">{a.student.class?.name ?? "-"}</p>
                             </div>
                             <div className="flex flex-col gap-1 items-end shrink-0">
                               <Badge className={`text-xs hover:opacity-100 ${

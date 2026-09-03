@@ -4,7 +4,7 @@ import { requirePiketAccess } from "@/server/auth";
 import { createAttendance, listAttendance } from "@/server/modules/piket/service";
 import { toAttendance, toClassOption, toTeacherOption } from "@/server/modules/piket/dto";
 
-/** GET /api/v1/piket/guru?date=YYYY-MM-DD — kehadiran guru di kelas. */
+/** GET /api/v1/piket/guru?date=YYYY-MM-DD - kehadiran guru di kelas. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     await requirePiketAccess(req);

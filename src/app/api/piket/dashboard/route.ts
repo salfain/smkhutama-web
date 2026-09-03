@@ -3,7 +3,7 @@ import { requirePiketApiAuth } from "@/lib/piket-api-auth";
 import { getDashboard } from "@/server/modules/piket/service";
 import { toDashboard } from "@/server/modules/piket/dto";
 
-// Endpoint versi lama — bentuk response dipertahankan untuk aplikasi mobile
+// Endpoint versi lama - bentuk response dipertahankan untuk aplikasi mobile
 // yang sudah beredar. Logikanya kini dipinjam dari modul piket; penggantinya
 // ada di /api/v1/piket/dashboard (lihat docs/api-v1-plan.md).
 export async function GET(req: NextRequest) {

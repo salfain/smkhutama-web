@@ -54,7 +54,7 @@ export function PrintQuestionsClient({
 
   return (
     <>
-      {/* Toolbar — disembunyikan saat print */}
+      {/* Toolbar - disembunyikan saat print */}
       <div className="print:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm px-6 py-3 flex items-center gap-3">
         <button
           onClick={() => window.history.back()}
@@ -124,7 +124,7 @@ export function PrintQuestionsClient({
           <div className="grid grid-cols-2 gap-x-6 text-sm mb-6 border border-gray-300 rounded p-3 bg-gray-50">
             <div className="space-y-1">
               <InfoRow label="Mata Pelajaran" value={`${exam.subject.name} (${exam.subject.code})`} />
-              <InfoRow label="Kelas" value={exam.classNames.join(", ") || "—"} />
+              <InfoRow label="Kelas" value={exam.classNames.join(", ") || "-"} />
               <InfoRow label="Guru" value={exam.teacherName} />
             </div>
             <div className="space-y-1">
@@ -133,7 +133,7 @@ export function PrintQuestionsClient({
               <InfoRow label="Tahun Ajaran" value={
                 exam.academicYear
                   ? `${exam.academicYear.year} ${exam.academicYear.semester === "GANJIL" ? "Ganjil" : "Genap"}`
-                  : "—"
+                  : "-"
               } />
               {exam.passingScore !== null && (
                 <InfoRow label="KKM" value={`${exam.passingScore}`} />
@@ -222,12 +222,12 @@ export function PrintQuestionsClient({
             </div>
           </div>
 
-          {/* Kunci jawaban — di halaman terpisah */}
+          {/* Kunci jawaban - di halaman terpisah */}
           {showKey && mcQuestions.length > 0 && (
             <div className="mt-8 print:break-before-page">
               <div className="border-2 border-dashed border-gray-400 rounded p-4">
                 <p className="text-sm font-bold text-center mb-3 uppercase tracking-wide">
-                  Kunci Jawaban — {exam.title}
+                  Kunci Jawaban - {exam.title}
                 </p>
                 <div className="grid grid-cols-5 gap-2 text-xs">
                   {mcQuestions.map((q) => {
@@ -239,7 +239,7 @@ export function PrintQuestionsClient({
                       <div key={q.id} className="flex gap-1.5 items-center">
                         <span className="font-semibold text-gray-700 w-6 text-right">{q.no}.</span>
                         <span className="font-bold text-brand-text bg-brand-soft px-2 py-0.5 rounded">
-                          {correctLabels || "—"}
+                          {correctLabels || "-"}
                         </span>
                       </div>
                     );

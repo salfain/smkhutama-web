@@ -4,7 +4,7 @@ import { getLaporanData } from "./actions";
 import { LaporanClient } from "./LaporanClient";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Laporan Piket – SMK Hutama" };
+export const metadata = { title: "Laporan Piket - SMK Hutama" };
 
 export default async function LaporanPage({
   searchParams,

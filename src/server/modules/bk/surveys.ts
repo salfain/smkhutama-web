@@ -1,5 +1,5 @@
 /**
- * Modul BK — angket / asesmen kebutuhan siswa (AKPD).
+ * Modul BK - angket / asesmen kebutuhan siswa (AKPD).
  *
  * Menyatukan query angket yang sebelumnya ditulis terpisah di route API dan
  * di server action halaman guru BK maupun halaman siswa.
@@ -96,7 +96,7 @@ export async function deleteQuestion(id: string) {
 // ─── Rekap hasil ────────────────────────────────────────────────────────────
 
 /**
- * Angket beserta jawabannya saja — cukup untuk menghitung rekap, tanpa ikut
+ * Angket beserta jawabannya saja - cukup untuk menghitung rekap, tanpa ikut
  * menarik identitas setiap responden.
  */
 export async function getSurveyAnswers(id: string) {
@@ -132,7 +132,7 @@ export type QuestionSummary = {
   questionId: string;
   text: string;
   category: string | null;
-  /** Rata-rata nilai jawaban pada skala 1–4, dibulatkan 2 desimal. */
+  /** Rata-rata nilai jawaban pada skala 1-4, dibulatkan 2 desimal. */
   average: number;
   answerCount: number;
 };
@@ -213,7 +213,7 @@ export type SurveyAnswerInput = { questionId: string; value: number };
 
 /**
  * Simpan jawaban angket satu siswa. Pemanggil bertanggung jawab memvalidasi
- * rentang nilai — API menolak nilai di luar 1–4, sedangkan form web
+ * rentang nilai - API menolak nilai di luar 1-4, sedangkan form web
  * membiarkan pertanyaan yang dilewati tersimpan sebagai 0.
  */
 export async function submitSurveyResponse(

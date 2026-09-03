@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Surat Pemanggilan Orang Tua" };
 
 function fmtDate(d: Date | string | null) {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleDateString("id-ID", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
@@ -64,7 +64,7 @@ export default async function SummonPrintPage({ params }: { params: Promise<{ id
           <p>Kepada Yth.</p>
           <p>Bapak/Ibu Orang Tua/Wali Murid:</p>
           <p className="font-semibold ml-4">{summon.student.user.name}</p>
-          <p className="ml-4">Kelas {summon.student.class?.name ?? "—"} — {summon.student.major?.name ?? "—"}</p>
+          <p className="ml-4">Kelas {summon.student.class?.name ?? "-"} - {summon.student.major?.name ?? "-"}</p>
         </div>
 
         <p className="mt-4 text-sm leading-7">
@@ -78,7 +78,7 @@ export default async function SummonPrintPage({ params }: { params: Promise<{ id
         <table className="mt-4 w-full text-sm">
           <tbody>
             <tr><td className="w-44 py-1 font-medium">Nama Siswa</td><td className="w-3 py-1">:</td><td className="py-1 font-semibold">{summon.student.user.name}</td></tr>
-            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{summon.student.class?.name ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{summon.student.class?.name ?? "-"}</td></tr>
             <tr><td className="w-44 py-1 font-medium">Total Poin Pelanggaran</td><td className="w-3 py-1">:</td><td className="py-1 font-semibold text-red-600">{summon.totalPoints} poin</td></tr>
             <tr><td className="w-44 py-1 font-medium">Alasan</td><td className="w-3 py-1">:</td><td className="py-1">{summon.reason}</td></tr>
             {summon.meetingDate && (

@@ -29,7 +29,7 @@ export const ASSIGNMENTS_REQUIRING_MAJOR: readonly AssignmentKey[] = ["HEAD_OF_P
 /**
  * Akses yang benar-benar dibuka tiap penugasan, sesuai gerbang di
  * `@/lib/session` dan `@/lib/assignment-access`. Penugasan yang tidak terdaftar
- * di sini murni catatan tanggung jawab — tidak menambah menu apa pun.
+ * di sini murni catatan tanggung jawab - tidak menambah menu apa pun.
  */
 const ASSIGNMENT_GRANTS: Partial<Record<AssignmentKey, string>> = {
   KURIKULUM: "Membuka menu admin Kurikulum: kelas, mata pelajaran, jadwal, dan tahun ajaran.",
@@ -42,7 +42,7 @@ const ASSIGNMENT_GRANTS: Partial<Record<AssignmentKey, string>> = {
 };
 
 export function assignmentEffect(type: AssignmentKey) {
-  return ASSIGNMENT_GRANTS[type] ?? "Hanya dicatat sebagai tanggung jawab — tidak membuka menu baru.";
+  return ASSIGNMENT_GRANTS[type] ?? "Hanya dicatat sebagai tanggung jawab - tidak membuka menu baru.";
 }
 
 export function assignmentGrantsAccess(type: AssignmentKey) {

@@ -59,7 +59,7 @@ export function StudentExamsList({ exams }: { exams: Exam[] }) {
           <SelectContent>
             <SelectItem value="all">Semua Jenis Ujian</SelectItem>
             {EXAM_TYPES.map((t) => (
-              <SelectItem key={t.value} value={t.value}>{t.short} – {t.label}</SelectItem>
+              <SelectItem key={t.value} value={t.value}>{t.short} - {t.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>

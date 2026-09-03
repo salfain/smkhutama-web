@@ -1,5 +1,5 @@
 /**
- * Modul CBT — sesi ujian siswa.
+ * Modul CBT - sesi ujian siswa.
  *
  * Ini jalur paling kritis di seluruh aplikasi: dipakai aplikasi mobile saat
  * ujian sedang berlangsung. Semua aturan akses, siklus attempt, dan
@@ -90,7 +90,7 @@ export type BeginAttemptResult =
 /**
  * Mulai atau lanjutkan attempt. Aman dipanggil berkali-kali: attempt yang
  * sudah berjalan dikembalikan apa adanya, dan yang sudah disubmit ditolak.
- * Pemanggil bertanggung jawab memvalidasi token lebih dulu — API mewajibkan
+ * Pemanggil bertanggung jawab memvalidasi token lebih dulu - API mewajibkan
  * token, sementara halaman web memvalidasinya di langkah terpisah.
  */
 export async function beginAttempt(input: {
@@ -142,7 +142,7 @@ export async function beginAttempt(input: {
   return { status: "OK", attemptId: created.id, resumed: false };
 }
 
-/** Ringkasan ujian tanpa isi soal — untuk halaman konfirmasi & token. */
+/** Ringkasan ujian tanpa isi soal - untuk halaman konfirmasi & token. */
 export async function getExamSummary(examId: string) {
   return prisma.exam.findUnique({
     where: { id: examId },
@@ -413,7 +413,7 @@ export type SubmitResult =
 
 /**
  * Kunci jawaban dinilai di sini, lalu status attempt dan seluruh nilai per
- * soal ditulis dalam satu transaksi — supaya tidak pernah ada attempt yang
+ * soal ditulis dalam satu transaksi - supaya tidak pernah ada attempt yang
  * berstatus terkirim tapi nilainya setengah jadi.
  *
  * Soal esai/uraian membuat `finalScore` bernilai null sampai guru menilai;

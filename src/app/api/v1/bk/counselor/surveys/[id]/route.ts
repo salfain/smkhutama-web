@@ -4,7 +4,7 @@ import { requireCounselorAccess } from "@/server/auth";
 import { getSurvey } from "@/server/modules/bk/surveys";
 import { toSurveyDetail } from "@/server/modules/bk/dto";
 
-/** GET /api/v1/bk/counselor/surveys/{id} — angket beserta pertanyaannya. */
+/** GET /api/v1/bk/counselor/surveys/{id} - angket beserta pertanyaannya. */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {
     await requireCounselorAccess(req);

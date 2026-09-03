@@ -320,7 +320,7 @@ export function AllClassesScheduleView({
                       <p className="px-4 py-6 text-center text-xs text-gray-400">Belum ada jadwal</p>
                     ) : classSchedules.map((schedule) => (
                       <button key={schedule.id} type="button" onClick={() => actions.onEdit(schedule)} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-                        <div className="w-[82px] shrink-0 font-mono text-[11px] font-semibold text-brand-text dark:text-brand-text">{schedule.startTime}–{schedule.endTime}</div>
+                        <div className="w-[82px] shrink-0 font-mono text-[11px] font-semibold text-brand-text dark:text-brand-text">{schedule.startTime}-{schedule.endTime}</div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">{schedule.subject.name}</p>
                           <p className="truncate text-[11px] text-gray-400">{schedule.teacher.user.name}</p>
@@ -375,7 +375,7 @@ export function PrintableAllClassesSchedule({
                   <tr><td colSpan={gradeClasses.length + 1} className="border border-black py-8 text-center">Belum ada jadwal</td></tr>
                 ) : slots.map((slot, index) => (
                   <tr key={slot.key}>
-                    <td className="border border-black px-1 py-2 text-center font-semibold">{index + 1}<br />{slot.startTime}–{slot.endTime}</td>
+                    <td className="border border-black px-1 py-2 text-center font-semibold">{index + 1}<br />{slot.startTime}-{slot.endTime}</td>
                     {gradeClasses.map((item) => {
                       const schedule = daySchedules.find((entry) => entry.classId === item.id && entry.startTime === slot.startTime && entry.endTime === slot.endTime);
                       return (

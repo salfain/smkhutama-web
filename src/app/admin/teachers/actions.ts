@@ -221,7 +221,7 @@ export async function exportTeachersExcel() {
     username: t.user.username,
     nip: t.nip ?? "",
     email: t.user.email ?? "",
-    mapel: t.subject ? `${t.subject.code} – ${t.subject.name}` : "",
+    mapel: t.subject ? `${t.subject.code} - ${t.subject.name}` : "",
     status: t.user.isActive ? "Aktif" : "Nonaktif",
   }));
 

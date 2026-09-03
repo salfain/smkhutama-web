@@ -177,7 +177,7 @@ export function DashboardClient({
                     <TrendingUp className="h-4 w-4 text-[#6B6B6B] dark:text-[#A7A7AE]" aria-hidden="true" />
                     Rata-rata nilai
                   </CardTitle>
-                  <p className="mt-1 text-xs text-[#9C9C9C]">Per mata pelajaran, skala 0–100</p>
+                  <p className="mt-1 text-xs text-[#9C9C9C]">Per mata pelajaran, skala 0-100</p>
                 </div>
                 <span className="rounded bg-[#F5F5F7] px-2 py-1 text-[11px] font-medium text-[#6B6B6B] dark:bg-white/5 dark:text-[#A7A7AE]">
                   Nilai

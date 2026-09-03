@@ -4,7 +4,7 @@ import { requireTeacher } from "@/server/auth";
 import { listTeacherQuestions } from "@/server/modules/cbt/teacher";
 
 /**
- * GET /api/v1/cbt/teacher/questions — bank soal milik guru beserta pilihannya.
+ * GET /api/v1/cbt/teacher/questions - bank soal milik guru beserta pilihannya.
  *
  * Berisi kunci jawaban (`isCorrect` pada setiap pilihan), jadi hanya untuk
  * guru pemilik soal.

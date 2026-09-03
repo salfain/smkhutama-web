@@ -4,7 +4,7 @@ import { type AnswerInput, syncAnswers } from "@/server/modules/cbt/exam-session
 
 const MAX_BATCH = 100;
 
-// Endpoint versi lama — antrean jawaban yang terkumpul saat aplikasi offline.
+// Endpoint versi lama - antrean jawaban yang terkumpul saat aplikasi offline.
 // Penggantinya: POST /api/v1/cbt/student/answers/sync.
 export async function POST(req: NextRequest) {
   const r = await requireApiAuth(req, "STUDENT");

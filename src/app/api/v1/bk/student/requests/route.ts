@@ -3,7 +3,7 @@ import { apiOk, handle, optionalString, preflight, readJson, requiredString } fr
 import { requireStudent } from "@/server/auth";
 import { createRequest } from "@/server/modules/bk/service";
 
-/** POST /api/v1/bk/student/requests — ajukan permohonan konseling. */
+/** POST /api/v1/bk/student/requests - ajukan permohonan konseling. */
 export async function POST(req: NextRequest) {
   return handle(async () => {
     const { student } = await requireStudent(req);

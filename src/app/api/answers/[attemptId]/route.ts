@@ -6,13 +6,13 @@ import { toAttemptReview } from "@/server/modules/cbt/dto";
 export const dynamic = "force-dynamic";
 
 /**
- * Endpoint versi lama — lembar jawaban satu attempt beserta kunci jawabannya.
+ * Endpoint versi lama - lembar jawaban satu attempt beserta kunci jawabannya.
  * Penggantinya: GET /api/v1/cbt/attempts/{attemptId}/answers.
  *
  * PERUBAHAN KEAMANAN: sebelumnya endpoint ini tidak memeriksa siapa pun,
  * sehingga siapa saja yang tahu `attemptId` bisa membaca kunci jawaban tanpa
- * login. Sekarang wajib terautentikasi — lewat cookie sesi (halaman web) atau
- * Bearer token (mobile) — dan siswa hanya boleh membuka attempt miliknya.
+ * login. Sekarang wajib terautentikasi - lewat cookie sesi (halaman web) atau
+ * Bearer token (mobile) - dan siswa hanya boleh membuka attempt miliknya.
  */
 export async function GET(
   req: NextRequest,

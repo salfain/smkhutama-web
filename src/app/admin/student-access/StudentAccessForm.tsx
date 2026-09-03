@@ -127,7 +127,7 @@ export function StudentAccessForm({ access }: { access: StudentAccess }) {
         <p className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>
-            Kedua jalur mati — siswa tidak bisa masuk sama sekali. Aktifkan minimal satu sebelum
+            Kedua jalur mati - siswa tidak bisa masuk sama sekali. Aktifkan minimal satu sebelum
             ujian dimulai.
           </span>
         </p>

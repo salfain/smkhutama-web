@@ -6,10 +6,10 @@ import { readMediaObject } from "@/server/modules/shared/assets";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/v1/media/{key} — alirkan satu berkas dari Cloudflare R2.
+ * GET /api/v1/media/{key} - alirkan satu berkas dari Cloudflare R2.
  *
  * Key boleh mengandung garis miring, mis. `/api/v1/media/soal/2026/gambar.png`.
- * Response-nya berupa byte, bukan JSON, jadi tidak memakai amplop v1 —
+ * Response-nya berupa byte, bukan JSON, jadi tidak memakai amplop v1 -
  * kegagalannya saja yang tetap berbentuk JSON standar.
  */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ key: string[] }> }) {

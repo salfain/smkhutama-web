@@ -1,5 +1,5 @@
 /**
- * Modul CBT — sisi guru: ringkasan, daftar ujian, bank soal, dan penilaian
+ * Modul CBT - sisi guru: ringkasan, daftar ujian, bank soal, dan penilaian
  * esai.
  *
  * Berbeda dengan `exam-session.ts` yang dipakai saat ujian berlangsung,
@@ -56,7 +56,7 @@ export async function getScoreByClass(teacherId: string) {
 
   const perClass = new Map<string, { total: number; count: number }>();
   for (const attempt of attempts) {
-    const className = attempt.student.class?.name ?? "—";
+    const className = attempt.student.class?.name ?? "-";
     const entry = perClass.get(className) ?? { total: 0, count: 0 };
     entry.total += attempt.score ?? 0;
     entry.count += 1;
@@ -96,7 +96,7 @@ export async function listTeacherExams(teacherId: string) {
 }
 
 /**
- * Ujian guru yang sudah berjalan atau selesai, beserta nilai pesertanya —
+ * Ujian guru yang sudah berjalan atau selesai, beserta nilai pesertanya -
  * dipakai halaman rekap nilai. Peserta diurutkan dari nilai tertinggi.
  */
 export async function listExamResults(teacherId: string) {
@@ -178,7 +178,7 @@ export type GradeEssayResult = "OK" | "NOT_FOUND" | "FORBIDDEN";
 /**
  * Simpan nilai satu jawaban esai, lalu hitung ulang nilai akhir attempt-nya.
  *
- * Nilai akhir tetap null selama masih ada jawaban manual yang belum dinilai —
+ * Nilai akhir tetap null selama masih ada jawaban manual yang belum dinilai -
  * lihat `calculateFinalScoreAfterManual`.
  */
 export async function gradeEssay(input: {

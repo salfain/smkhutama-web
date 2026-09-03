@@ -14,7 +14,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://smkhutama.web.id"),
   title: {
-    default: "SMK HUTAMA — Portal Akademik",
+    default: "SMK HUTAMA - Portal Akademik",
     template: "%s | SMK Hutama",
   },
   description:
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "SMK Hutama Pondok Gede",
-    title: "SMK HUTAMA — Portal Akademik",
+    title: "SMK HUTAMA - Portal Akademik",
     description:
       "Portal Akademik resmi terpadu SMK Hutama Pondok Gede. Menyediakan profil sekolah, informasi PPDB, dan layanan digital.",
     images: [{ url: "/api/school/logo", width: 512, height: 512, alt: "Logo SMK Hutama" }],

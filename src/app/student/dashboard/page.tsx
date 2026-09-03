@@ -63,7 +63,7 @@ export default async function StudentDashboard() {
                     <h3 className="genesis-heading text-xl font-semibold text-[#0A0A0A] transition-colors group-hover:text-brand-text dark:text-[#F5F5F7] dark:group-hover:text-brand-text">{exam.title}</h3>
                     <p className="mt-1 text-sm text-[#6B6B6B] dark:text-[#A7A7AE]">{exam.subject.name}</p>
                     <div className="mt-5 grid gap-3 border-t border-[#E8E8EC] pt-4 text-xs text-[#6B6B6B] dark:border-white/10 dark:text-[#A7A7AE] sm:grid-cols-2">
-                      <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-[#9C9C9C]" /> {formatTime(exam.startAt)}–{formatTime(exam.endAt)}</span>
+                      <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-[#9C9C9C]" /> {formatTime(exam.startAt)}-{formatTime(exam.endAt)}</span>
                       <span className="flex items-center gap-2"><ClipboardCheck className="h-3.5 w-3.5 text-[#9C9C9C]" /> {exam._count.questions} soal · {exam.durationMinutes} menit</span>
                     </div>
                     <span className="mt-5 flex items-center justify-center gap-1.5 rounded-[10px] bg-brand py-[13px] text-sm font-semibold text-white transition-colors group-hover:bg-brand-strong">
@@ -131,7 +131,7 @@ export default async function StudentDashboard() {
                             : passed
                             ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
                             : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
-                        }`}>{attempt.score ?? "—"}</span>
+                        }`}>{attempt.score ?? "-"}</span>
                         {attempt.exam.passingScore !== null && <p className="mt-1 text-[11px] text-[#9C9C9C]">KKM {attempt.exam.passingScore}</p>}
                       </div>
                     </div>

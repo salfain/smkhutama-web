@@ -20,7 +20,7 @@ describe("requiredString", () => {
     }
   });
 
-  test("menolak angka — bukan sekadar mengubahnya jadi teks", () => {
+  test("menolak angka - bukan sekadar mengubahnya jadi teks", () => {
     assert.throws(() => requiredString({ nama: 123 }, "nama"), ApiError);
   });
 });
@@ -46,7 +46,7 @@ describe("intField", () => {
     assert.equal(intField({ poin: 7.9 }, "poin"), 7);
   });
 
-  test("nilai negatif dibiarkan — pembatasan urusan pemanggil", () => {
+  test("nilai negatif dibiarkan - pembatasan urusan pemanggil", () => {
     assert.equal(intField({ poin: -5 }, "poin"), -5);
   });
 

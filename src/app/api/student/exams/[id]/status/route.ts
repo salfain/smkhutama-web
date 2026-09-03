@@ -4,7 +4,7 @@ import { findAttempt } from "@/server/modules/cbt/exam-session";
 import { toAttemptStatus } from "@/server/modules/cbt/dto";
 
 /**
- * Endpoint versi lama — mobile cek apakah attempt masih terkunci atau sudah
+ * Endpoint versi lama - mobile cek apakah attempt masih terkunci atau sudah
  * dibuka pengawas. Penggantinya: GET /api/v1/cbt/student/exams/{id}/status.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

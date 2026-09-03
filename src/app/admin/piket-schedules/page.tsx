@@ -3,7 +3,7 @@ import { getPiketScheduleData } from "./actions";
 import { PiketScheduleClient } from "./PiketScheduleClient";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Jadwal Piket – Admin" };
+export const metadata = { title: "Jadwal Piket - Admin" };
 
 export default async function PiketSchedulePage() {
   await requireAuth("KURIKULUM");

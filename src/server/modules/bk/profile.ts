@@ -1,5 +1,5 @@
 /**
- * Modul BK — biodata siswa pada Buku Siswa.
+ * Modul BK - biodata siswa pada Buku Siswa.
  *
  * Alur: siswa mengisi sendiri lewat "Biodata Saya" (status PENDING), lalu guru
  * BK memverifikasi (VERIFIED, terkunci) atau mengembalikannya (REJECTED).
@@ -45,7 +45,7 @@ export async function getProfileByUserId(userId: string) {
   return prisma.student.findUnique({ where: { userId }, select: profileSelect });
 }
 
-/** Nomor HP orang tua: 08xx / +62xx, 9–15 digit. */
+/** Nomor HP orang tua: 08xx / +62xx, 9-15 digit. */
 export function normalizePhone(raw: string) {
   const digits = raw.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
   const plain = digits.startsWith("+62") ? `0${digits.slice(3)}` : digits.startsWith("62") ? `0${digits.slice(2)}` : digits;
@@ -74,7 +74,7 @@ function toData(input: ProfileInput) {
   };
 }
 
-/** Pengisian oleh siswa — selalu masuk antrean verifikasi BK. */
+/** Pengisian oleh siswa - selalu masuk antrean verifikasi BK. */
 export async function submitProfile(studentId: string, input: ProfileInput) {
   return prisma.student.update({
     where: { id: studentId },
@@ -89,7 +89,7 @@ export async function submitProfile(studentId: string, input: ProfileInput) {
   });
 }
 
-/** Pengisian oleh guru BK — langsung dianggap terverifikasi. */
+/** Pengisian oleh guru BK - langsung dianggap terverifikasi. */
 export async function saveProfileByCounselor(studentId: string, counselorUserId: string, input: ProfileInput) {
   return prisma.student.update({
     where: { id: studentId },

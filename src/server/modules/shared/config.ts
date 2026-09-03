@@ -2,7 +2,7 @@
  * Pengaturan runtime yang dibaca aplikasi klien saat mulai.
  *
  * Nilainya berasal dari tabel `SystemSetting` yang bisa diubah admin tanpa
- * merilis ulang aplikasi — mis. menaikkan ambang pelanggaran atau menyalakan
+ * merilis ulang aplikasi - mis. menaikkan ambang pelanggaran atau menyalakan
  * mode pemeliharaan saat ujian bermasalah.
  */
 

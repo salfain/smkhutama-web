@@ -3,7 +3,7 @@ import { readMediaObject } from "@/server/modules/shared/assets";
 
 export const dynamic = "force-dynamic";
 
-// Endpoint versi lama — dipakai `src/lib/r2.ts` untuk membangun URL publik.
+// Endpoint versi lama - dipakai `src/lib/r2.ts` untuk membangun URL publik.
 // Penggantinya: GET /api/v1/media/{key}.
 export async function GET(req: NextRequest) {
   const key = req.nextUrl.searchParams.get("key");

@@ -4,7 +4,7 @@ import { canPrintExam, getExamForPrint, getSchoolProfile } from "@/server/module
 import { toExamPrint } from "@/server/modules/cbt/dto";
 
 /**
- * GET /api/admin/exams/[id]/print-questions — endpoint versi lama.
+ * GET /api/admin/exams/[id]/print-questions - endpoint versi lama.
  * Semua soal dalam paket ujian beserta opsi jawaban, untuk halaman cetak/PDF.
  * Penggantinya: GET /api/v1/cbt/admin/exams/{id}/print-questions.
  */

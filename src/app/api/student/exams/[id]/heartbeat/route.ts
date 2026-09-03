@@ -3,7 +3,7 @@ import { requireApiAuth } from "@/lib/api-auth";
 import { recordHeartbeat } from "@/server/modules/cbt/exam-session";
 
 /**
- * Endpoint versi lama — mobile mengirim heartbeat tiap ~30 detik selama ujian
+ * Endpoint versi lama - mobile mengirim heartbeat tiap ~30 detik selama ujian
  * berlangsung, berguna untuk mendeteksi siswa yang koneksinya putus tanpa
  * menutup aplikasi.
  * Penggantinya: POST /api/v1/cbt/student/exams/{id}/heartbeat.

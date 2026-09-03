@@ -27,7 +27,7 @@ export async function gradeEssay(answerId: string, formData: FormData) {
 
   const score = Number(formData.get("score") ?? "");
   if (Number.isNaN(score) || score < 0 || score > 100) {
-    return { error: "Nilai harus 0–100" };
+    return { error: "Nilai harus 0-100" };
   }
 
   try {

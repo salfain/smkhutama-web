@@ -66,9 +66,9 @@ export function AttendanceSheet({ school, exam, students }: { school: School; ex
         <tbody>
           <tr><td className="w-40 py-0.5">Jenis Ujian</td><td>: {examTypeLabel[exam.examType] ?? exam.examType}</td></tr>
           <tr><td className="py-0.5">Mata Pelajaran</td><td>: {exam.subject.name}</td></tr>
-          <tr><td className="py-0.5">Kelas</td><td>: {exam.classNames.join(", ") || "—"}</td></tr>
+          <tr><td className="py-0.5">Kelas</td><td>: {exam.classNames.join(", ") || "-"}</td></tr>
           <tr><td className="py-0.5">Hari / Tanggal</td><td>: {fmtDate(exam.startAt)}</td></tr>
-          <tr><td className="py-0.5">Waktu</td><td>: {fmtTime(exam.startAt)} – {fmtTime(exam.endAt)} WIB</td></tr>
+          <tr><td className="py-0.5">Waktu</td><td>: {fmtTime(exam.startAt)} - {fmtTime(exam.endAt)} WIB</td></tr>
           <tr><td className="py-0.5">Pengawas</td><td>: {exam.teacherName}</td></tr>
         </tbody>
       </table>
@@ -88,7 +88,7 @@ export function AttendanceSheet({ school, exam, students }: { school: School; ex
             <tr key={s.no}>
               <td className="border border-black px-2 py-1.5 text-center">{s.no}</td>
               <td className="border border-black px-2 py-1.5">{s.name}</td>
-              <td className="border border-black px-2 py-1.5">{s.nis ?? "—"}</td>
+              <td className="border border-black px-2 py-1.5">{s.nis ?? "-"}</td>
               <td className="border border-black px-2 py-1.5 text-center">{s.className}</td>
               <td className="border border-black px-2 py-1.5 text-center">{s.no % 2 === 1 ? `${s.no}.` : `${s.no}.`}</td>
             </tr>
@@ -119,7 +119,7 @@ export function ExamReport({ school, exam, students }: { school: School; exam: E
     <div className="print-doc bg-white p-8 text-black" style={{ fontFamily: "Times New Roman, serif" }}>
       <Letterhead school={school} />
       <h2 className="mt-5 text-center text-base font-bold uppercase underline">Berita Acara Pelaksanaan Ujian</h2>
-      <p className="mt-1 text-center text-sm">{examTypeLabel[exam.examType] ?? exam.examType}{exam.academicYear ? ` — Tahun Ajaran ${exam.academicYear.year}` : ""}</p>
+      <p className="mt-1 text-center text-sm">{examTypeLabel[exam.examType] ?? exam.examType}{exam.academicYear ? ` - Tahun Ajaran ${exam.academicYear.year}` : ""}</p>
 
       <div className="mt-5 space-y-3 text-sm leading-relaxed">
         <p className="text-justify">
@@ -129,8 +129,8 @@ export function ExamReport({ school, exam, students }: { school: School; exam: E
         <table className="w-full text-sm">
           <tbody>
             <tr><td className="w-44 py-0.5 align-top">Mata Pelajaran</td><td className="align-top">: {exam.subject.name} ({exam.subject.code})</td></tr>
-            <tr><td className="py-0.5 align-top">Kelas / Peserta</td><td className="align-top">: {exam.classNames.join(", ") || "—"}</td></tr>
-            <tr><td className="py-0.5 align-top">Waktu Pelaksanaan</td><td className="align-top">: {fmtTime(exam.startAt)} – {fmtTime(exam.endAt)} WIB ({exam.durationMinutes} menit)</td></tr>
+            <tr><td className="py-0.5 align-top">Kelas / Peserta</td><td className="align-top">: {exam.classNames.join(", ") || "-"}</td></tr>
+            <tr><td className="py-0.5 align-top">Waktu Pelaksanaan</td><td className="align-top">: {fmtTime(exam.startAt)} - {fmtTime(exam.endAt)} WIB ({exam.durationMinutes} menit)</td></tr>
             <tr><td className="py-0.5 align-top">Pengawas</td><td className="align-top">: {exam.teacherName}</td></tr>
             <tr><td className="py-0.5 align-top">Jumlah Peserta Terdaftar</td><td className="align-top">: {students.length} siswa</td></tr>
             <tr><td className="py-0.5 align-top">Hadir</td><td className="align-top">: {present} siswa</td></tr>
@@ -196,7 +196,7 @@ export function ParticipantCards({ school, exam, students }: { school: School; e
               <table className="flex-1 text-[10px]">
                 <tbody>
                   <tr><td className="py-0.5 align-top w-16">Nama</td><td className="align-top font-semibold">: {s.name}</td></tr>
-                  <tr><td className="py-0.5 align-top">NIS</td><td className="align-top">: {s.nis ?? "—"}</td></tr>
+                  <tr><td className="py-0.5 align-top">NIS</td><td className="align-top">: {s.nis ?? "-"}</td></tr>
                   <tr><td className="py-0.5 align-top">Kelas</td><td className="align-top">: {s.className}</td></tr>
                   <tr><td className="py-0.5 align-top">Ujian</td><td className="align-top">: {examTypeLabel[exam.examType] ?? exam.examType}</td></tr>
                 </tbody>
@@ -207,7 +207,7 @@ export function ParticipantCards({ school, exam, students }: { school: School; e
             <div className="mt-2 border-t border-gray-400 pt-1.5 text-[9px]">
               <p>Mapel: {exam.subject.name}</p>
               <p>Tanggal: {fmtDate(exam.startAt)}</p>
-              <p>Waktu: {fmtTime(exam.startAt)} – {fmtTime(exam.endAt)} WIB</p>
+              <p>Waktu: {fmtTime(exam.startAt)} - {fmtTime(exam.endAt)} WIB</p>
             </div>
           </div>
         ))}

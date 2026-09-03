@@ -1,5 +1,5 @@
 /**
- * Modul BK — tindak lanjut: kunjungan rumah, pemanggilan orang tua, agenda,
+ * Modul BK - tindak lanjut: kunjungan rumah, pemanggilan orang tua, agenda,
  * dan rekap laporan.
  *
  * Ambang poin → rekomendasi SP tetap di `src/lib/bk-points.ts` karena aturan
@@ -172,7 +172,7 @@ export async function getAgenda() {
       .map((s) => ({
         id: s.id,
         kind: "Pemanggilan",
-        title: `${s.level} — ${s.reason}`,
+        title: `${s.level} - ${s.reason}`,
         date: s.meetingDate as Date,
         studentName: s.student.user.name,
         className: s.student.class?.name ?? "-",

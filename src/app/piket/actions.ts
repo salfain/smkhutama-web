@@ -3,8 +3,8 @@
 /**
  * Server action halaman piket.
  *
- * Query-nya sekarang dipinjam dari `@/server/modules/piket/service` — sumber
- * yang sama dengan route API — sehingga tidak ada lagi dua salinan query yang
+ * Query-nya sekarang dipinjam dari `@/server/modules/piket/service` - sumber
+ * yang sama dengan route API - sehingga tidak ada lagi dua salinan query yang
  * bisa berbeda diam-diam. File ini menyisakan urusan yang memang milik web:
  * cek sesi cookie, parsing FormData, dan `revalidatePath`.
  */

@@ -18,7 +18,7 @@ export default async function SchoolProfilePage() {
         <div>
           <h1 className="font-heading text-2xl font-bold text-gray-900">Profil Sekolah</h1>
           <p className="text-sm text-gray-500">
-            {profile ? "Edit identitas sekolah" : "Belum ada profil – isi data sekolah sekarang"}
+            {profile ? "Edit identitas sekolah" : "Belum ada profil - isi data sekolah sekarang"}
           </p>
         </div>
       </div>

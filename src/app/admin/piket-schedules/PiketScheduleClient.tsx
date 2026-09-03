@@ -78,7 +78,7 @@ export function PiketScheduleClient({
         </Button>
       </div>
 
-      {/* Tampilkan per hari (Senin–Sabtu) */}
+      {/* Tampilkan per hari (Senin-Sabtu) */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {[1, 2, 3, 4, 5, 6].map((d) => (
           <div key={d} className="rounded-xl border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm overflow-hidden">

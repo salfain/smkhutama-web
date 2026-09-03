@@ -69,7 +69,7 @@ export function ProfileForm({ profile }: { profile: MyProfile }) {
         </div>
       </div>
 
-      {/* Identitas resmi — dikelola admin, siswa hanya membaca. */}
+      {/* Identitas resmi - dikelola admin, siswa hanya membaca. */}
       <section className="rounded-2xl border bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
           <Lock className="h-4 w-4 text-gray-400" /> Identitas Resmi
@@ -77,8 +77,8 @@ export function ProfileForm({ profile }: { profile: MyProfile }) {
         <div className="grid gap-3 sm:grid-cols-2">
           <ReadOnly label="Nama Lengkap" value={profile.name} />
           <ReadOnly label="Kelas / Jurusan" value={`${profile.className} · ${profile.major}`} />
-          <ReadOnly label="NISN" value={profile.nisn || "—"} />
-          <ReadOnly label="NIS" value={profile.nis || "—"} />
+          <ReadOnly label="NISN" value={profile.nisn || "-"} />
+          <ReadOnly label="NIS" value={profile.nis || "-"} />
         </div>
         <p className="mt-2 text-xs text-gray-400">
           Data ini mengikuti Dapodik. Bila keliru, laporkan ke guru BK atau admin.

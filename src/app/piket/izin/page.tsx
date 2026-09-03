@@ -5,7 +5,7 @@ import { PermitClient } from "./PermitClient";
 import { PiketDateFilter } from "@/components/piket/PiketDateFilter";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Izin Keluar/Masuk – Piket" };
+export const metadata = { title: "Izin Keluar/Masuk - Piket" };
 
 export default async function IzinPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   await requirePiketAuth();
@@ -32,7 +32,7 @@ export default async function IzinPage({ searchParams }: { searchParams: Promise
         records={records.map((r) => ({
           id: r.id,
           studentName: r.student.user.name,
-          className: r.student.class?.name ?? "—",
+          className: r.student.class?.name ?? "-",
           reason: r.reason,
           exitTime: r.exitTime,
           returnTime: r.returnTime,
@@ -41,7 +41,7 @@ export default async function IzinPage({ searchParams }: { searchParams: Promise
         students={students.map((s) => ({
           id: s.id,
           name: s.user.name,
-          className: s.class?.name ?? "—",
+          className: s.class?.name ?? "-",
           nis: s.nis,
         }))}
       />

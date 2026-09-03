@@ -3,7 +3,7 @@ import { requireApiAuth } from "@/lib/api-auth";
 import { VIOLATION_LOCK_THRESHOLD, recordViolation } from "@/server/modules/cbt/exam-session";
 
 /**
- * Endpoint versi lama — mobile melaporkan pelanggaran (misal siswa keluar
+ * Endpoint versi lama - mobile melaporkan pelanggaran (misal siswa keluar
  * aplikasi). Server menambah counter dan mengunci attempt bila melewati
  * ambang batas.
  * Penggantinya: POST /api/v1/cbt/student/exams/{id}/violation.

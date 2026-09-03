@@ -12,7 +12,7 @@ import { requirePiketAuth } from "@/lib/session";
 import { getDashboardSummary } from "../actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Dashboard Piket – SMK Hutama" };
+export const metadata = { title: "Dashboard Piket - SMK Hutama" };
 
 export default async function PiketDashboardPage() {
   const user = await requirePiketAuth();
@@ -57,11 +57,11 @@ export default async function PiketDashboardPage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[#0A0A0A] dark:text-[#F5F5F7]">{permit.student.user.name}</p>
                       <p className="mt-1 truncate text-xs text-[#6B6B6B] dark:text-[#A7A7AE]">
-                        {permit.student.class?.name ?? "—"} · {permit.reason}
+                        {permit.student.class?.name ?? "-"} · {permit.reason}
                       </p>
                     </div>
                     <time className="shrink-0 font-mono text-xs text-[#9C9C9C]">
-                      {permit.exitTime ? new Date(permit.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                      {permit.exitTime ? new Date(permit.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-"}
                     </time>
                   </div>
                 ))}

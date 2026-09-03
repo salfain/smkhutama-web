@@ -86,13 +86,13 @@ export function AttendanceClient({
                 <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
                   <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{r.teacherName}</td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.className}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.period ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.period ?? "-"}</td>
                   <td className="px-4 py-3">
                     <Badge className={`text-xs hover:opacity-100 ${statusStyle[r.status] ?? ""}`}>
                       {statusLabel[r.status] ?? r.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.substitute ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{r.substitute ?? "-"}</td>
                   <td className="px-4 py-3 text-right">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={() => remove(r.id)} disabled={pending}>
                       <Trash2 className="h-3.5 w-3.5" />

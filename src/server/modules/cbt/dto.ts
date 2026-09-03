@@ -1,5 +1,5 @@
 /**
- * Modul CBT — pemetaan record Prisma ke bentuk JSON API.
+ * Modul CBT - pemetaan record Prisma ke bentuk JSON API.
  *
  * Bentuknya sama persis dengan response route lama supaya aplikasi mobile
  * yang sudah beredar tidak perlu berubah saat pindah ke `/api/v1`.
@@ -131,7 +131,7 @@ export function toAttemptReview(attempt: AttemptReview) {
   return {
     student: {
       name: attempt.student.user.name,
-      class: attempt.student.class?.name ?? "—",
+      class: attempt.student.class?.name ?? "-",
       nis: attempt.student.nis,
     },
     exam: {
@@ -181,7 +181,7 @@ export function toMonitoring(exam: MonitoredExam, attempts: MonitoredAttempt[]) 
     participants: attempts.map((attempt) => ({
       attemptId: attempt.id,
       studentName: attempt.student.user.name,
-      className: attempt.student.class?.name ?? "—",
+      className: attempt.student.class?.name ?? "-",
       status: attempt.status,
       answeredCount: attempt._count.answers,
       startedAt: attempt.startedAt,
@@ -199,7 +199,7 @@ export function toEssayAnswer(answer: EssayAnswer) {
     questionText: answer.question.questionText,
     subjectCode: answer.question.subject.code,
     studentName: answer.attempt.student.user.name,
-    className: answer.attempt.student.class?.name ?? "—",
+    className: answer.attempt.student.class?.name ?? "-",
     examTitle: answer.attempt.exam.title,
   };
 }

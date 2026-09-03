@@ -1,12 +1,12 @@
 /**
- * Modul Piket — lapisan service.
+ * Modul Piket - lapisan service.
  *
  * Satu-satunya tempat query Prisma untuk guru piket. Dipakai bersama oleh:
  *   - route API v1  : `src/app/api/v1/piket/**`
  *   - route API lama: `src/app/api/piket/**` (bentuk response dipertahankan)
  *   - server action : `src/app/piket/actions.ts` (halaman web)
  *
- * Service ini tidak tahu-menahu soal HTTP, cookie, atau `revalidatePath` —
+ * Service ini tidak tahu-menahu soal HTTP, cookie, atau `revalidatePath` -
  * urusan itu tetap di route handler dan server action masing-masing.
  */
 
@@ -172,7 +172,7 @@ export async function createPermit(input: CreatePermitInput) {
 
 /**
  * Satu catatan izin beserta identitas siswa dan nama petugas piket yang
- * mencatatnya — untuk surat izin keluar yang dicetak.
+ * mencatatnya - untuk surat izin keluar yang dicetak.
  */
 export async function getPermitForPrint(id: string) {
   const permit = await prisma.studentPermit.findUnique({

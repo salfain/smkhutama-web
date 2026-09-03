@@ -156,7 +156,7 @@ export function CasesClient({ cases, students }: { cases: Case[]; students: Stud
               <Select value={studentId} onValueChange={setStudentId}>
                 <SelectTrigger><SelectValue placeholder="Pilih siswa" /></SelectTrigger>
                 <SelectContent>
-                  {students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} — {s.className}</SelectItem>)}
+                  {students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} - {s.className}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

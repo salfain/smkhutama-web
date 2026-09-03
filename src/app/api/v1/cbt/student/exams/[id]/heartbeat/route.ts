@@ -8,7 +8,7 @@ import { attemptNotFound } from "@/server/modules/cbt/http-errors";
  * POST /api/v1/cbt/student/exams/{id}/heartbeat
  *
  * Denyut tiap ~30 detik selama ujian. Attempt yang sudah selesai atau
- * terkunci bukan error — klien perlu tahu keadaannya, bukan gagal.
+ * terkunci bukan error - klien perlu tahu keadaannya, bukan gagal.
  */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   return handle(async () => {

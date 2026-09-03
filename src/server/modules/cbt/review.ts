@@ -1,9 +1,9 @@
 /**
- * Modul CBT — pembahasan lembar jawaban satu attempt.
+ * Modul CBT - pembahasan lembar jawaban satu attempt.
  *
  * Dipakai dialog tinjau jawaban di halaman hasil siswa maupun guru. Isinya
  * memuat kunci jawaban, jadi pemanggil wajib memastikan penanya berhak
- * melihatnya — lihat `canReviewAttempt`.
+ * melihatnya - lihat `canReviewAttempt`.
  */
 
 import { prisma } from "@/lib/prisma";

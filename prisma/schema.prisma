@@ -355,7 +355,7 @@ model Student {
   address    String?
   parentPhone String?  @map("parent_phone")
   photoUrl   String?   @map("photo_url")
-  /// Data kesehatan — sensitif, hanya BK yang boleh membaca.
+  /// Data kesehatan - sensitif, hanya BK yang boleh membaca.
   medicalHistory String? @map("medical_history")
 
   profileStatus      StudentProfileStatus @default(DRAFT) @map("profile_status")

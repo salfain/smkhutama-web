@@ -4,7 +4,7 @@ import { requireStudent } from "@/server/auth";
 import { listExams } from "@/server/modules/cbt/student";
 import { toExamListItem } from "@/server/modules/cbt/dto";
 
-/** GET /api/v1/cbt/student/exams — ujian untuk kelas siswa. */
+/** GET /api/v1/cbt/student/exams - ujian untuk kelas siswa. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     const { student } = await requireStudent(req);

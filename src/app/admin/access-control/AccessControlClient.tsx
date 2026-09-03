@@ -298,7 +298,7 @@ function AssignmentsPanel({ data, user }: { data: Data; user: Data["users"][numb
                       {assignment.academicYear && <span>{assignment.academicYear.year} · {semesterLabel(assignment.academicYear.semester)}</span>}
                       {assignment.class && <span>Kelas {assignment.class.name}</span>}
                       {assignment.major && <span>{assignment.major.code} · {assignment.major.name}</span>}
-                      {(start || end) && <span>{start ?? "Sekarang"} – {end ?? "seterusnya"}</span>}
+                      {(start || end) && <span>{start ?? "Sekarang"} - {end ?? "seterusnya"}</span>}
                     </div>
                     {assignment.note && <p className="mt-2 text-xs text-gray-400">{assignment.note}</p>}
                   </div>

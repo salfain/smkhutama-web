@@ -5,7 +5,7 @@ import { listTeacherExams } from "@/server/modules/cbt/teacher";
 import { toTeacherExam } from "@/server/modules/cbt/dto";
 
 /**
- * GET /api/v1/cbt/teacher/exams — ujian milik guru.
+ * GET /api/v1/cbt/teacher/exams - ujian milik guru.
  *
  * Hanya baca. Pembuatan, aktivasi, dan penghapusan ujian beserta tokennya
  * dikelola admin lewat halaman web, jadi tidak ada padanan tulisnya di sini.

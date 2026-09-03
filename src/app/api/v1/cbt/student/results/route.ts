@@ -4,7 +4,7 @@ import { requireStudent } from "@/server/auth";
 import { listResults } from "@/server/modules/cbt/student";
 import { toResult } from "@/server/modules/cbt/dto";
 
-/** GET /api/v1/cbt/student/results — hasil ujian yang sudah dikirim. */
+/** GET /api/v1/cbt/student/results - hasil ujian yang sudah dikirim. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     const { student } = await requireStudent(req);

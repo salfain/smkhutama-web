@@ -4,7 +4,7 @@ import { requireCounselorAccess } from "@/server/auth";
 import { listStudentsWithPoints } from "@/server/modules/bk/service";
 import { toStudentWithPoints } from "@/server/modules/bk/dto";
 
-/** GET /api/v1/bk/counselor/students/book — buku siswa beserta akumulasi poin. */
+/** GET /api/v1/bk/counselor/students/book - buku siswa beserta akumulasi poin. */
 export async function GET(req: NextRequest) {
   return handle(async () => {
     await requireCounselorAccess(req);

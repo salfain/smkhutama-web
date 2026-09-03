@@ -4,7 +4,7 @@
  * Browser mengirim string `datetime-local` tanpa informasi timezone,
  * misalnya "2026-06-18T09:00". JavaScript `new Date("2026-06-18T09:00")`
  * memperlakukannya sebagai UTC, sehingga di server (UTC) jam 09:00
- * sebenarnya berarti 16:00 WIB — salah 7 jam.
+ * sebenarnya berarti 16:00 WIB - salah 7 jam.
  *
  * `parseWIB` menambahkan offset +07:00 secara eksplisit agar waktu
  * yang diinput guru/admin selalu diinterpretasikan sebagai WIB.

@@ -8,7 +8,7 @@ import { PageHero } from "@/components/landing/PageHero";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Ekstrakurikuler – SMK Hutama" };
+export const metadata = { title: "Ekstrakurikuler - SMK Hutama" };
 
 const ICONS: Record<string, LucideIcon> = {
   Tent, Trophy, Volleyball, Flag, Moon, Languages, Music, Sparkles, HeartPulse,

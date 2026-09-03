@@ -1,5 +1,5 @@
 /**
- * Modul BK — lapisan service inti.
+ * Modul BK - lapisan service inti.
  *
  * Berisi query dan aturan bisnis untuk siswa binaan, sesi konseling, catatan
  * pelanggaran, prestasi, dan permohonan konseling. Angket ada di `surveys.ts`,
@@ -72,7 +72,7 @@ export async function listStudents() {
   });
 }
 
-/** Daftar siswa lengkap dengan akumulasi poin — dipakai "buku siswa". */
+/** Daftar siswa lengkap dengan akumulasi poin - dipakai "buku siswa". */
 export async function listStudentsWithPoints() {
   return prisma.student.findMany({
     include: { ...STUDENT_WITH_CLASS, ...POINT_COLUMNS },

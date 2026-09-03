@@ -5,7 +5,7 @@ import { GraduationCap } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Program Keahlian – SMK Hutama" };
+export const metadata = { title: "Program Keahlian - SMK Hutama" };
 
 export default async function JurusanPage() {
   const { majors } = await getLandingContent().catch(() => ({ majors: [] }));

@@ -4,7 +4,7 @@ import { StatusChecker } from "./StatusChecker";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Cek Status PPDB – SMK Hutama" };
+export const metadata = { title: "Cek Status PPDB - SMK Hutama" };
 
 export default function PpdbStatusPage() {
   return (

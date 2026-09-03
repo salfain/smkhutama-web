@@ -2,7 +2,7 @@ import { ChangePasswordForm } from "@/app/profile/change-password/ChangePassword
 import { requireAdminArea } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Ganti Password — Admin" };
+export const metadata = { title: "Ganti Password - Admin" };
 
 export default async function AdminChangePasswordPage() {
   await requireAdminArea();

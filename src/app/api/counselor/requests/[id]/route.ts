@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-auth";
 import { REQUEST_STATUSES, type RequestStatus, respondRequest } from "@/server/modules/bk/service";
 
-// Endpoint versi lama — tanggapi / ubah status permohonan.
+// Endpoint versi lama - tanggapi / ubah status permohonan.
 // Penggantinya: PATCH /api/v1/bk/counselor/requests/{id}.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const r = await requireApiAuth(req, "COUNSELOR");

@@ -106,7 +106,7 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
               <div className="mt-2 flex gap-4 text-xs">
                 <span className="text-green-600 font-semibold">✓ {correct} Benar</span>
                 <span className="text-red-500 font-semibold">✗ {wrong} Salah</span>
-                <span className="text-gray-500">— {empty} Kosong</span>
+                <span className="text-gray-500">{empty} Kosong</span>
                 <span className="text-gray-400">Total: {totalQ} soal</span>
               </div>
             </div>
@@ -201,7 +201,7 @@ export function AnswerReviewDialog({ open, onClose, attemptId, showCorrectAnswer
                   <div className="rounded-lg bg-gray-50 border p-3">
                     <p className="text-xs font-semibold text-gray-500 mb-1">Jawaban Siswa:</p>
                     <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                      {q.studentAnswer?.answerText || <span className="text-gray-400 italic">— Tidak ada jawaban —</span>}
+                      {q.studentAnswer?.answerText || <span className="text-gray-400 italic">Tidak ada jawaban</span>}
                     </p>
                     {q.studentAnswer?.score !== null && q.studentAnswer?.score !== undefined && (
                       <p className="mt-2 text-sm font-bold text-purple-600">Skor: {q.studentAnswer.score}/100</p>

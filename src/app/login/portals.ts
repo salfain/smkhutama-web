@@ -1,7 +1,7 @@
 import { GraduationCap, Users, ShieldCheck, HeartHandshake, ClipboardList } from "lucide-react";
 
 /**
- * Tabel portal login — satu sumber untuk route, formulir, dan validasi server.
+ * Tabel portal login - satu sumber untuk route, formulir, dan validasi server.
  *
  * Tiap portal adalah satu pintu masuk dengan URL sendiri (`/login/siswa`,
  * `/login/guru`, …) sehingga tautannya bisa dibagikan langsung ke kelompok
@@ -31,7 +31,7 @@ export type Portal = "siswa" | "guru" | "staf" | "sibikons" | "piket";
 /** Portal CBT ditampilkan sebagai satu kelompok di halaman pemilih. */
 export const PORTAL_GROUPS: { label: string; hint: string; portals: Portal[] }[] = [
   {
-    label: "CBT — Ujian Online",
+    label: "CBT - Ujian Online",
     hint: "Sistem ujian digital sekolah",
     portals: ["siswa", "guru", "staf"],
   },
@@ -45,7 +45,7 @@ export const PORTAL_GROUPS: { label: string; hint: string; portals: Portal[] }[]
 export const portalPath = (portal: Portal) => `/login/${portal}`;
 
 /**
- * Warna per portal ditulis sebagai kelas utuh — Tailwind memindai kelas secara
+ * Warna per portal ditulis sebagai kelas utuh - Tailwind memindai kelas secara
  * statis, jadi nama kelas tidak boleh dirangkai dari potongan string.
  */
 const themes = {
@@ -168,7 +168,7 @@ export const portals: Record<Portal, PortalDef> = {
   },
   sibikons: {
     name: "Login SIBIKONS",
-    title: "SIBIKONS — Bimbingan Konseling",
+    title: "SIBIKONS - Bimbingan Konseling",
     subtitle: "Untuk Guru BK dan Siswa",
     button: "Masuk ke SIBIKONS",
     audience: "Guru BK · Siswa",
@@ -201,7 +201,7 @@ export const portals: Record<Portal, PortalDef> = {
 /**
  * Portal yang sebaiknya dipakai oleh sebuah peran.
  *
- * Dipakai untuk mengarahkan pengguna yang membuka pintu keliru — kredensialnya
+ * Dipakai untuk mengarahkan pengguna yang membuka pintu keliru - kredensialnya
  * benar, hanya salah halaman, jadi lebih baik ditunjukkan pintu yang tepat
  * daripada sekadar ditolak. Portal khusus (SIBIKONS, piket) sengaja tidak
  * disarankan otomatis karena punya syarat tambahan sendiri.

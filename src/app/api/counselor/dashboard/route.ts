@@ -3,7 +3,7 @@ import { requireApiAuth } from "@/lib/api-auth";
 import { getCounselorDashboard } from "@/server/modules/bk/service";
 import { toDashboard } from "@/server/modules/bk/dto";
 
-// Endpoint versi lama — bentuk response dipertahankan untuk klien yang sudah
+// Endpoint versi lama - bentuk response dipertahankan untuk klien yang sudah
 // beredar. Penggantinya: /api/v1/bk/counselor/dashboard (yang juga memuat
 // `topStudents`). Lihat docs/api-v1-plan.md.
 export async function GET(req: NextRequest) {

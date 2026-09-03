@@ -157,7 +157,7 @@ async function parseAndValidate(formData: FormData): Promise<{ data: AssignmentI
     return { error: "Tahun ajaran, guru, mata pelajaran, dan kelas wajib dipilih." };
   }
   if (!Number.isInteger(weeklyPeriods) || weeklyPeriods < 1 || weeklyPeriods > 48) {
-    return { error: "Jumlah jam pelajaran per minggu harus antara 1–48 JP." };
+    return { error: "Jumlah jam pelajaran per minggu harus antara 1-48 JP." };
   }
 
   const [academicYear, teacher, subject, targetClass] = await Promise.all([

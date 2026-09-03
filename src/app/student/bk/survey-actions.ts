@@ -5,8 +5,8 @@
  * Query-nya dipinjam dari `@/server/modules/bk/surveys`.
  *
  * Catatan: form web menyimpan pertanyaan yang dilewati sebagai nilai 0,
- * sedangkan API v1 menolak nilai di luar 1–4. Perbedaan ini disengaja agar
- * perilaku halaman yang sudah berjalan tidak berubah — lihat bagian utang
+ * sedangkan API v1 menolak nilai di luar 1-4. Perbedaan ini disengaja agar
+ * perilaku halaman yang sudah berjalan tidak berubah - lihat bagian utang
  * teknis di docs/api-v1-plan.md.
  */
 

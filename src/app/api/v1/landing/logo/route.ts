@@ -4,7 +4,7 @@ import { preflight } from "@/server/http";
 import { readSchoolLogo } from "@/server/modules/shared/assets";
 
 /**
- * GET /api/v1/landing/logo — logo sekolah. Publik.
+ * GET /api/v1/landing/logo - logo sekolah. Publik.
  *
  * Mengembalikan gambar, bukan JSON. Bila logo belum diunggah, dialihkan ke
  * favicon bawaan supaya klien selalu mendapat gambar yang bisa ditampilkan.

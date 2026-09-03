@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Laporan Sesi Konseling" };
 
 function fmtDate(d: Date | string | null) {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleDateString("id-ID", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
@@ -58,8 +58,8 @@ export default async function CasePrintPage({ params }: { params: Promise<{ id: 
         <table className="mt-6 w-full text-sm">
           <tbody>
             <tr><td className="w-44 py-1 font-medium">Nama Siswa</td><td className="w-3 py-1">:</td><td className="py-1 font-semibold">{c.student.user.name}</td></tr>
-            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{c.student.class?.name ?? "—"}</td></tr>
-            <tr><td className="w-44 py-1 font-medium">Jurusan</td><td className="w-3 py-1">:</td><td className="py-1">{c.student.major?.name ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{c.student.class?.name ?? "-"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Jurusan</td><td className="w-3 py-1">:</td><td className="py-1">{c.student.major?.name ?? "-"}</td></tr>
             <tr><td className="w-44 py-1 font-medium">Tanggal Sesi</td><td className="w-3 py-1">:</td><td className="py-1">{fmtDate(c.sessionDate)}</td></tr>
             <tr><td className="w-44 py-1 font-medium">Topik</td><td className="w-3 py-1">:</td><td className="py-1">{c.title}</td></tr>
             <tr><td className="w-44 py-1 font-medium">Jenis Konseling</td><td className="w-3 py-1">:</td><td className="py-1">{typeLabel[c.type] ?? c.type}</td></tr>

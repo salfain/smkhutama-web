@@ -5,7 +5,7 @@ import { RevealContainer, RevealCard } from "@/components/landing/Reveal";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Galeri – SMK Hutama" };
+export const metadata = { title: "Galeri - SMK Hutama" };
 
 export default async function GaleriPage() {
   const photos = await listGallery();

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Laporan Kunjungan Rumah" };
 
 function fmtDate(d: Date | string | null) {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleDateString("id-ID", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
@@ -55,10 +55,10 @@ export default async function HomeVisitPrintPage({ params }: { params: Promise<{
         <table className="mt-4 w-full text-sm">
           <tbody>
             <tr><td className="w-44 py-1 font-medium">Nama Siswa</td><td className="w-3 py-1">:</td><td className="py-1 font-semibold">{visit.student.user.name}</td></tr>
-            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{visit.student.class?.name ?? "—"}</td></tr>
-            <tr><td className="w-44 py-1 font-medium">Jurusan</td><td className="w-3 py-1">:</td><td className="py-1">{visit.student.major?.name ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Kelas</td><td className="w-3 py-1">:</td><td className="py-1">{visit.student.class?.name ?? "-"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Jurusan</td><td className="w-3 py-1">:</td><td className="py-1">{visit.student.major?.name ?? "-"}</td></tr>
             <tr><td className="w-44 py-1 font-medium">Tanggal Kunjungan</td><td className="w-3 py-1">:</td><td className="py-1">{fmtDate(visit.visitDate)}</td></tr>
-            <tr><td className="w-44 py-1 font-medium">Alamat</td><td className="w-3 py-1">:</td><td className="py-1">{visit.address ?? "—"}</td></tr>
+            <tr><td className="w-44 py-1 font-medium">Alamat</td><td className="w-3 py-1">:</td><td className="py-1">{visit.address ?? "-"}</td></tr>
             <tr><td className="w-44 py-1 font-medium">Tujuan Kunjungan</td><td className="w-3 py-1">:</td><td className="py-1">{visit.purpose}</td></tr>
           </tbody>
         </table>

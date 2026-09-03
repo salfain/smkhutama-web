@@ -1,8 +1,8 @@
 /**
- * Modul CBT — data cetak naskah soal.
+ * Modul CBT - data cetak naskah soal.
  *
  * Berisi kunci jawaban, jadi pemanggil wajib memastikan yang meminta adalah
- * admin atau guru pemilik ujian — lihat `canPrintExam`.
+ * admin atau guru pemilik ujian - lihat `canPrintExam`.
  */
 
 import { prisma } from "@/lib/prisma";

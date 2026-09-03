@@ -191,7 +191,7 @@ export function ClassTable({ classes, majors, teachers }: { classes: Class[]; ma
               <Select value={homeroomTeacherId} onValueChange={setHomeroomTeacherId}>
                 <SelectTrigger><SelectValue placeholder="Pilih wali kelas..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">— Tidak ada —</SelectItem>
+                  <SelectItem value="none">Tidak ada</SelectItem>
                   {teachers.map((t) => (
                     <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                   ))}

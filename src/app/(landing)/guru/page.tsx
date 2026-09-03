@@ -6,7 +6,7 @@ import { PageHero } from "@/components/landing/PageHero";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Data Guru & Tenaga Pendidik – SMK Hutama" };
+export const metadata = { title: "Data Guru & Tenaga Pendidik - SMK Hutama" };
 
 export default async function GuruPage() {
   const teachers: Teacher[] = await listTeachers();

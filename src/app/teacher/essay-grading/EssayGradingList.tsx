@@ -44,7 +44,7 @@ export function EssayGradingList({ essays }: { essays: Essay[] }) {
               <div>
                 <p className="font-semibold text-gray-900">{e.attempt.student.user.name}</p>
                 <p className="text-xs text-gray-400">
-                  {e.attempt.student.class?.name ?? "—"} · {e.attempt.exam.title}
+                  {e.attempt.student.class?.name ?? "-"} · {e.attempt.exam.title}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -65,13 +65,13 @@ export function EssayGradingList({ essays }: { essays: Essay[] }) {
             <div className="mb-4 rounded-lg bg-gray-50 border p-3">
               <p className="text-xs font-semibold text-gray-500 mb-1">Jawaban Siswa:</p>
               <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                {e.answerText || <span className="text-gray-400 italic">— Tidak ada jawaban —</span>}
+                {e.answerText || <span className="text-gray-400 italic">Tidak ada jawaban</span>}
               </p>
             </div>
 
             <div className="flex items-end gap-2">
               <div className="flex-1 space-y-1">
-                <Label htmlFor={`score-${e.id}`}>Nilai (0–100)</Label>
+                <Label htmlFor={`score-${e.id}`}>Nilai (0-100)</Label>
                 <Input
                   id={`score-${e.id}`} type="number" min="0" max="100"
                   defaultValue={e.score ?? ""}

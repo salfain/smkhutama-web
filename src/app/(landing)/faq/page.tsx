@@ -5,7 +5,7 @@ import { FaqAccordion } from "./FaqAccordion";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "FAQ – SMK Hutama" };
+export const metadata = { title: "FAQ - SMK Hutama" };
 
 export default async function FaqPage() {
   const faqs = await listFaq();

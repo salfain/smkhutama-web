@@ -4,7 +4,7 @@
  * Server action halaman ujian siswa (versi web).
  *
  * Aturan akses, siklus attempt, dan penilaiannya dipinjam dari
- * `@/server/modules/cbt/exam-session` — sumber yang sama dengan route API,
+ * `@/server/modules/cbt/exam-session` - sumber yang sama dengan route API,
  * sehingga ujian lewat browser dan lewat aplikasi mobile tidak bisa lagi
  * berbeda aturan.
  */

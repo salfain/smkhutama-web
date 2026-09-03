@@ -3,7 +3,7 @@
 /**
  * Server action pengawasan ujian oleh admin.
  * Query dan kendali attempt-nya dipinjam dari
- * `@/server/modules/cbt/monitoring` — sumber yang sama dengan versi guru.
+ * `@/server/modules/cbt/monitoring` - sumber yang sama dengan versi guru.
  */
 
 import { revalidatePath } from "next/cache";

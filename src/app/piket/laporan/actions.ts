@@ -81,15 +81,15 @@ export async function getLaporanData(dateStr?: string) {
     tardiness: tardiness.map(r => ({
       id: r.id,
       studentName: r.student.user.name,
-      className: r.student.class?.name ?? "—",
+      className: r.student.class?.name ?? "-",
       arrivalTime: r.arrivalTime,
-      reason: r.reason ?? "—",
-      sanction: r.sanction ?? "—",
+      reason: r.reason ?? "-",
+      sanction: r.sanction ?? "-",
     })),
     permits: permits.map(r => ({
       id: r.id,
       studentName: r.student.user.name,
-      className: r.student.class?.name ?? "—",
+      className: r.student.class?.name ?? "-",
       reason: r.reason,
       exitTime: r.exitTime,
       returnTime: r.returnTime,
@@ -100,8 +100,8 @@ export async function getLaporanData(dateStr?: string) {
       teacherName: r.teacher.user.name,
       className: r.class.name,
       status: r.status,
-      period: r.period ?? "—",
-      substitute: r.substitute ?? "—",
+      period: r.period ?? "-",
+      substitute: r.substitute ?? "-",
     })),
     trend,
   };
@@ -142,10 +142,10 @@ export async function exportLaporanPiket(dateStr?: string) {
   const rowsTard = tardiness.map((r, i) => ({
     no: i + 1,
     nama: r.student.user.name,
-    kelas: r.student.class?.name ?? "—",
-    waktu_tiba: r.arrivalTime ? new Date(r.arrivalTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—",
-    alasan: r.reason ?? "—",
-    sanksi: r.sanction ?? "—",
+    kelas: r.student.class?.name ?? "-",
+    waktu_tiba: r.arrivalTime ? new Date(r.arrivalTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
+    alasan: r.reason ?? "-",
+    sanksi: r.sanction ?? "-",
   }));
 
   // Sheet 2: Izin keluar
@@ -155,10 +155,10 @@ export async function exportLaporanPiket(dateStr?: string) {
   const rowsPermit = permits.map((r, i) => ({
     no: i + 1,
     nama: r.student.user.name,
-    kelas: r.student.class?.name ?? "—",
+    kelas: r.student.class?.name ?? "-",
     alasan: r.reason,
-    jam_keluar: r.exitTime ? new Date(r.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—",
-    jam_kembali: r.returnTime ? new Date(r.returnTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "—",
+    jam_keluar: r.exitTime ? new Date(r.exitTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
+    jam_kembali: r.returnTime ? new Date(r.returnTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
     status: statusLabel[r.status] ?? r.status,
   }));
 
@@ -170,9 +170,9 @@ export async function exportLaporanPiket(dateStr?: string) {
     no: i + 1,
     nama_guru: r.teacher.user.name,
     kelas: r.class.name,
-    jam_ke: r.period ?? "—",
+    jam_ke: r.period ?? "-",
     status: attendanceLabel[r.status] ?? r.status,
-    pengganti: r.substitute ?? "—",
+    pengganti: r.substitute ?? "-",
   }));
 
   const ExcelJS = (await import("exceljs")).default;
@@ -182,7 +182,7 @@ export async function exportLaporanPiket(dateStr?: string) {
   // Helper buat sheet
   function makeSheet(sheetName: string, columns: { header: string; key: string; width: number }[], rows: Record<string, string | number>[]) {
     const ws = wb.addWorksheet(sheetName);
-    ws.addRow([`LAPORAN PIKET — ${sheetName.toUpperCase()}`]);
+    ws.addRow([`LAPORAN PIKET - ${sheetName.toUpperCase()}`]);
     ws.addRow([`Tanggal: ${label}`]);
     ws.addRow([]);
 

@@ -91,8 +91,8 @@ export function RegistrationsClient({ registrations }: { registrations: Reg[] })
                     <td className="px-3 py-2.5 text-gray-400 text-xs">{i + 1}</td>
                     <td className="px-3 py-2.5 font-mono text-xs text-gray-600">{r.registNumber}</td>
                     <td className="px-3 py-2.5 font-medium text-gray-900">{r.fullName}</td>
-                    <td className="px-3 py-2.5 text-gray-600">{r.selectedMajor ?? "—"}</td>
-                    <td className="px-3 py-2.5 text-gray-600 text-xs">{r.phone ?? "—"}</td>
+                    <td className="px-3 py-2.5 text-gray-600">{r.selectedMajor ?? "-"}</td>
+                    <td className="px-3 py-2.5 text-gray-600 text-xs">{r.phone ?? "-"}</td>
                     <td className="px-3 py-2.5 text-gray-500 text-xs">{new Date(r.createdAt).toLocaleDateString("id-ID")}</td>
                     <td className="px-3 py-2.5">
                       <Badge className={`text-xs hover:opacity-100 ${statusStyle[r.status] ?? ""}`}>
@@ -129,14 +129,14 @@ export function RegistrationsClient({ registrations }: { registrations: Reg[] })
               <div className="rounded-xl bg-gray-50 border p-4 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-gray-500">No. Pendaftaran</span><span className="font-mono font-semibold">{detail.registNumber}</span></div>
                 <div className="flex justify-between"><span className="text-gray-500">Nama</span><span className="font-semibold">{detail.fullName}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">NISN</span><span>{detail.nisn ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Jenis Kelamin</span><span>{detail.gender === "MALE" ? "Laki-laki" : detail.gender === "FEMALE" ? "Perempuan" : "—"}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">No. HP</span><span>{detail.phone ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Email</span><span>{detail.email ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Asal Sekolah</span><span>{detail.originSchool ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Pilihan Jurusan</span><span className="font-semibold">{detail.selectedMajor ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Orang Tua</span><span>{detail.parentName ?? "—"} · {detail.parentPhone ?? ""}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Alamat</span><span className="text-right max-w-[200px]">{detail.address ?? "—"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">NISN</span><span>{detail.nisn ?? "-"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Jenis Kelamin</span><span>{detail.gender === "MALE" ? "Laki-laki" : detail.gender === "FEMALE" ? "Perempuan" : "-"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">No. HP</span><span>{detail.phone ?? "-"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Email</span><span>{detail.email ?? "-"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Asal Sekolah</span><span>{detail.originSchool ?? "-"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Pilihan Jurusan</span><span className="font-semibold">{detail.selectedMajor ?? "-"}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Orang Tua</span><span>{detail.parentName ?? "-"} · {detail.parentPhone ?? ""}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Alamat</span><span className="text-right max-w-[200px]">{detail.address ?? "-"}</span></div>
               </div>
 
               <div className="space-y-2">

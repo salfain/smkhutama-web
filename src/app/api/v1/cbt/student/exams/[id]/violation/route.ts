@@ -9,7 +9,7 @@ import { attemptNotFound } from "@/server/modules/cbt/http-errors";
  *
  * Laporan pelanggaran dari klien, mis. siswa berpindah aplikasi. Pelanggaran
  * yang terjadi saat offline dikirim menyusul lewat `offlineCount`.
- * Attempt yang sudah terkunci atau selesai dijawab apa adanya, bukan error —
+ * Attempt yang sudah terkunci atau selesai dijawab apa adanya, bukan error -
  * klien tidak boleh gagal hanya karena melapor terlambat.
  */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {

@@ -99,7 +99,7 @@ export function TeacherResultsClient({ exams }: { exams: Exam[] }) {
                                         : "bg-red-100 text-red-600 border-red-200 hover:bg-red-100"}>
                                         {lulus ? "Lulus" : "Tidak Lulus"}
                                       </Badge>
-                                    ) : <span className="text-xs text-gray-400">—</span>}
+                                    ) : <span className="text-xs text-gray-400">-</span>}
                                   </td>
                                 )}
                                 <td className="py-2 text-center">

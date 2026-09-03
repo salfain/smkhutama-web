@@ -1,5 +1,5 @@
 /**
- * Modul Landing — bentuk JSON untuk klien luar.
+ * Modul Landing - bentuk JSON untuk klien luar.
  *
  * Endpoint landing seluruhnya baru, jadi tidak ada bentuk lama yang harus
  * dipertahankan. Yang dipilih di sini: hanya kirim field yang memang dipakai
@@ -82,7 +82,7 @@ export function toFaqItem(item: FaqItem) {
 
 /**
  * Status pendaftaran. Data pribadi pendaftar sengaja tidak dikirim selain
- * nama — nomor pendaftaran bukan rahasia dan bisa ditebak, jadi endpoint ini
+ * nama - nomor pendaftaran bukan rahasia dan bisa ditebak, jadi endpoint ini
  * tidak boleh jadi jalan membocorkan alamat atau nomor telepon.
  */
 export function toRegistrationStatus(registration: Registration) {

@@ -35,7 +35,7 @@ export default async function StudentResultsPage() {
     <StudentResultsClient
       attempts={data}
       studentName={user.name}
-      className={user.student.class?.name ?? "—"}
+      className={user.student.class?.name ?? "-"}
     />
   );
 }

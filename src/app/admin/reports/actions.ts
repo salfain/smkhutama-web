@@ -124,7 +124,7 @@ export async function exportAttendance(examId: string) {
     nis: s.nis ?? "",
     kelas: s.class?.name ?? "",
     hadir: s.attempts[0]?.startedAt ? "✓ Hadir" : "Tidak Hadir",
-    waktu: s.attempts[0]?.startedAt ? new Date(s.attempts[0].startedAt).toLocaleString("id-ID") : "—",
+    waktu: s.attempts[0]?.startedAt ? new Date(s.attempts[0].startedAt).toLocaleString("id-ID") : "-",
     tanda_tangan: "",
   }));
 

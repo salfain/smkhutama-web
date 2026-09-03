@@ -4,7 +4,7 @@
  * CATATAN: batas hari dihitung memakai waktu lokal proses Node
  * (`setHours(0,0,0,0)`), sama persis dengan perilaku route dan server action
  * yang sudah berjalan. Di container produksi TZ-nya UTC, jadi "hari" di sini
- * adalah hari UTC, bukan WIB — pencatatan sebelum pukul 07:00 WIB masih
+ * adalah hari UTC, bukan WIB - pencatatan sebelum pukul 07:00 WIB masih
  * terhitung hari sebelumnya. Perilaku ini sengaja dipertahankan agar migrasi
  * ke API v1 tidak mengubah data; perbaikannya dicatat sebagai pekerjaan
  * terpisah di `docs/api-v1-plan.md`.

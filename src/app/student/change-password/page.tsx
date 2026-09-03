@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Ganti Password — Siswa" };
+export const metadata = { title: "Ganti Password - Siswa" };
 
 export default async function StudentChangePasswordPage() {
   await requireAuth("STUDENT");

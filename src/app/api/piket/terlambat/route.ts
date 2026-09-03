@@ -3,7 +3,7 @@ import { requirePiketApiAuth } from "@/lib/piket-api-auth";
 import { createTardiness, deleteTardiness, listTardiness } from "@/server/modules/piket/service";
 import { toStudentOption, toTardiness } from "@/server/modules/piket/dto";
 
-// Endpoint versi lama — bentuk response dipertahankan untuk aplikasi mobile
+// Endpoint versi lama - bentuk response dipertahankan untuk aplikasi mobile
 // yang sudah beredar. Penggantinya: /api/v1/piket/terlambat.
 export async function GET(req: NextRequest) {
   const r = await requirePiketApiAuth(req);

@@ -57,7 +57,7 @@ const statusInfo = {
 } as const;
 
 function fmtTime(d: Date | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
@@ -127,7 +127,7 @@ export function MonitoringClient({
 
   // Daftar kelas unik di ujian ini (urut alfabet)
   const classNames = Array.from(
-    new Set(rows.map((r) => r.class?.name ?? "—"))
+    new Set(rows.map((r) => r.class?.name ?? "-"))
   ).sort();
 
   // Hitung statistik TOTAL (semua kelas, untuk summary cards)
@@ -141,7 +141,7 @@ export function MonitoringClient({
 
   // Terapkan filter kelas + filter status
   const filtered = rows.filter((r) => {
-    const classMatch = selectedClass === "ALL" || (r.class?.name ?? "—") === selectedClass;
+    const classMatch = selectedClass === "ALL" || (r.class?.name ?? "-") === selectedClass;
     const statusMatch =
       statusFilter === "ALL" ? true
       : statusFilter === "IN_PROGRESS" ? r.statusKey === "IN_PROGRESS" && !r.isLocked
@@ -156,13 +156,13 @@ export function MonitoringClient({
   const groupedByClass = classNames
     .map((cls) => ({
       name: cls,
-      items: filtered.filter((r) => (r.class?.name ?? "—") === cls),
+      items: filtered.filter((r) => (r.class?.name ?? "-") === cls),
     }))
     .filter((g) => g.items.length > 0);
 
   // Statistik per kelas (untuk badge di tab pill)
   function classStats(cls: string) {
-    const clsRows = rows.filter((r) => (r.class?.name ?? "—") === cls);
+    const clsRows = rows.filter((r) => (r.class?.name ?? "-") === cls);
     return {
       total:      clsRows.length,
       inProgress: clsRows.filter((r) => r.statusKey === "IN_PROGRESS").length,
@@ -186,7 +186,7 @@ export function MonitoringClient({
             <SelectTrigger className="w-full sm:w-64"><SelectValue /></SelectTrigger>
             <SelectContent>
               {exams.map((e) => (
-                <SelectItem key={e.id} value={e.id}>{e.subject.code} – {e.title}</SelectItem>
+                <SelectItem key={e.id} value={e.id}>{e.subject.code} - {e.title}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -206,7 +206,7 @@ export function MonitoringClient({
         </div>
       </div>
 
-      {/* Summary cards — selalu total semua kelas */}
+      {/* Summary cards - selalu total semua kelas */}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         {[
           { label: "Total Peserta", value: totalCounts.total,      color: "text-gray-700",  bg: "bg-gray-50",  icon: Monitor,       filter: "ALL" as StatusFilter },
@@ -313,7 +313,7 @@ export function MonitoringClient({
         </div>
       )}
 
-      {/* Participant cards — dikelompokkan per kelas */}
+      {/* Participant cards - dikelompokkan per kelas */}
       {students.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
           <AlertCircle className="mx-auto mb-2 h-8 w-8 text-gray-300" />

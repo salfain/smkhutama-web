@@ -35,7 +35,7 @@ export default async function StudentExamsPage() {
     <div className="mx-auto max-w-3xl p-4 md:p-6">
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold text-gray-900">Ujian Saya</h1>
-        <p className="text-sm text-gray-500">{user.name} · {user.student.class?.name ?? "—"}</p>
+        <p className="text-sm text-gray-500">{user.name} · {user.student.class?.name ?? "-"}</p>
       </div>
       <StudentExamsList exams={exams} />
     </div>

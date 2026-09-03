@@ -12,7 +12,7 @@ import { requireStudent } from "@/server/auth";
 import { saveAnswer } from "@/server/modules/cbt/exam-session";
 import { alreadySubmitted, attemptNotFound } from "@/server/modules/cbt/http-errors";
 
-/** POST /api/v1/cbt/student/answers — simpan satu jawaban. */
+/** POST /api/v1/cbt/student/answers - simpan satu jawaban. */
 export async function POST(req: NextRequest) {
   return handle(async () => {
     const { student } = await requireStudent(req);

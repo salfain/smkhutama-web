@@ -3,8 +3,8 @@
 /**
  * Saklar pintu masuk siswa ke sistem CBT.
  *
- * Nilainya dibaca saat login — web lewat `src/app/login/actions.ts`, aplikasi
- * mobile lewat `@/server/modules/auth/service` — jadi perubahan di sini langsung
+ * Nilainya dibaca saat login - web lewat `src/app/login/actions.ts`, aplikasi
+ * mobile lewat `@/server/modules/auth/service` - jadi perubahan di sini langsung
  * berlaku tanpa perlu deploy ulang.
  */
 
